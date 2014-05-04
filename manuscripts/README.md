@@ -1,0 +1,1 @@
+Manuscript draft for automatic equilibration detection paper.

@@ -1,0 +1,104 @@
+% PRL look and style (easy on the eyes)
+\documentclass[aps,pre,twocolumn,nofootinbib,superscriptaddress,linenumbers]{revtex4-1}
+% Two-column style (for submission/review/editing)
+%\documentclass[aps,prl,preprint,nofootinbib,superscriptaddress,linenumbers]{revtex4-1}
+
+\usepackage{palatino}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+%\usepackage[mathbf,mathcal]{euler}
+%\usepackage{citesort}
+\usepackage{dcolumn}
+\usepackage{boxedminipage}
+\usepackage{verbatim}
+\usepackage[colorlinks=true,citecolor=blue,linkcolor=blue]{hyperref}
+
+
+% The figures are in a figures/ subdirectory.
+\graphicspath{{figures/}}
+
+
+% italicized boldface for math (e.g. vectors)
+\newcommand{\bfv}[1]{{\mbox{\boldmath{$#1$}}}}
+% non-italicized boldface for math (e.g. matrices)
+\newcommand{\bfm}[1]{{\bf #1}}          
+
+%\newcommand{\bfm}[1]{{\mbox{\boldmath{$#1$}}}}
+%\newcommand{\bfm}[1]{{\bf #1}}
+\newcommand{\expect}[1]{\left \langle #1 \right \rangle}                % <.> for denoting expectations over realizations of an experiment or thermal averages
+
+% vectors
+\newcommand{\x}{\bfv{x}}
+\newcommand{\y}{\bfv{y}}
+\newcommand{\f}{\bfv{f}}
+
+\newcommand{\bfc}{\bfm{c}}
+\newcommand{\hatf}{\hat{f}}
+
+\newcommand{\bTheta}{\bfm{\Theta}}
+\newcommand{\btheta}{\bfm{\theta}}
+\newcommand{\bhatf}{\bfm{\hat{f}}}
+\newcommand{\Cov}[1] {\mathrm{cov}\left( #1 \right)}
+\newcommand{\Ept}[1] {{\mathrm E}\left[ #1 \right]}
+\newcommand{\Eptk}[2] {{\mathrm E}\left[ #2 \,|\, #1\right]}
+\newcommand{\T}{\mathrm{T}}                                % T used in matrix transpose
+\newcommand{\conc}[1] {\left[ \mathrm{#1} \right]}
+
+\newcommand{\pyitc}{\url{http://www.simtk.org/home/bayesian-itc}} % URL of pyITC project homepage
+
+%% DOCUMENT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%% TITLE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{A simple method for automatically detecting equilibrated regions in molecular simulations}
+
+\author{John D. Chodera}
+ \thanks{Corresponding author}
+ \email{john.chodera@choderalab.org}
+ \affiliation{Computational Biology Program, Sloan Kettering Institute, Memorial Sloan Kettering Cancer Center, New York, NY 10065}
+
+\date{\today}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ABSTRACT/pacs
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstract}
+Molecular simulations (molecular dynamics, Monte Carlo) are often initiated from configurations that are highly dissimilar to equilibrium samples, a practice which causes the appearance of a distinct initial transient in various mechanical observables computed over the timecourse of the simulation.
+Traditional practice in simulation data analysis recommends this initial transient portion be discarded as \emph{equilibration}, but no simple, general automated procedure exists.
+Here, we consider a simple, automated, easy-to-implement procedure in which the final region of the simulation that maximizes the number of effectively uncorrelated samples is used.
+We present a reference implementation of this procedure and illustrate its application to synthetic and real data.
+
+\emph{Keywords: molecular dynamics (MD); Monte Carlo (MC); Markov chain Monte Carlo (MCMC); equilibration; timeseries analysis; statistical inefficiency; integrated autocorrelation time}
+\end{abstract}
+
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% INTRODUCTION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+\label{section:introduction}
+
+% Molecular simulations generate correlated timeseries data; we can think of this as a realization of an MCMC chain
+% Often, we want to compute an average (expectation) of some property A(x)
+% Standard practice is to discard the initial transient to "equilibration" (a process known in the MCMC literature as "burn-in")
+% In principle, if we run the chain long enough, it will converge to the true mean; no discarding is required (Gelman)
+% In practice, however, starting from highly atypical initial conditions may mean that we need to run for a very long time
+% Often, we're limited in how much data we can collect, so we are faced with the problem of how to make the best of the data we were able to collect
+
+% Other schemes for determining the equilibrated region exist
+% Some are based on statistical hypothesis tests, and assume the data follow a Gaussian form (Wei Yang, Karplus)
+
+% We propose a simple approach: Select the origin of the equilibrated (production) region $t_0$ that maximizes the number of effectively uncorrelated samples
+
+% Aside on computing the effective number of correlated samples and statistical error
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% BIBLIOGRAPHY
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\bibliographystyle{prsty} 
+\bibliography{bayesian-itc.bib}
+
+\end{document}
