@@ -3,7 +3,13 @@
 % Two-column style (for submission/review/editing)
 %\documentclass[aps,prl,preprint,nofootinbib,superscriptaddress,linenumbers]{revtex4-1}
 
-\usepackage{palatino}
+%\usepackage{palatino}
+
+% Change to a sans serif font.
+\usepackage{avant}
+\renewcommand*\familydefault{\sfdefault} %% Only if the base font of the document is to be sans serif
+\usepackage[T1]{fontenc}
+
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{graphicx}
@@ -51,7 +57,7 @@
 \begin{document}
 
 %% TITLE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\title{A simple method for automatically detecting equilibrated regions in molecular simulations}
+\title{A simple method for automated equilibration detection in molecular simulations}
 
 \author{John D. Chodera}
  \thanks{Corresponding author}
