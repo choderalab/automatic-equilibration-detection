@@ -6,7 +6,7 @@
 %\usepackage{palatino}
 
 % Change to a sans serif font.
-\usepackage{avant}
+\usepackage{helvet}
 \renewcommand*\familydefault{\sfdefault} %% Only if the base font of the document is to be sans serif
 \usepackage[T1]{fontenc}
 
@@ -53,10 +53,16 @@
 
 \newcommand{\pyitc}{\url{http://www.simtk.org/home/bayesian-itc}} % URL of pyITC project homepage
 
-%% DOCUMENT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DOCUMENT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{document}
 
-%% TITLE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TITLE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \title{A simple method for automated equilibration detection in molecular simulations}
 
 \author{John D. Chodera}
@@ -66,45 +72,75 @@
 
 \date{\today}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% ABSTRACT/pacs
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ABSTRACT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{abstract}
+
 Molecular simulations (molecular dynamics, Monte Carlo) are often initiated from configurations that are highly dissimilar to equilibrium samples, a practice which causes the appearance of a distinct initial transient in various mechanical observables computed over the timecourse of the simulation.
 Traditional practice in simulation data analysis recommends this initial transient portion be discarded as \emph{equilibration}, but no simple, general automated procedure exists.
 Here, we consider a simple, automated, easy-to-implement procedure in which the final region of the simulation that maximizes the number of effectively uncorrelated samples is used.
-We present a reference implementation of this procedure and illustrate its application to synthetic and real data.
+We present a simple reference Python implementation of this procedure and illustrate its application to both synthetic and real simulation data.\\
 
+% KEYWORDS
 \emph{Keywords: molecular dynamics (MD); Monte Carlo (MC); Markov chain Monte Carlo (MCMC); equilibration; timeseries analysis; statistical inefficiency; integrated autocorrelation time}
+
 \end{abstract}
 
 \maketitle
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % INTRODUCTION
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Introduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Introduction}
 \label{section:introduction}
 
-% Molecular simulations generate correlated timeseries data; we can think of this as a realization of an MCMC chain
-% Often, we want to compute an average (expectation) of some property A(x)
-% Standard practice is to discard the initial transient to "equilibration" (a process known in the MCMC literature as "burn-in")
-% In principle, if we run the chain long enough, it will converge to the true mean; no discarding is required (Gelman)
-% In practice, however, starting from highly atypical initial conditions may mean that we need to run for a very long time
-% Often, we're limited in how much data we can collect, so we are faced with the problem of how to make the best of the data we were able to collect
+Molecular simulations use Markov chain Monte Carlo (MCMC) techniques~\cite{jun-s-liu:mcmc} to sample configurations $x$ from an equilibrium distribution $\pi(x)$, either exactly (using Monte Carlo methods) or approximately (using molecular dynamics simulations).
 
-% Other schemes for determining the equilibrated region exist
-% Some are based on statistical hypothesis tests, and assume the data follow a Gaussian form (Wei Yang, Karplus)
+Due to the nature of the equilibrium distribution $\pi(x)$ and the difficulty in producing a sufficiently good guess of an equilibrium configuration, these molecular simulations are often started from highly atypical initial conditions.
+For example, simulations of biopolymers might be initiated from a fully extended conformation unrepresentative of behavior in solution; solvated systems may be prepared by periodically replicating a small solvent box that was equilibrated with a different forcefield under different conditions from the current simulation, thus yielding atypical densities; 
+liquid mixtures or lipid bilayers may be constructed by using methods that fulfill spatial constraints but create locally aytpical geometries (e.g. PackMol~\cite{martinez:jctc:2009:packmol}) that may require long simulation times to relax to typical configurations.
 
-% We propose a simple approach: Select the origin of the equilibrated (production) region $t_0$ that maximizes the number of effectively uncorrelated samples
+As a result, common practice in molecular simulations is to discard some initial portion of the trajectory to ``equilibration'' (also called \emph{burn-in}\footnote{The term \emph{burn-in} comes from the field of electronics, in which a short ``burn-in'' period is used to ensure that a device is free of faulty components---which often fail quickly---and is operating normally~\cite{crc-mcmc-handbook}.} in MCMC literature~\cite{crc-mcmc-handbook}).
+While this is strictly unnecessary~\cite{geyer:burn-in-unnecessary,crc-mcmc-handbook}, this often allows the practitioner to avoid what would otherwise be extremely long run times to eliminate the bias from the initial atypical starting conditions in computed averages.
 
-% Aside on computing the effective number of correlated samples and statistical error
+As an illustrative example of this effect, consider the simulation shown in {\bf Figure~\ref{figure:burn-in-example}}, in which a simulation of liquid argon is started at an atypically density and allowed to equilibrate to its equilibrium density (see caption for detailed description of simulation methods).
+The expectation of the running average of the density over many realizations of this procedure ({\bf Figure~\ref{figure:burn-in-example}b}) significantly deviates from the actual expectation, which would lead to biased estimates unless simulations were sufficiently long to eliminate this starting point dependent bias.
+Note that this significant bias is present because the \emph{same} atypical starting condition is used for every realization of this simulation process.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+For the purposes of this note, we presume that the goal is to compute some form of equilibrium expectation, <A> from a timeseries average:
+\begin{eqnarray}
+\hat{A} \approx \int_0^T dt \, A(x(t))
+\end{eqnarray}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FIGURE: BURN-IN EXAMPLE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure*} 
+%\resizebox{0.8\textwidth}{!}{\includegraphics{burn-in-example.pdf}}
+\caption{\label{figure:burn-in-example} {\bf Illustration of the motivation for discarding data to equilibration in computing expectations from molecular simulations.} 
+This is text.}
+\end{figure*}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% METHODS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{methods}
+\label{section:methods}
+
+All molecular simulations were performed with OpenMM 6.2~\cite{eastman:jctc:2012:openmm} using the Python API.
+All scripts used to run simulations, analyze data, and generate plots---along with the simulation data itself---are availabile on GitHub at \url{http://github.com/choderalab/automatic-equilibration-detection}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BIBLIOGRAPHY
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%\bibliographystyle{prsty} 
-\bibliography{bayesian-itc.bib}
+\bibliographystyle{prsty} 
+\bibliography{automatic-equilibration-detection}
 
 \end{document}

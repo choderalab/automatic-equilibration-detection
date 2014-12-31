@@ -1,96 +1,51 @@
 This is BibTeX, Version 0.99d (TeX Live 2013)
 Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: automatic-equilibration-detection.aux
-I couldn't open database file bayesian-itc.bib.bib
----line 99 of file automatic-equilibration-detection.aux
- : \bibdata{automatic-equilibration-detectionNotes,bayesian-itc.bib
- :                                                                 }
-I'm skipping whatever remains of this command
-The style file: apsrev4-1.bst
+The style file: prsty.bst
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
-Reallocated singl_function (elt_size=4) to 100 items from 50.
-Reallocated singl_function (elt_size=4) to 100 items from 50.
-Reallocated singl_function (elt_size=4) to 100 items from 50.
-Reallocated singl_function (elt_size=4) to 100 items from 50.
-Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
 Database file #1: automatic-equilibration-detectionNotes.bib
-Warning--I didn't find a database entry for "wiseman:anal-biochem:1989:itc"
-Warning--I didn't find a database entry for "freire:curr-opin-struct-biol:2001:itc"
-Warning--I didn't find a database entry for "salim-feig:methods:2009:itc-rna"
-Warning--I didn't find a database entry for "freire:arch-biochem-biophys:2001"
-Warning--I didn't find a database entry for "klebe:2007:jmb:protonation-state-trypsin"
-Warning--I didn't find a database entry for "klebe:2007:jmb:protonation-state"
-Warning--I didn't find a database entry for "han:2007:biophys-chem:itc-tautomers"
-Warning--I didn't find a database entry for "bonini:jpcb:2008:kinetics-from-itc"
-Warning--I didn't find a database entry for "freire:drug-discovery-today:2008:entropy-enthalpy"
-Warning--I didn't find a database entry for "freire:nat-rev-drug-discovery:2010:itc-lead-optimization"
-Warning--I didn't find a database entry for "tellinghuisen:anal-biochem:2003:statistical-errors-in-itc"
-Warning--I didn't find a database entry for "tellinghuisen:anal-biochem:2004:first-injection-anomaly"
-Warning--I didn't find a database entry for "tellinghuisen:anal-biochem:2004:volume-errors-in-itc"
-Warning--I didn't find a database entry for "tellinghuisen:jpcb:2005:optimizing-experimental-parameters-itc"
-Warning--I didn't find a database entry for "tellinghuisen:jpcb:2007:variable-volume-procedures"
-Warning--I didn't find a database entry for "parody-morreale:meas-sci-technol:1994:itc-assembly-and-response"
-Warning--I didn't find a database entry for "parody-morreale:meas-sci-technol:1994:itc-operational-characterization"
-Warning--I didn't find a database entry for "freire:nature-protocols:2006:itc-competitive"
-Warning--I didn't find a database entry for "dialysis-against-common-buffer"
-Warning--I didn't find a database entry for "vp-itc-manual"
-Warning--I didn't find a database entry for "jeffreys:1946a"
-Warning--I didn't find a database entry for "tellinghuisen:anal-biochem:2005:itc-generalized-least-squares"
-Warning--I didn't find a database entry for "jun-s-liu:mcmc"
-Warning--I didn't find a database entry for "reference"
-Warning--I didn't find a database entry for "iseman:anal-biochem:1989:itc"
-control{REVTEX41Control}, control.key{N/A}, control.author{N/A}, control.editor{N/A}, control.title{N/A}, control.pages{N/A}, control.year{N/A}, control.eprint{N/A}, 
-control{apsrev41Control}, control.key{N/A}, control.author{08}, control.editor{1}, control.title{}, control.pages{0}, control.year{1}, control.eprint{N/A}, 
-Warning--jnrlst (dependency: not reversed) set 1
-Reallocated singl_function (elt_size=4) to 100 items from 50.
-merlin.mbs apsrev4-1.bst 2010-07-25 4.21a (PWD, AO, DPC) hacked
-Control: key (0) 
-Control: author (8) initials jnrlst
-Control: editor formatted (1) identically to author
-Control: production of article title (-1) disabled
-Control: page (0) single
-Control: year (1) truncated
-Control: production of eprint (0) enabled
-You've used 2 entries,
-            5847 wiz_defined-function locations,
-            1627 strings with 15748 characters,
-and the built_in function-call counts, 955 in all, are:
-= -- 12
-> -- 13
-< -- 33
-+ -- 7
-- -- 19
-* -- 131
-:= -- 68
-add.period$ -- 0
-call.type$ -- 2
-change.case$ -- 0
-chr.to.int$ -- 10
-cite$ -- 2
-duplicate$ -- 130
-empty$ -- 15
-format.name$ -- 0
-if$ -- 120
-int.to.chr$ -- 1
-int.to.str$ -- 9
-missing$ -- 28
-newline$ -- 52
-num.names$ -- 0
-pop$ -- 68
+Database file #2: automatic-equilibration-detection.bib
+Warning--Missing address in entry crc-mcmc-handbook.
+You've used 4 entries,
+            1909 wiz_defined-function locations,
+            526 strings with 4350 characters,
+and the built_in function-call counts, 925 in all, are:
+= -- 30
+> -- 44
+< -- 0
++ -- 14
+- -- 10
+* -- 74
+:= -- 103
+add.period$ -- 4
+call.type$ -- 4
+change.case$ -- 1
+chr.to.int$ -- 0
+cite$ -- 5
+duplicate$ -- 37
+empty$ -- 128
+format.name$ -- 14
+if$ -- 250
+int.to.chr$ -- 0
+int.to.str$ -- 4
+missing$ -- 0
+newline$ -- 15
+num.names$ -- 4
+pop$ -- 30
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 32
+skip$ -- 80
 stack$ -- 0
-substring$ -- 10
-swap$ -- 108
+substring$ -- 13
+swap$ -- 12
 text.length$ -- 0
 text.prefix$ -- 0
-top$ -- 10
-type$ -- 12
+top$ -- 0
+type$ -- 16
 warning$ -- 1
-while$ -- 9
-width$ -- 0
-write$ -- 52
-(There was 1 error message)
+while$ -- 5
+width$ -- 5
+write$ -- 21
+(There was 1 warning)
