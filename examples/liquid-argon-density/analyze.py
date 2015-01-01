@@ -29,9 +29,12 @@ for replicate in range(nreplicates):
 print reduced_density_it
 
 # Plot
+
+A_it = reduced_density_it
+
 x = range(niterations+1)
-A_t = reduced_density_it.mean(0)
-dA_t = reduced_density_it.std(0)
+A_t = A_it.mean(0)
+dA_t = A_it.std(0)
 
 print "<A> = "
 print A_t
@@ -40,10 +43,34 @@ print dA_t
 
 import pylab
 pylab.figure()
+
+pylab.subplot(211)
 pylab.hold(True)
 #pylab.errorbar(range(niterations+1), A_t, yerr=dA_t)
 for replicate in range(nreplicates):
-    pylab.plot(x, reduced_density_it[replicate,:])
-
+    pylab.plot(x, A_it[replicate,:])
 pylab.errorbar(x, A_t, yerr=2*dA_t, fmt='ko')
+
+pylab.xlabel('number of samples')
+pylab.ylabel(r'reduced density $\rho^*$')
+
+Nequil = 100
+Acumavg_it = np.zeros([nreplicates, niterations+1], np.float64)
+Aburnin_it = np.zeros([nreplicates, niterations+1], np.float64)
+for i in range(nreplicates):
+    for t in range(niterations+1):
+        Acumavg_it[i,t] = A_it[i,0:(t+1)].mean()
+
+        Ninit = max(0, t-Nequil+1)
+        Aburnin_it[i,t] = A_it[i,Ninit:(t+1)].mean()
+
+pylab.subplot(212)
+pylab.hold(True)
+pylab.plot(x, Acumavg_it.mean(0), 'k.')
+pylab.plot(x, Aburnin_it.mean(0), 'r.')
+pylab.legend(['cumulative average', 'discarding first %d samples to equilibration' % Nequil])
+
+pylab.xlabel('number of samples')
+pylab.ylabel(r'reduced density $\rho^*$')
+
 pylab.show()

@@ -5,6 +5,8 @@ Run a simulation of liquid argon at constant pressure.
 
 """
 
+import os, os.path, copy
+
 from simtk import openmm
 from simtk import unit
 from simtk.openmm import app
@@ -22,8 +24,9 @@ reduced_density = 0.960     # reduced_density = density * (sigma**3)
 reduced_temperature = 0.850 # reduced_temperature = kB * temperature / epsilon
 reduced_pressure = 1.2660   # reduced_pressure = pressure * (sigma**3) / epsilon
 
-platform_name = 'Reference'    # OpenMM platform name to use for simulation
+platform_name = 'CPU'    # OpenMM platform name to use for simulation
 platform = openmm.Platform.getPlatformByName(platform_name)
+data_directory = 'data'     # Directory in which data is to be stored
 
 r0 = 2.0**(1./6.) * sigma   # minimum potential distance for Lennard-Jones interaction
 characteristic_timescale = unit.sqrt((mass * r0**2) / (72 * epsilon)) # characteristic timescale for bound Lennard-Jones interaction
@@ -42,7 +45,7 @@ barostat_frequency = 25 # number of steps between barostat updates
 
 # Set parameters for number of simulation replicates, number of iterations per simulation, and number of steps per iteration.
 nreplicates = 100
-niterations = 1000
+niterations = 5000
 nsteps_per_iteration = 25
 
 # Compute real units.
@@ -54,12 +57,11 @@ kT = kB * temperature
 
 # Create the Lennard-Jones fluid.
 testsystem = testsystems.LennardJonesFluid(nparticles=nparticles, mass=mass, sigma=sigma, epsilon=epsilon, reduced_density=reduced_density)
-system = testsystem.system
 
 # Construct initial positions by minimization.
 print "Minimizing to obtain initial positions..."
 integrator = openmm.LangevinIntegrator(temperature, collision_rate, timestep)
-context = openmm.Context(system, integrator)
+context = openmm.Context(testsystem.system, integrator)
 context.setPositions(testsystem.positions)
 openmm.LocalEnergyMinimizer.minimize(context)
 state = context.getState(getPositions=True)
@@ -72,14 +74,22 @@ for particle in range(nparticles):
     outfile.write("ATOM  %5d  AR   AR     1    %8.3f%8.3f%8.3f\n" % (particle, initial_positions[particle,0]/unit.angstrom, initial_positions[particle,1]/unit.angstrom, initial_positions[particle,2]/unit.angstrom))
 outfile.close()
 
-# Add a barostat.
-barostat = openmm.MonteCarloBarostat(pressure, temperature, barostat_frequency)
-system.addForce(barostat)
+# Make directory to store data.
+if not os.path.exists(data_directory):
+    os.makedirs(data_directory)
 
 # Run replicates of the simulation.
 for replicate in range(nreplicates):
+    # Make a new copy of the system.
+    system = copy.deepcopy(testsystem.system)
+
+    # Add a barostat to the system.
+    # NOTE: This is added to a new copy of the system to ensure barostat random number seeds are unique.
+    barostat = openmm.MonteCarloBarostat(pressure, temperature, barostat_frequency)
+    system.addForce(barostat)
+
     # Open output file.
-    output_filename = 'data/output.%05d' % replicate
+    output_filename = os.path.join(data_directory, 'output.%05d' % replicate)
     outfile = open(output_filename, 'w')
 
     # Create integrator
@@ -90,6 +100,7 @@ for replicate in range(nreplicates):
 
     # Set initial conditions.
     context.setPositions(initial_positions)
+    context.setVelocityToTemperature(temperature)
 
     # Record initial data.
     state = context.getState(getEnergy=True)
