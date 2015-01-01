@@ -17,7 +17,8 @@ nparticles = 500
 mass = 39.9 * unit.amu
 sigma = 3.4 * unit.angstrom
 epsilon = 0.238 * unit.kilocalories_per_mole
-reduced_density = 0.860     # reduced_density = density * (sigma**3)
+#reduced_density = 0.860     # reduced_density = density * (sigma**3)
+reduced_density = 0.960     # reduced_density = density * (sigma**3)
 reduced_temperature = 0.850 # reduced_temperature = kB * temperature / epsilon
 reduced_pressure = 1.2660   # reduced_pressure = pressure * (sigma**3) / epsilon
 
@@ -41,7 +42,7 @@ barostat_frequency = 25 # number of steps between barostat updates
 
 # Set parameters for number of simulation replicates, number of iterations per simulation, and number of steps per iteration.
 nreplicates = 100
-niterations = 500
+niterations = 1000
 nsteps_per_iteration = 25
 
 # Compute real units.
