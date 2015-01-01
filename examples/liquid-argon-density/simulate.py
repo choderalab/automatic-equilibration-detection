@@ -45,7 +45,7 @@ barostat_frequency = 25 # number of steps between barostat updates
 
 # Set parameters for number of simulation replicates, number of iterations per simulation, and number of steps per iteration.
 nreplicates = 100
-niterations = 5000
+niterations = 10000
 nsteps_per_iteration = 25
 
 # Compute real units.
@@ -100,7 +100,7 @@ for replicate in range(nreplicates):
 
     # Set initial conditions.
     context.setPositions(initial_positions)
-    context.setVelocityToTemperature(temperature)
+    context.setVelocitiesToTemperature(temperature)
 
     # Record initial data.
     state = context.getState(getEnergy=True)
