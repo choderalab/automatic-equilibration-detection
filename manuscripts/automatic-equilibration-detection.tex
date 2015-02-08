@@ -128,10 +128,35 @@ This is text.}
 \end{figure*}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% STATISTICAL INEFFICIENCY
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Effective number of uncorrelated samples}
+\label{section:statistical-inefficiency}
+
+Consider a successively sampled configurations $x_t$, $t = 1, \ldots, T$ from a molecular simulation.
+We presume we are interested in the timeseries of a mechanical property $A(x)$, which we denote $A_1, \ldots, A_T$ with $A_t \equiv A(x_t)$.
+If we average this quantity 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% THE IDEA
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{The idea}
+\label{section:the-idea}
+
+Suppose we choose some arbitrary time $t_0$ and discard all samples $t \in [0, t_0)$ to equilibration, keeping $[t_0, T]$ as the dataset to analyze.
+How much data remains?
+We can determine this by computing the statistical inefficiency $g_{t_0}$ for the interval $[t_0, T]$, and computing the effective number of uncorrelated samples $N_\mathrm{eff}(t_0) \equiv (T - t_0 + 1) / g_{t_0}$.
+If we start at $t_0 \equiv T$ and move $t_0$ to earlier and earlier points in time, we expect that the effective number of uncorrelated samples $N_\mathrm{eff}(t_0)$ will continue to grow until we start to include the highly atypical initial data.
+At that point, the integrated autocorrelation time $\tau$ (and hence the statistical inefficiency $g$) will greatly increase, and the effective number of samples $N_\mathrm{eff}$ will start to plummet.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % METHODS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section*{Methods}
+\section*{Illustration}
 \label{section:methods}
 
 All molecular simulations were performed with OpenMM 6.2~\cite{eastman:jctc:2012:openmm} using the Python API.
