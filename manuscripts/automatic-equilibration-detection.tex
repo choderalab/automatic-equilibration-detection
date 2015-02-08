@@ -1,5 +1,5 @@
 % PRL look and style (easy on the eyes)
-\documentclass[aps,pre,twocolumn,nofootinbib,superscriptaddress,linenumbers]{revtex4-1}
+\documentclass[aps,pre,twocolumn,nofootinbib,superscriptaddress,linenumbers,11point]{revtex4-1}
 % Two-column style (for submission/review/editing)
 %\documentclass[aps,prl,preprint,nofootinbib,superscriptaddress,linenumbers]{revtex4-1}
 
@@ -78,9 +78,9 @@
 
 \begin{abstract}
 
-Molecular simulations (molecular dynamics, Monte Carlo) are often initiated from configurations that are highly dissimilar to equilibrium samples, a practice which causes the appearance of a distinct initial transient in various mechanical observables computed over the timecourse of the simulation.
-Traditional practice in simulation data analysis recommends this initial transient portion be discarded as \emph{equilibration}, but no simple, general automated procedure exists.
-Here, we consider a simple, automated, easy-to-implement procedure in which the final region of the simulation that maximizes the number of effectively uncorrelated samples is used.
+Molecular simulations intended to compute equilibrium properties (such as molecular dynamics and Metropolis Monte Carlo simulations) are often initiated from configurations that are highly dissimilar to equilibrium samples, a practice which typically generates a distinct initial transient in various mechanical observables computed over the timecourse of the simulation.
+Traditional practice in simulation data analysis recommends this initial transient portion be discarded to \emph{equilibration}, but no simple, general, and automated procedure for this process exists.
+Here, we consider a conceptually simple, automated, easy-to-implement procedure that does not make strict assumptions about the distribution of the observable of interest, in which the equilibration region is chosen to maximize the number of effectively uncorrelated samples in the production portion used for computing equilibrium averages.
 We present a simple reference Python implementation of this procedure and illustrate its application to both synthetic and real simulation data.\\
 
 % KEYWORDS
@@ -97,16 +97,18 @@ We present a simple reference Python implementation of this procedure and illust
 \section*{Introduction}
 \label{section:introduction}
 
-Molecular simulations use Markov chain Monte Carlo (MCMC) techniques~\cite{jun-s-liu:mcmc} to sample configurations $x$ from an equilibrium distribution $\pi(x)$, either exactly (using Monte Carlo methods) or approximately (using molecular dynamics simulations).
+Molecular simulations use Markov chain Monte Carlo (MCMC) techniques~\cite{jun-s-liu:mcmc} to sample configurations $x$ from an equilibrium distribution $\pi(x)$, either exactly (using Monte Carlo methods) or approximately (using molecular dynamics simulations without Metropolization).
 
-Due to the nature of the equilibrium distribution $\pi(x)$ and the difficulty in producing a sufficiently good guess of an equilibrium configuration, these molecular simulations are often started from highly atypical initial conditions.
-For example, simulations of biopolymers might be initiated from a fully extended conformation unrepresentative of behavior in solution; solvated systems may be prepared by periodically replicating a small solvent box that was equilibrated with a different forcefield under different conditions from the current simulation, thus yielding atypical densities; 
+Due to the nature of the equilibrium distribution $\pi(x)$ and the difficulty in producing a sufficiently good guess at a typical equilibrium configuration, these molecular simulations are often started from highly atypical initial conditions.
+For example, simulations of biopolymers might be initiated from a fully extended conformation unrepresentative of behavior in solution, or a model derived from a fit to diffraction data of a cryocooled crystal; 
+solvated systems may be prepared by periodically replicating a small solvent box that was equilibrated with a different forcefield under different conditions from the current simulation, thus yielding atypical densities; 
 liquid mixtures or lipid bilayers may be constructed by using methods that fulfill spatial constraints but create locally aytpical geometries (e.g. PackMol~\cite{martinez:jctc:2009:packmol}) that may require long simulation times to relax to typical configurations.
 
 As a result, common practice in molecular simulations is to discard some initial portion of the trajectory to ``equilibration'' (also called \emph{burn-in}\footnote{The term \emph{burn-in} comes from the field of electronics, in which a short ``burn-in'' period is used to ensure that a device is free of faulty components---which often fail quickly---and is operating normally~\cite{crc-mcmc-handbook}.} in MCMC literature~\cite{crc-mcmc-handbook}).
-While this is strictly unnecessary~\cite{geyer:burn-in-unnecessary,crc-mcmc-handbook}, this often allows the practitioner to avoid what would otherwise be extremely long run times to eliminate the bias from the initial atypical starting conditions in computed averages.
+While discarding an initial portion of the dataset is strictly unnecessary for the time-average of quantities of interest to converge to the desired expectations~\cite{geyer:burn-in-unnecessary,crc-mcmc-handbook}, this process often allows the practitioner to avoid what would otherwise be extremely long run times to eliminate the bias in computed properties in finite-length simulations due to the initial atypical starting conditions.
 
-As an illustrative example of this effect, consider the simulation shown in {\bf Figure~\ref{figure:burn-in-example}}, in which a simulation of liquid argon is started at an atypically density and allowed to equilibrate to its equilibrium density (see caption for detailed description of simulation methods).
+As an illustrative example of this effect, consider the simulation shown in {\bf Figure~\ref{figure:burn-in-example}}, in which a simulation of liquid argon is started at an atypical density and allowed to equilibrate to its equilibrium density (see caption for detailed description of simulation methods).
+{\color{red}[JDC: Use TIP3P water instead?]}
 The expectation of the running average of the density over many realizations of this procedure ({\bf Figure~\ref{figure:burn-in-example}b}) significantly deviates from the actual expectation, which would lead to biased estimates unless simulations were sufficiently long to eliminate this starting point dependent bias.
 Note that this significant bias is present because the \emph{same} atypical starting condition is used for every realization of this simulation process.
 
@@ -129,12 +131,19 @@ This is text.}
 % METHODS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section*{methods}
+\section*{Methods}
 \label{section:methods}
 
 All molecular simulations were performed with OpenMM 6.2~\cite{eastman:jctc:2012:openmm} using the Python API.
 All scripts used to run simulations, analyze data, and generate plots---along with the simulation data itself---are availabile on GitHub at \url{http://github.com/choderalab/automatic-equilibration-detection}.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ACKNOWLEDGMENTS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Acknowledgments}
+
+We are grateful to William C.~Swope (IBM Almaden Research Center), Kyle A.~Beauchamp (MSKCC), and Robert C.~McGibbon (Stanford University) for valuable discussions on this topic, and Joshua L.~Adelman (University of Pittsburgh) for helpful feedback and encouragement.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BIBLIOGRAPHY
