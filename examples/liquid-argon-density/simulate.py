@@ -38,7 +38,7 @@ timestep = 0.01 * characteristic_timescale # integrator timestep
 #timestep = 0.05 * characteristic_timescale
 
 print "characteristic timescale = %.3f ps" % (characteristic_timescale / unit.picoseconds)
-print "timestep = %.3f ps" % (timestep / unit.picoseconds)
+print "timestep = %.12f ps" % (timestep / unit.picoseconds)
 
 collision_rate = 5.0 / unit.picoseconds # collision rate for Langevin thermostat
 barostat_frequency = 25 # number of steps between barostat updates
@@ -81,26 +81,45 @@ if not os.path.exists(data_directory):
 # Run replicates of the simulation.
 for replicate in range(nreplicates):
     # Make a new copy of the system.
+    print "Making a deep copy of the system..."
     system = copy.deepcopy(testsystem.system)
 
     # Add a barostat to the system.
     # NOTE: This is added to a new copy of the system to ensure barostat random number seeds are unique.
+    print "Adding barostat..."
     barostat = openmm.MonteCarloBarostat(pressure, temperature, barostat_frequency)
     system.addForce(barostat)
 
     # Open output file.
-    output_filename = os.path.join(data_directory, 'output.%05d' % replicate)
+    print "Opening output file..."
+    output_filename = os.path.join(data_directory, '%05d.output' % replicate)
     outfile = open(output_filename, 'w')
 
     # Create integrator
+    print "Creating LangevinIntegrator..."
     integrator = openmm.LangevinIntegrator(temperature, collision_rate, timestep)
 
     # Create context.
+    print "Creating Context..."
     context = openmm.Context(system, integrator, platform)
 
     # Set initial conditions.
+    print "Setting initial positions..."
     context.setPositions(initial_positions)
+    print "Setting initial velocities appropriate for temperature..."
     context.setVelocitiesToTemperature(temperature)
+
+    # DEBUG: Write out initial conditions.
+    print "Serializing..."
+    def write_file(filename, contents):
+        file = open(filename, 'w')
+        file.write(contents)
+        file.close()
+    from simtk.openmm import XmlSerializer
+    state = context.getState(getPositions=True, getVelocities=True, getEnergy=True, getForces=True)
+    write_file(os.path.join(data_directory, '%05d.system.xml' % replicate), XmlSerializer.serialize(system))
+    write_file(os.path.join(data_directory, '%05d.state.xml' % replicate), XmlSerializer.serialize(state))
+    write_file(os.path.join(data_directory, '%05d.integrator.xml' % replicate), XmlSerializer.serialize(integrator))
 
     # Record initial data.
     state = context.getState(getEnergy=True)
@@ -121,7 +140,8 @@ for replicate in range(nreplicates):
         reduced_density = 1.0 / reduced_volume
         reduced_potential = state.getPotentialEnergy() / kT
 
-        print "replicate %5d / %5d : iteration %5d / %5d : density %8.3f | potential %8.3f" % (replicate, nreplicates, iteration+1, niterations, reduced_density, reduced_potential)
+        if ((iteration + 1) % 100) == 0:
+            print "replicate %5d / %5d : iteration %5d / %5d : density %8.3f | potential %8.3f" % (replicate, nreplicates, iteration+1, niterations, reduced_density, reduced_potential)
         outfile.write('%8d %12.6f %12.6f\n' % (iteration+1, reduced_density, reduced_potential))
 
     # Clean up.

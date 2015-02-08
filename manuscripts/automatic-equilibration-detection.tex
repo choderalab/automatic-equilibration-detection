@@ -6,7 +6,7 @@
 %\usepackage{palatino}
 
 % Change to a sans serif font.
-\usepackage{helvet}
+\usepackage{sourcesanspro}
 \renewcommand*\familydefault{\sfdefault} %% Only if the base font of the document is to be sans serif
 \usepackage[T1]{fontenc}
 
@@ -97,17 +97,17 @@ We present a simple reference Python implementation of this procedure and illust
 \section*{Introduction}
 \label{section:introduction}
 
-Molecular simulations use Markov chain Monte Carlo (MCMC) techniques~\cite{jun-s-liu:mcmc} to sample configurations $x$ from an equilibrium distribution $\pi(x)$, either exactly (using Monte Carlo methods) or approximately (using molecular dynamics simulations without Metropolization).
+Molecular simulations use Markov chain Monte Carlo (MCMC) techniques~\cite{jun-s-liu:mcmc} to sample configurations $x$ from an equilibrium distribution $\pi(x)$, either exactly (using Monte Carlo methods) or approximately (using molecular dynamics simulations without Metropolization)~\cite{sivak:2013:prx:vvvr}.
 
-Due to the nature of the equilibrium distribution $\pi(x)$ and the difficulty in producing a sufficiently good guess at a typical equilibrium configuration, these molecular simulations are often started from highly atypical initial conditions.
-For example, simulations of biopolymers might be initiated from a fully extended conformation unrepresentative of behavior in solution, or a model derived from a fit to diffraction data of a cryocooled crystal; 
-solvated systems may be prepared by periodically replicating a small solvent box that was equilibrated with a different forcefield under different conditions from the current simulation, thus yielding atypical densities; 
-liquid mixtures or lipid bilayers may be constructed by using methods that fulfill spatial constraints but create locally aytpical geometries (e.g. PackMol~\cite{martinez:jctc:2009:packmol}) that may require long simulation times to relax to typical configurations.
+Due to the sensitivity of the equilibrium distribution $\pi(x)$ to small perturbations in configuration $x$ and the difficulty of producing sufficiently good guesses of typical equilibrium configurations, these molecular simulations are often started from highly atypical initial conditions.
+For example, simulations of biopolymers might be initiated from a fully extended conformation unrepresentative of behavior in solution, or a geometry derived from a fit to diffraction data collected from a cryocooled crystal; 
+solvated systems may be prepared by periodically replicating a small solvent box equilibrated under different conditions, yielding atypical densities; 
+liquid mixtures or lipid bilayers may be constructed by using methods that fulfill spatial constraints but create locally aytpical geometries (e.g.~PackMol~\cite{martinez:jctc:2009:packmol}), requiring long simulation times to relax to typical configurations.
 
-As a result, common practice in molecular simulations is to discard some initial portion of the trajectory to ``equilibration'' (also called \emph{burn-in}\footnote{The term \emph{burn-in} comes from the field of electronics, in which a short ``burn-in'' period is used to ensure that a device is free of faulty components---which often fail quickly---and is operating normally~\cite{crc-mcmc-handbook}.} in MCMC literature~\cite{crc-mcmc-handbook}).
-While discarding an initial portion of the dataset is strictly unnecessary for the time-average of quantities of interest to converge to the desired expectations~\cite{geyer:burn-in-unnecessary,crc-mcmc-handbook}, this process often allows the practitioner to avoid what would otherwise be extremely long run times to eliminate the bias in computed properties in finite-length simulations due to the initial atypical starting conditions.
+As a result, traditional practice in molecular simulation has been to discard some initial portion of the trajectory to ``equilibration'' (also called \emph{burn-in}\footnote{The term \emph{burn-in} comes from the field of electronics, in which a short ``burn-in'' period is used to ensure that a device is free of faulty components---which often fail quickly---and is operating normally~\cite{crc-mcmc-handbook}.} in MCMC literature~\cite{crc-mcmc-handbook}).
+While this practice is strictly unnecessary for the time-average of quantities of interest to converge to the desired expectations~\cite{geyer:burn-in-unnecessary,crc-mcmc-handbook}, this process often allows the practitioner to avoid impractically long run times to eliminate the bias in computed properties in finite-length simulations induced by atypical initial starting conditions.
 
-As an illustrative example of this effect, consider the simulation shown in {\bf Figure~\ref{figure:burn-in-example}}, in which a simulation of liquid argon is started at an atypical density and allowed to equilibrate to its equilibrium density (see caption for detailed description of simulation methods).
+As an illustrative example, consider the simulation shown in {\bf Figure~\ref{figure:burn-in-example}}, in which a simulation of liquid argon is started at an atypical density and allowed to relax to its equilibrium density (see caption for detailed description of simulation methods).
 {\color{red}[JDC: Use TIP3P water instead?]}
 The expectation of the running average of the density over many realizations of this procedure ({\bf Figure~\ref{figure:burn-in-example}b}) significantly deviates from the actual expectation, which would lead to biased estimates unless simulations were sufficiently long to eliminate this starting point dependent bias.
 Note that this significant bias is present because the \emph{same} atypical starting condition is used for every realization of this simulation process.
