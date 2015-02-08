@@ -10,8 +10,8 @@ import os.path
 
 data_directory = 'data'
 
-nreplicates = 100
-niterations = 1000
+nreplicates = 35
+niterations = 10000
 
 reduced_density_it = np.zeros([nreplicates, niterations+1], np.float64)
 reduced_potential_it = np.zeros([nreplicates, niterations+1], np.float64)
@@ -47,9 +47,11 @@ pylab.figure()
 pylab.subplot(211)
 pylab.hold(True)
 #pylab.errorbar(range(niterations+1), A_t, yerr=dA_t)
-for replicate in range(nreplicates):
-    pylab.plot(x, A_it[replicate,:])
-pylab.errorbar(x, A_t, yerr=2*dA_t, fmt='ko')
+#for replicate in range(nreplicates):
+#    pylab.plot(x, A_it[replicate,:])
+#pylab.errorbar(x, A_t, yerr=2*dA_t, fmt='ko')
+pylab.plot(x, A_t, 'ko')
+pylab.fill_between(x, A_t+2*dA_t, A_t-2*dA_t, facecolor='grey', alpha=0.5)
 
 pylab.xlabel('number of samples')
 pylab.ylabel(r'reduced density $\rho^*$')
@@ -61,7 +63,9 @@ for i in range(nreplicates):
     for t in range(niterations+1):
         Acumavg_it[i,t] = A_it[i,0:(t+1)].mean()
 
-        Ninit = max(0, t-Nequil+1)
+        Ninit = Nequil
+        if t < Nequil:
+            Ninit = 0
         Aburnin_it[i,t] = A_it[i,Ninit:(t+1)].mean()
 
 pylab.subplot(212)
