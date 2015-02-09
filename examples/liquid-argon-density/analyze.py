@@ -7,6 +7,7 @@ Analyze multiple replicates of a simulation of liquid argon at constant pressure
 
 import numpy as np
 import os.path
+import matplotlib.pyplot as plt
 
 data_directory = 'data'
 
@@ -59,7 +60,18 @@ import pylab
 # FIGURE
 #
 
-pylab.figure()
+fontsize=10
+
+font = {'family' : 'sans-serif',
+        'weight' : 'normal',
+        'size'   : fontsize}
+
+plt.rc('font', **font)
+
+figure = pylab.figure(figsize=(7.5, 3.5), dpi=300)
+
+nskip = 10 # number of samples to skip in uncertainty shading
+nmax = 4000 # maximum samples to show
 
 #
 # TOP PANEL: AVERAGE DENSITY AND 95% CONFIDENCE INTERVAL
@@ -72,18 +84,17 @@ pylab.hold(True)
 #    pylab.plot(x, A_it[replicate,:])
 #pylab.errorbar(x, A_t, yerr=2*dA_t, fmt='ko')
 #pylab.fill_between(x, A_t+2*dA_t, A_t-2*dA_t, facecolor='grey', alpha=0.5)
-nskip = 10
-pylab.fill_between(x[::nskip], A_t[::nskip]+2*dA_t[::nskip], A_t[::nskip]-2*dA_t[::nskip], facecolor='grey', edgecolor='grey')
-pylab.plot(x, A_t, 'k-')
+pylab.fill_between(x[:nmax:nskip], A_t[:nmax:nskip]+2*dA_t[:nmax:nskip], A_t[:nmax:nskip]-2*dA_t[:nmax:nskip], facecolor='grey', edgecolor='grey', alpha=0.5, linewidth=0)
+pylab.plot(x[:nmax], A_t[:nmax], 'k-')
 
-pylab.xlabel('simulation time / ns')
-pylab.ylabel(r'reduced density $\rho^*$')
+#pylab.xlabel('simulation time / ns')
+pylab.ylabel(r'density $\rho^*$', fontsize=fontsize)
 # Adjust axes.
 oldaxis = pylab.axis()
-pylab.axis([0, x.max(), oldaxis[2], oldaxis[3]])
+pylab.axis([0, x[:nmax].max(), oldaxis[2], oldaxis[3]])
 
 subplot.set_xticklabels([]) # no x-tick labels
-#subplot.set_yticklabels([0.80, 0.85, 0.90, 0.95, 1.00]) # no x-tick labels
+subplot.set_yticklabels([0.8, 0.9, 1.0, 1.1, 1.2]) # no x-tick labels
 
 #
 # BOTTOM PANEL: CUMULATIVE AVERAGE WITH INITIAL BURN-IN PERIOD DISCARDED
@@ -109,27 +120,29 @@ Aburnin_std_t = Aburnin_it.std(0)
 
 
 
-pylab.subplot(212)
+subplot = pylab.subplot(212)
 pylab.subplots_adjust(hspace=0.001)
 pylab.hold(True)
 
-nskip = 10
-pylab.fill_between(x[::nskip], Acumavg_mean_t[::nskip]+2*Acumavg_std_t[::nskip], Acumavg_mean_t[::nskip]-2*Acumavg_std_t[::nskip], facecolor='grey', edgecolor='grey')
-pylab.fill_between(x[Nequil::nskip], Aburnin_mean_t[Nequil::nskip]+2*Aburnin_std_t[Nequil::nskip], Aburnin_mean_t[Nequil::nskip]-2*Acumavg_std_t[Nequil::nskip], facecolor='grey', edgecolor='grey')
+pylab.fill_between(x[:nmax:nskip], Acumavg_mean_t[:nmax:nskip]+2*Acumavg_std_t[:nmax:nskip], Acumavg_mean_t[:nmax:nskip]-2*Acumavg_std_t[:nmax:nskip], facecolor='red', edgecolor='red', alpha=0.5, linewidth=0)
+pylab.fill_between(x[Nequil:nmax:nskip], Aburnin_mean_t[Nequil:nmax:nskip]+2*Aburnin_std_t[Nequil:nmax:nskip], Aburnin_mean_t[Nequil:nmax:nskip]-2*Acumavg_std_t[Nequil:nmax:nskip], facecolor='blue', edgecolor='blue', alpha=0.5, linewidth=0)
 
-pylab.plot(x, Acumavg_mean_t, 'k-')
-pylab.plot(x[Nequil:], Aburnin_mean_t[Nequil:], 'k:')
-pylab.legend(['cumulative average', 'discarding first %d samples to equilibration' % Nequil], fontsize=9)
+pylab.plot(x[:nmax], Acumavg_mean_t[:nmax], 'r-')
+pylab.plot(x[Nequil:nmax], Aburnin_mean_t[Nequil:nmax], 'b-')
+pylab.legend(['cumulative average', 'discarding first %d samples to equilibration' % Nequil], fontsize=fontsize)
 
-pylab.xlabel('simulation time / ns')
-pylab.ylabel(r'reduced density $\rho^*$')
+pylab.xlabel('simulation time / ns', fontsize=fontsize)
+pylab.ylabel(r'reduced density $\rho^*$', fontsize=fontsize)
 
-#subplot.set_yticklabels([0.75, 0.80, 0.85, 0.90, 0.95, 1.00]) # no x-tick labels
+subplot.set_yticklabels([0.8, 0.9, 1.0, 1.1, 1.2]) # no x-tick labels
 
 # Adjust axes.
 oldaxis = pylab.axis()
-pylab.axis([0, x.max(), oldaxis[2], oldaxis[3]])
+pylab.axis([0, x[:nmax].max(), oldaxis[2], oldaxis[3]])
 
 #pylab.show()
+figure.tight_layout()
+
+# Write figure to PDF
 pp.savefig()
 pp.close()

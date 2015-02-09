@@ -9,6 +9,8 @@
 \usepackage{sourcesanspro}
 \renewcommand*\familydefault{\sfdefault} %% Only if the base font of the document is to be sans serif
 \usepackage[T1]{fontenc}
+\usepackage[font=sf]{caption}
+\usepackage[font=sf]{floatrow}
 
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -122,7 +124,7 @@ For the purposes of this note, we presume that the goal is to compute some form 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{figure*} 
-%\resizebox{0.8\textwidth}{!}{\includegraphics{burn-in-example.pdf}}
+\resizebox{0.9\textwidth}{!}{\includegraphics{argon-density.pdf}}
 \caption{\label{figure:burn-in-example} {\bf Illustration of the motivation for discarding data to equilibration in computing expectations from molecular simulations.} 
 This is text.}
 \end{figure*}
