@@ -88,7 +88,7 @@ pylab.fill_between(x[:nmax:nskip], A_t[:nmax:nskip]+2*dA_t[:nmax:nskip], A_t[:nm
 pylab.plot(x[:nmax], A_t[:nmax], 'k-')
 
 #pylab.xlabel('simulation time / ns')
-pylab.ylabel(r'density $\rho^*$', fontsize=fontsize)
+pylab.ylabel(r'reduced density $\rho^*$', fontsize=fontsize)
 # Adjust axes.
 oldaxis = pylab.axis()
 pylab.axis([0, x[:nmax].max(), oldaxis[2], oldaxis[3]])
@@ -118,7 +118,7 @@ Aburnin_mean_t = Aburnin_it.mean(0)
 Acumavg_std_t = Acumavg_it.std(0)
 Aburnin_std_t = Aburnin_it.std(0)
 
-
+true_expectation = Acumavg_mean_t[-1]
 
 subplot = pylab.subplot(212)
 pylab.subplots_adjust(hspace=0.001)
@@ -126,6 +126,8 @@ pylab.hold(True)
 
 pylab.fill_between(x[:nmax:nskip], Acumavg_mean_t[:nmax:nskip]+2*Acumavg_std_t[:nmax:nskip], Acumavg_mean_t[:nmax:nskip]-2*Acumavg_std_t[:nmax:nskip], facecolor='red', edgecolor='red', alpha=0.5, linewidth=0)
 pylab.fill_between(x[Nequil:nmax:nskip], Aburnin_mean_t[Nequil:nmax:nskip]+2*Aburnin_std_t[Nequil:nmax:nskip], Aburnin_mean_t[Nequil:nmax:nskip]-2*Acumavg_std_t[Nequil:nmax:nskip], facecolor='blue', edgecolor='blue', alpha=0.5, linewidth=0)
+
+pylab.plot([x[0], x[nmax]], [true_expectation, true_expectation], 'k:')
 
 pylab.plot(x[:nmax], Acumavg_mean_t[:nmax], 'r-')
 pylab.plot(x[Nequil:nmax], Aburnin_mean_t[Nequil:nmax], 'b-')

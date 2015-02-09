@@ -9,8 +9,16 @@
 \usepackage{sourcesanspro}
 \renewcommand*\familydefault{\sfdefault} %% Only if the base font of the document is to be sans serif
 \usepackage[T1]{fontenc}
-\usepackage[font=sf]{caption}
+%\usepackage[font=sf,justification=justified]{caption}
 \usepackage[font=sf]{floatrow}
+
+% Rework captions to use sans serif font.
+\makeatletter
+\renewcommand\@make@capt@title[2]{%
+ \@ifx@empty\float@link{\@firstofone}{\expandafter\href\expandafter{\float@link}}%
+  {\textbf{#1}}\sf\@caption@fignum@sep#2\quad
+}%
+\makeatother
 
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -25,7 +33,6 @@
 
 % The figures are in a figures/ subdirectory.
 \graphicspath{{figures/}}
-
 
 % italicized boldface for math (e.g. vectors)
 \newcommand{\bfv}[1]{{\mbox{\boldmath{$#1$}}}}
@@ -80,7 +87,7 @@
 
 \begin{abstract}
 
-Molecular simulations intended to compute equilibrium properties (such as molecular dynamics and Metropolis Monte Carlo simulations) are often initiated from configurations that are highly dissimilar to equilibrium samples, a practice which typically generates a distinct initial transient in various mechanical observables computed over the timecourse of the simulation.
+Molecular simulations intended to compute equilibrium properties (such as molecular dynamics and Metropolis Monte Carlo simulations) are often initiated from configurations that are highly atypical of equilibrium samples, a practice which typically generates a distinct initial transient in mechanical observables computed over the timecourse of the simulation.
 Traditional practice in simulation data analysis recommends this initial transient portion be discarded to \emph{equilibration}, but no simple, general, and automated procedure for this process exists.
 Here, we consider a conceptually simple, automated, easy-to-implement procedure that does not make strict assumptions about the distribution of the observable of interest, in which the equilibration region is chosen to maximize the number of effectively uncorrelated samples in the production portion used for computing equilibrium averages.
 We present a simple reference Python implementation of this procedure and illustrate its application to both synthetic and real simulation data.\\
@@ -109,15 +116,22 @@ liquid mixtures or lipid bilayers may be constructed by using methods that fulfi
 As a result, traditional practice in molecular simulation has been to discard some initial portion of the trajectory to ``equilibration'' (also called \emph{burn-in}\footnote{The term \emph{burn-in} comes from the field of electronics, in which a short ``burn-in'' period is used to ensure that a device is free of faulty components---which often fail quickly---and is operating normally~\cite{crc-mcmc-handbook}.} in MCMC literature~\cite{crc-mcmc-handbook}).
 While this practice is strictly unnecessary for the time-average of quantities of interest to converge to the desired expectations~\cite{geyer:burn-in-unnecessary,crc-mcmc-handbook}, this process often allows the practitioner to avoid impractically long run times to eliminate the bias in computed properties in finite-length simulations induced by atypical initial starting conditions.
 
-As an illustrative example, consider the simulation shown in {\bf Figure~\ref{figure:burn-in-example}}, in which a simulation of liquid argon is started at an atypical density and allowed to relax to its equilibrium density (see caption for detailed description of simulation methods).
-{\color{red}[JDC: Use TIP3P water instead?]}
-The expectation of the running average of the density over many realizations of this procedure ({\bf Figure~\ref{figure:burn-in-example}b}) significantly deviates from the actual expectation, which would lead to biased estimates unless simulations were sufficiently long to eliminate this starting point dependent bias.
+% Liquid argon example
+% JDC: Should we use TIP3P water instead?
+As an illustrative example, consider the simulation shown in {Figure~\ref{figure:burn-in-example}}, in which a simulation of liquid argon is started at an atypical density and allowed to relax to its equilibrium density ({Figure~\ref{figure:burn-in-example}, top}).
+The expectation of the running average of the density over many realizations of this procedure ({Figure~\ref{figure:burn-in-example}, bottom}) significantly deviates from the actual expectation, which would lead to biased estimates unless simulations were sufficiently long to eliminate this starting point dependent bias.
 Note that this significant bias is present because the \emph{same} atypical starting condition is used for every realization of this simulation process.
 
-For the purposes of this note, we presume that the goal is to compute some form of equilibrium expectation, <A> from a timeseries average:
+For the purposes of this note, we presume that the goal is to compute some form of equilibrium expectation, $\expect{A}$ from a timeseries average:
+
+Consider successively sampled configurations $x_t$, $t = 1, \ldots, T$ from a molecular simulation.
+We presume we are interested in the expectation $\expect{A} \equiv \int dx \, A(x) \, \pi(x)$ of a mechanical property $A(x)$.
+For convenience, we will refer to the timeseries $A_t \equiv A(x_t)$, with $t = 0$.
+The estimator $\hat{A} \approx \expect{A}$ constructed from the entire dataset is given by
 \begin{eqnarray}
-\hat{A} \approx \int_0^T dt \, A(x(t))
+\hat{A}_{[1,T]} \equiv \frac{1}{T} \sum_{t=1}^T A_t . \label{equation:time-average}
 \end{eqnarray}
+While $\lim_{T \rightarrow \infty} \hat{A}_{[1,T]} = \expect{A}$\footnote{We note that this equality only holds for simulation schemes that sample from the true equilibrium distribution $\pi(x)$, such as Metropolis-Hastings Monte Carlo or Metropolized integration schemes. Molecular dynamics simulations utilizing finite timestep integration without Metropolization will produce averages that may deviate from the true expectation $\expect{A}$~\cite{deviation}.}, we concern ourselves here with the optimal approach to estimating $\expect{A}$ given a simulation of \emph{finite} time $T$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FIGURE: BURN-IN EXAMPLE
@@ -125,8 +139,20 @@ For the purposes of this note, we presume that the goal is to compute some form 
 
 \begin{figure*} 
 \resizebox{0.9\textwidth}{!}{\includegraphics{argon-density.pdf}}
-\caption{\label{figure:burn-in-example} {\bf Illustration of the motivation for discarding data to equilibration in computing expectations from molecular simulations.} 
-This is text.}
+\caption{\label{figure:burn-in-example} {\bf Illustration of the motivation for discarding data to equilibration.} 
+To illustrate the bias in expectations induced by relaxation away from initial conditions, 100 replicates of a simulation of liquid argon were initiated from the same energy-minimized initial configuration constructed with initial reduced density $\rho^* \equiv \rho \sigma^3 = 0.960$ but different random number seeds for stochastic integration.
+%
+{\bf Top:} The average of the reduced density (black line) over the replicates relaxes to the region of typical equilibrium densities over the first few ns of simulation time.
+%
+{\bf Bottom:} If the average density is estimated by a cumulative average from the beginning of the simulation (red line), the estimate will be heavily biased by the atypical starting density even beyond 10 ns.
+Discarding even a small amount of initial data---in this case 100 initial samples (blue line)---results in a cumulative average estimate that converges to the true average (black dotted line) much more rapidly.
+% 
+Shaded regions denote 95\% confidence intervals.
+%
+Simulations were performed using a box of $N = 500$ argon atoms at reduced temperature $T^* \equiv k_B T / \epsilon = 0.850$ and reduced pressure $p^* \equiv p \sigma^3 / \epsilon = 1.266$ using a Langevin integrator~\cite{sivak-chodera-crooks:jpcb:2014:vvvr} with timestep $\Delta t = 0.01 \tau$, where characteristic oscillation timescale $\tau = \sqrt{m r_0^2 / 72 \epsilon}$, with $r_0 = 2^{1/6} \sigma$~\cite{liquid-argon-characteristic-timescale}.
+A Metropolis Monte Carlo barostat was used with box volume moves attempted every 25 timesteps.
+Densities were recorded every 25 timesteps.
+}
 \end{figure*}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -136,9 +162,10 @@ This is text.}
 \section*{Effective number of uncorrelated samples}
 \label{section:statistical-inefficiency}
 
-Consider a successively sampled configurations $x_t$, $t = 1, \ldots, T$ from a molecular simulation.
-We presume we are interested in the timeseries of a mechanical property $A(x)$, which we denote $A_1, \ldots, A_T$ with $A_t \equiv A(x_t)$.
-If we average this quantity 
+An important concept in the development of the main idea presented here is the notion of the \emph{effective number of uncorrelated samples} present in a sample of correlated timeseries data and the related concept of \emph{statistical inefficiency}.
+While this is well-established for the analysis of both Monte Carlo and molecular dynamics simulations~\cite{}, we review it here for the sake of clarity.
+
+We first 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % THE IDEA

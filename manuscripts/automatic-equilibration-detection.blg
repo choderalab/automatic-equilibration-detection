@@ -6,47 +6,46 @@ Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Database file #1: automatic-equilibration-detectionNotes.bib
 Database file #2: automatic-equilibration-detection.bib
-Warning--Warning: pages missing in entry sivak:2013:prx:vvvr.
 Warning--Missing address in entry crc-mcmc-handbook.
-You've used 6 entries,
+You've used 8 entries,
             1909 wiz_defined-function locations,
-            538 strings with 5004 characters,
-and the built_in function-call counts, 1470 in all, are:
-= -- 39
-> -- 103
+            550 strings with 5447 characters,
+and the built_in function-call counts, 1894 in all, are:
+= -- 54
+> -- 126
 < -- 0
-+ -- 33
-- -- 27
-* -- 142
-:= -- 188
-add.period$ -- 6
-call.type$ -- 6
++ -- 40
+- -- 32
+* -- 173
+:= -- 240
+add.period$ -- 8
+call.type$ -- 8
 change.case$ -- 2
 chr.to.int$ -- 0
-cite$ -- 8
-duplicate$ -- 57
-empty$ -- 161
-format.name$ -- 33
-if$ -- 369
+cite$ -- 9
+duplicate$ -- 71
+empty$ -- 209
+format.name$ -- 40
+if$ -- 478
 int.to.chr$ -- 0
-int.to.str$ -- 6
+int.to.str$ -- 8
 missing$ -- 0
-newline$ -- 21
-num.names$ -- 6
-pop$ -- 41
+newline$ -- 27
+num.names$ -- 8
+pop$ -- 50
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 104
+skip$ -- 142
 stack$ -- 0
-substring$ -- 26
-swap$ -- 26
+substring$ -- 57
+swap$ -- 33
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 16
-warning$ -- 2
-while$ -- 9
-width$ -- 7
-write$ -- 31
-(There were 2 warnings)
+warning$ -- 1
+while$ -- 12
+width$ -- 9
+write$ -- 40
+(There was 1 warning)
