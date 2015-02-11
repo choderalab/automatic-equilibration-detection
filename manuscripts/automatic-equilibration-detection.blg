@@ -6,46 +6,48 @@ Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Database file #1: automatic-equilibration-detectionNotes.bib
 Database file #2: automatic-equilibration-detection.bib
+Warning--I didn't find a database entry for "deviation"
+Warning--I didn't find a database entry for ""
 Warning--Missing address in entry crc-mcmc-handbook.
-You've used 8 entries,
+You've used 9 entries,
             1909 wiz_defined-function locations,
-            550 strings with 5447 characters,
-and the built_in function-call counts, 1894 in all, are:
-= -- 54
-> -- 126
+            558 strings with 5718 characters,
+and the built_in function-call counts, 2112 in all, are:
+= -- 61
+> -- 139
 < -- 0
-+ -- 40
-- -- 32
-* -- 173
-:= -- 240
-add.period$ -- 8
-call.type$ -- 8
++ -- 44
+- -- 35
+* -- 195
+:= -- 268
+add.period$ -- 9
+call.type$ -- 9
 change.case$ -- 2
 chr.to.int$ -- 0
-cite$ -- 9
-duplicate$ -- 71
-empty$ -- 209
-format.name$ -- 40
-if$ -- 478
+cite$ -- 10
+duplicate$ -- 81
+empty$ -- 228
+format.name$ -- 44
+if$ -- 529
 int.to.chr$ -- 0
-int.to.str$ -- 8
+int.to.str$ -- 9
 missing$ -- 0
-newline$ -- 27
-num.names$ -- 8
-pop$ -- 50
+newline$ -- 30
+num.names$ -- 9
+pop$ -- 55
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 142
+skip$ -- 158
 stack$ -- 0
-substring$ -- 57
-swap$ -- 33
+substring$ -- 70
+swap$ -- 40
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 16
 warning$ -- 1
-while$ -- 12
-width$ -- 9
-write$ -- 40
-(There was 1 warning)
+while$ -- 14
+width$ -- 10
+write$ -- 45
+(There were 3 warnings)
