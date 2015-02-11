@@ -20,6 +20,11 @@
 }%
 \makeatother
 
+\usepackage{listings} % For code examples
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+
+\usepackage{minted}
+
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{graphicx}
@@ -133,6 +138,13 @@ The estimator $\hat{A} \approx \expect{A}$ constructed from the entire dataset i
 \end{eqnarray}
 While $\lim_{T \rightarrow \infty} \hat{A}_{[1,T]} = \expect{A}$\footnote{We note that this equality only holds for simulation schemes that sample from the true equilibrium distribution $\pi(x)$, such as Metropolis-Hastings Monte Carlo or Metropolized integration schemes. Molecular dynamics simulations utilizing finite timestep integration without Metropolization will produce averages that may deviate from the true expectation $\expect{A}$~\cite{deviation}.}, we concern ourselves here with the optimal approach to estimating $\expect{A}$ given a simulation of \emph{finite} time $T$.
 
+While several automated methods for discarding data to equilibration have been proposed, these approaches have shortcomings that have greatly limited their use.
+The reverse cumulative averaging method~\cite{yang-karplus:2004:jcp:reverse-cumulative-averaging}, for example, uses a statistical test for normality to determine the point before which which the observable timeseries deviates from normality.
+While this concept may be reasonable for experimental data, where measurements often represent the sum of many random variables such that the central limit theorem's guarantee of asymptotic normality ensures the distribution of the observable will be approximately normal, there is no such guarantee that instantaneous measurements of a simulation property of interest will be normally distributed.
+In fact, many properties will be decidedly \emph{non-normal}.
+For a biomolecule such as a protein, for example, the radius of gyration, end-to-end distance, and torsion angles sampled during a simulation will all be highly non-normal.
+Instead, we require a method that makes no assumptions about the nature of the distribution of the property under study.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FIGURE: BURN-IN EXAMPLE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -171,7 +183,7 @@ We first
 % THE IDEA
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section*{The idea}
+\section*{The essential idea}
 \label{section:the-idea}
 
 Suppose we choose some arbitrary time $t_0$ and discard all samples $t \in [0, t_0)$ to equilibration, keeping $[t_0, T]$ as the dataset to analyze.
@@ -190,6 +202,19 @@ At that point, the integrated autocorrelation time $\tau$ (and hence the statist
 
 All molecular simulations were performed with OpenMM 6.2~\cite{eastman:jctc:2012:openmm} using the Python API.
 All scripts used to run simulations, analyze data, and generate plots---along with the simulation data itself---are availabile on GitHub at \url{http://github.com/choderalab/automatic-equilibration-detection}.
+The automated equilibration detection scheme is also available in the \href{http://pymbar.readthedocs.org/en/latest/timeseries.html}{\tt timeseries} module of the \href{http://github.com/choderalab/pymbar}{\tt pymbar} package as {\tt detectEquilibration()}:
+\begin{minted}[mathescape,
+%               linenos,
+               numbersep=5pt,
+               gobble=0,
+               frame=lines,
+               framesep=2mm]{python}
+from pymbar.timeseries import detectEquilibration
+# determine equilibrated region
+[t, g, Neff_max] = detectEquilibration(A_t)
+# extract equilibrated region
+A_t_equilibrated = A_t[t:]
+\end{minted}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ACKNOWLEDGMENTS
