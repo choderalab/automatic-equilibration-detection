@@ -46,7 +46,14 @@
 
 %\newcommand{\bfm}[1]{{\mbox{\boldmath{$#1$}}}}
 %\newcommand{\bfm}[1]{{\bf #1}}
-\newcommand{\expect}[1]{\left \langle #1 \right \rangle}                % <.> for denoting expectations over realizations of an experiment or thermal averages
+%\newcommand{\expect}[1]{\left \langle #1 \right \rangle}                % <.> for denoting expectations over realizations of an experiment or thermal averages
+
+% Define some useful commands we will use repeatedly.
+\newcommand{\T}{\mathrm{T}}                                % T used in matrix transpose
+\newcommand{\tauarrow}{\stackrel{\tau}{\rightarrow}}       % the symbol tau over a right arrow
+\newcommand{\expect}[1]{\langle #1 \rangle}                % <.> for denoting expectations over realizations of an experiment or thermal averages
+\newcommand{\estimator}[1]{\hat{#1}}                       % estimator for some quantity from a finite dataset.
+\newcommand{\code}[1]{{\tt #1}}
 
 % vectors
 \newcommand{\x}{\bfv{x}}
@@ -56,14 +63,14 @@
 \newcommand{\bfc}{\bfm{c}}
 \newcommand{\hatf}{\hat{f}}
 
-\newcommand{\bTheta}{\bfm{\Theta}}
-\newcommand{\btheta}{\bfm{\theta}}
-\newcommand{\bhatf}{\bfm{\hat{f}}}
-\newcommand{\Cov}[1] {\mathrm{cov}\left( #1 \right)}
-\newcommand{\Ept}[1] {{\mathrm E}\left[ #1 \right]}
-\newcommand{\Eptk}[2] {{\mathrm E}\left[ #2 \,|\, #1\right]}
-\newcommand{\T}{\mathrm{T}}                                % T used in matrix transpose
-\newcommand{\conc}[1] {\left[ \mathrm{#1} \right]}
+%\newcommand{\bTheta}{\bfm{\Theta}}
+%\newcommand{\btheta}{\bfm{\theta}}
+%\newcommand{\bhatf}{\bfm{\hat{f}}}
+%\newcommand{\Cov}[1] {\mathrm{cov}\left( #1 \right)}
+%\newcommand{\Ept}[1] {{\mathrm E}\left[ #1 \right]}
+%\newcommand{\Eptk}[2] {{\mathrm E}\left[ #2 \,|\, #1\right]}
+%\newcommand{\T}{\mathrm{T}}                                % T used in matrix transpose
+%\newcommand{\conc}[1] {\left[ \mathrm{#1} \right]}
 
 \newcommand{\pyitc}{\url{http://www.simtk.org/home/bayesian-itc}} % URL of pyITC project homepage
 
@@ -143,14 +150,18 @@ By discarding samples $t < t_0$ to equilibration, we hope to eliminate the initi
 \begin{eqnarray}
 \hat{A}_{[t_0,T]} \equiv \frac{1}{T-t_0+1} \sum_{t=t_0}^T a_t . \label{equation:production-time-average} 
 \end{eqnarray}
-We quantify the bias in an estimator $\hat{A}$ by the expected error $\delta(\hat{A})$,
+We quantify the bias in an estimator $\hat{A}$ by the expected error $\delta^2 \hat{A}$,
 \begin{eqnarray}
-\delta(\hat{A}) &\equiv& \left| \expect{\hat{A}} - \expect{A} \right| . \label{equation:error} 
+\delta^2 \hat{A} &\equiv& E_{x_0} \left| \left( \hat{A} - \expect{A} \right)^2 \right] . \label{equation:error} 
 \end{eqnarray}
-In this note, we concern ourselves with this question: 
-Is there a simple approach to choosing an optimal equilibration time $t_0$ that provides an improved estimate $\hat{A}_{[t_0,T]}$ such that $\delta(\hat{A}_{[t_0,T]}) < \delta(\hat{A}_{[1,T]})$?
+where $E_{x_0}[\cdot]$ denotes the expectation over independent realizations of the simulation from the same initial configuration $x_0$.
 
-While several automated methods for selecting $t_0$, these approaches have shortcomings that have greatly limited their use.
+In this note, we concern ourselves with this question: 
+Is there a simple approach to choosing an optimal equilibration time $t_0$ that provides an improved estimate $\hat{A}_{[t_0,T]}$ such that $\delta^2 \hat{A}_{[t_0,T]} < \delta^2 \hat{A}_{[1,T]}$?
+
+{\color{red}[JDC: We note that, for cases in which the simulation is not long enough to reach equilibrium, no choice of $t_0$ will minimize bias completely.]}
+
+While several automated methods for selecting the equilibration time $t_0$ have been proposed, these approaches have shortcomings that have greatly limited their use.
 The reverse cumulative averaging method~\cite{yang-karplus:2004:jcp:reverse-cumulative-averaging}, for example, uses a statistical test for normality to determine the point before which which the observable timeseries deviates from normality.
 While this concept may be reasonable for experimental data, where measurements often represent the sum of many random variables such that the central limit theorem's guarantee of asymptotic normality ensures the distribution of the observable will be approximately normal, there is no such guarantee that instantaneous measurements of a simulation property of interest will be normally distributed.
 In fact, many properties will be decidedly \emph{non-normal}.
@@ -187,9 +198,36 @@ Densities were recorded every 25 timesteps.
 \label{section:statistical-inefficiency}
 
 An important concept in the development of the main idea presented here is the notion of the \emph{effective number of uncorrelated samples} present in a sample of correlated timeseries data and the related concept of \emph{statistical inefficiency}.
-While this is well-established for the analysis of both Monte Carlo and molecular dynamics simulations~\cite{}, we review it here for the sake of clarity.
+While this is well-established for the analysis of both Monte Carlo and molecular dynamics simulations~\cite{mueller-krumbhaar:j-stat-phys:1973:monte-carlo-analysis,swope:jcp:1982:autocorrelation-analysis,janke:2002:error-analysis,parallel-tempering-wham}, we review it here for the sake of clarity.
 
-We first 
+The statistical uncertainty in the estimator $\hat{A}$ can be written as
+\begin{eqnarray}
+\delta^2 \estimator{A}_{[t_0,T]} &\equiv& E_{x_0}\left[\left(\hat{A}_{[t_0,T]} - \expect{\estimator{A}}\right)^2\right] \nonumber \\
+&=& E_{x_0}\left[ \hat{A}_{[t_0,T]} ^2 \right] - E_{x_0}\left[ \hat{A}_{[t_0,T]}  \right]^2 \nonumber \\
+&=& \frac{1}{(T-t_0+1)^2} \sum_{t,t'=t_0}^T \left[ \expect{a_t a_{t'}} - \expect{a_t}\expect{a_{t'}} \right] \nonumber \\
+&=& \frac{1}{(T-t_0+1)^2} \sum_{t=t_0}^T \left[ \expect{x_t^2} - \expect{x_t}^2 \right] \nonumber \\
+\mbox{} &+& \frac{1}{(T-t_0+1)^2} \sum_{t\ne t' = t_0}^T \left[ \expect{a_t a_{t'}} - \expect{a_t}\expect{a_{t'}} \right] .
+\end{eqnarray}
+In the last step, we have split the sum into two sums---a term capturing the variance in the observations $a_t$, and a remaining term capturing the correlation between observations. 
+
+If $t_0$ is sufficiently large for the initial bias to be eliminated, the remaining timeseries $\{a_t\}_{t_0}^T$ will obey the properties of both stationarity and time-reversibility, which we can use to write
+\begin{eqnarray}
+\delta^2 \hat{A}_{[t_0,T]}^\mathrm{equil} &=& \frac{1}{T-t_0+1} \left[ \expect{a_t^2} - \expect{t_n}^2 \right] \nonumber \\
+\mbox{} &+& \frac{2}{T-t_0+1} \sum_{n=1}^{T-t_0} \left(\frac{T-t_0+1-n}{T-t_0+1}\right) \left[ \expect{a_t a_{t+n}} - \expect{a_t}\expect{a_{t+n}} \right]  \nonumber \\
+&\equiv& \frac{\sigma_{t_0}^2}{T-t_0+1}(1 + 2 \tau_{t_0}) \nonumber \\
+&=& \frac{\sigma_{t_0}^2}{g^{-1} (T-t_0+1)}
+\end{eqnarray}
+where the variance $\sigma_x^2$, statistical inefficiency $g$, and integrated autocorrelation time $\tau$ (in units of the sampling interval) are given by
+\begin{eqnarray}
+\sigma_x^2 &\equiv& \expect{x_n^2} - \expect{x_n}^2 \label{equation:variance-definition} \\
+\tau &\equiv& \sum_{t=1}^{N-1} \left(1 - \frac{t}{N}\right) C_t \label{equation:integrated-autocorrelation-time-definition} \\
+g &\equiv& 1 + 2 \tau \label{equation:statistical-inefficiency-definition}
+\end{eqnarray}
+with the discrete-time normalized fluctuation autocorrelation function $C_t$ defined as
+\begin{eqnarray}
+C_t &\equiv& \frac{\expect{x_n x_{n+t}} - \expect{x_n}^2}{\expect{x_n^2} - \expect{x_n}^2} . \label{equation:autocorrelation-definition}
+\end{eqnarray}
+The quantity $g \equiv (1 + 2 \tau) \ge 1$ can be thought of as a \emph{statistical inefficiency}, in that $g^{-1} N$ gives the effective number of \emph{uncorrelated} configurations contained in the time series.  The statistical inefficiency will depend on the time interval at which configurations are collected for analysis; longer intervals will reduce the statistical inefficiency, which will approach unity as the sampling interval exceeds the correlation time. Practically, we use our best estimates for the variance $\sigma_x^2$ and autocorrelation function $C_t$ to compute an estimate of the statistical uncertainty $\delta^2 \estimator{X}$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % THE IDEA
@@ -234,7 +272,7 @@ A_t_equilibrated = A_t[t:]
 
 \section*{Acknowledgments}
 
-We are grateful to William C.~Swope (IBM Almaden Research Center), Kyle A.~Beauchamp (MSKCC), and Robert C.~McGibbon (Stanford University) for valuable discussions on this topic, and Joshua L.~Adelman (University of Pittsburgh) for helpful feedback and encouragement.
+We are grateful to William C.~Swope (IBM Almaden Research Center), Michael R.~Shirts (University of Virginia), David L.~Mobley (University of California, Irvine), Kyle A.~Beauchamp (MSKCC), and Robert C.~McGibbon (Stanford University) for valuable discussions on this topic, and Joshua L.~Adelman (University of Pittsburgh) for helpful feedback and encouragement.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BIBLIOGRAPHY
