@@ -92,13 +92,13 @@
 
 \begin{abstract}
 
-Molecular simulations intended to compute equilibrium properties (such as molecular dynamics and Metropolis Monte Carlo simulations) are often initiated from configurations that are highly atypical of equilibrium samples, a practice which typically generates a distinct initial transient in mechanical observables computed over the timecourse of the simulation.
-Traditional practice in simulation data analysis recommends this initial transient portion be discarded to \emph{equilibration}, but no simple, general, and automated procedure for this process exists.
-Here, we consider a conceptually simple, automated, easy-to-implement procedure that does not make strict assumptions about the distribution of the observable of interest, in which the equilibration region is chosen to maximize the number of effectively uncorrelated samples in the production portion used for computing equilibrium averages.
-We present a simple reference Python implementation of this procedure and illustrate its application to both synthetic and real simulation data.\\
+Molecular simulations intended to compute equilibrium properties are often initiated from configurations that are highly atypical of equilibrium samples, a practice which can generate a distinct initial transient in mechanical observables computed over the timecourse of the simulation.
+Traditional practice in simulation data analysis recommends this initial portion be discarded to \emph{equilibration}, but no simple, general, and automated procedure for this process exists.
+Here, we suggest a conceptually simple, automated procedure that does not make strict assumptions about the distribution of the observable of interest, in which the equilibration region is chosen to maximize the number of effectively uncorrelated samples in the production portion used to compute equilibrium averages.
+We present a simple reference implementation of the procedure in Python, and demonstrate its utility on both synthetic and real simulation data.\\
 
 % KEYWORDS
-\emph{Keywords: molecular dynamics (MD); Monte Carlo (MC); Markov chain Monte Carlo (MCMC); equilibration; timeseries analysis; statistical inefficiency; integrated autocorrelation time}
+\emph{Keywords: molecular dynamics (MD); Metropolis-Hastings; Monte Carlo (MC); Markov chain Monte Carlo (MCMC); equilibration; timeseries analysis; statistical inefficiency; integrated autocorrelation time}
 
 \end{abstract}
 
@@ -111,34 +111,46 @@ We present a simple reference Python implementation of this procedure and illust
 \section*{Introduction}
 \label{section:introduction}
 
-Molecular simulations use Markov chain Monte Carlo (MCMC) techniques~\cite{jun-s-liu:mcmc} to sample configurations $x$ from an equilibrium distribution $\pi(x)$, either exactly (using Monte Carlo methods) or approximately (using molecular dynamics simulations without Metropolization)~\cite{sivak:2013:prx:vvvr}.
+Molecular simulations use Markov chain Monte Carlo (MCMC) techniques~\cite{jun-s-liu:mcmc} to sample configurations $x$ from an equilibrium distribution $\pi(x)$, either exactly (using Monte Carlo methods such as Metropolis-Hastings) or approximately (using molecular dynamics integrators without Metropolization)~\cite{sivak:2013:prx:vvvr}.
 
 Due to the sensitivity of the equilibrium distribution $\pi(x)$ to small perturbations in configuration $x$ and the difficulty of producing sufficiently good guesses of typical equilibrium configurations, these molecular simulations are often started from highly atypical initial conditions.
 For example, simulations of biopolymers might be initiated from a fully extended conformation unrepresentative of behavior in solution, or a geometry derived from a fit to diffraction data collected from a cryocooled crystal; 
-solvated systems may be prepared by periodically replicating a small solvent box equilibrated under different conditions, yielding atypical densities; 
-liquid mixtures or lipid bilayers may be constructed by using methods that fulfill spatial constraints but create locally aytpical geometries (e.g.~PackMol~\cite{martinez:jctc:2009:packmol}), requiring long simulation times to relax to typical configurations.
+solvated systems may be prepared by periodically replicating a small solvent box equilibrated under different conditions, yielding atypical densities and solvent structure; 
+liquid mixtures or lipid bilayers may be constructed by using methods that fulfill spatial constraints (e.g.~PackMol~\cite{martinez:jctc:2009:packmol}) but create locally aytpical geometries, requiring long simulation times to relax to typical configurations.
 
-As a result, traditional practice in molecular simulation has been to discard some initial portion of the trajectory to ``equilibration'' (also called \emph{burn-in}\footnote{The term \emph{burn-in} comes from the field of electronics, in which a short ``burn-in'' period is used to ensure that a device is free of faulty components---which often fail quickly---and is operating normally~\cite{crc-mcmc-handbook}.} in MCMC literature~\cite{crc-mcmc-handbook}).
-While this practice is strictly unnecessary for the time-average of quantities of interest to converge to the desired expectations~\cite{geyer:burn-in-unnecessary,crc-mcmc-handbook}, this process often allows the practitioner to avoid impractically long run times to eliminate the bias in computed properties in finite-length simulations induced by atypical initial starting conditions.
+As a result, traditional practice in molecular simulation has recommended some initial portion of the trajectory be discarded to \emph{equilibration} (also called \emph{burn-in}\footnote{The term \emph{burn-in} comes from the field of electronics, in which a short ``burn-in'' period is used to ensure that a device is free of faulty components---which often fail quickly---and is operating normally~\cite{crc-mcmc-handbook}.} in the MCMC literature~\cite{crc-mcmc-handbook}).
+While this practice is strictly unnecessary for the time-average of quantities of interest to eventually converge to the desired expectations~\cite{geyer:burn-in-unnecessary,crc-mcmc-handbook}, it nevertheless often allows the practitioner to avoid impractically long run times to eliminate the bias in computed properties in finite-length simulations induced by atypical initial starting conditions.
 
 % Liquid argon example
 % JDC: Should we use TIP3P water instead?
-As an illustrative example, consider the simulation shown in {Figure~\ref{figure:burn-in-example}}, in which a simulation of liquid argon is started at an atypical density and allowed to relax to its equilibrium density ({Figure~\ref{figure:burn-in-example}, top}).
+As an illustrative example, consider the computation of the average density of liquid argon under a given set of reduced temperature and pressure conditions Figure~\ref{figure:burn-in-example}.
+To initiate the simulation, an initial dense liquid geometry at reduced density $\rho^* \equiv \rho \sigma^3 = 0.960$ was prepared and subjected to local energy minimization.
+Figure~\ref{figure:burn-in-example} (top) depicts the relaxation behavior of 100 simulations initiated from the same configuration with different random initial velocities and integrator random number seeds.
+The average (black line) and standard deviation (shaded grey) shows that all realizations of this simulation show a characteristic relaxation behavior away from the initial density toward a new equilibrium density.
 The expectation of the running average of the density over many realizations of this procedure ({Figure~\ref{figure:burn-in-example}, bottom}) significantly deviates from the actual expectation, which would lead to biased estimates unless simulations were sufficiently long to eliminate this starting point dependent bias.
 Note that this significant bias is present because the \emph{same} atypical starting condition is used for every realization of this simulation process.
 
-For the purposes of this note, we presume that the goal is to compute some form of equilibrium expectation, $\expect{A}$ from a timeseries average:
-
-Consider successively sampled configurations $x_t$, $t = 1, \ldots, T$ from a molecular simulation.
-We presume we are interested in the expectation $\expect{A} \equiv \int dx \, A(x) \, \pi(x)$ of a mechanical property $A(x)$.
-For convenience, we will refer to the timeseries $A_t \equiv A(x_t)$, with $t = 0$.
+Consider successively sampled configurations $x_t$ from a molecular simulation, with $t = 1, \ldots, T$.
+We presume we are interested in computing the expectation $\expect{A} \equiv \int dx \, A(x) \, \pi(x)$ of a mechanical property $A(x)$.
+For convenience, we will refer to the timeseries $a_t \equiv A(x_t)$, with $t = 0$.
 The estimator $\hat{A} \approx \expect{A}$ constructed from the entire dataset is given by
 \begin{eqnarray}
-\hat{A}_{[1,T]} \equiv \frac{1}{T} \sum_{t=1}^T A_t . \label{equation:time-average}
+\hat{A}_{[1,T]} \equiv \frac{1}{T} \sum_{t=1}^T a_t . \label{equation:time-average}
 \end{eqnarray}
-While $\lim_{T \rightarrow \infty} \hat{A}_{[1,T]} = \expect{A}$\footnote{We note that this equality only holds for simulation schemes that sample from the true equilibrium distribution $\pi(x)$, such as Metropolis-Hastings Monte Carlo or Metropolized integration schemes. Molecular dynamics simulations utilizing finite timestep integration without Metropolization will produce averages that may deviate from the true expectation $\expect{A}$~\cite{deviation}.}, we concern ourselves here with the optimal approach to estimating $\expect{A}$ given a simulation of \emph{finite} time $T$.
+While $\lim_{T \rightarrow \infty} \hat{A}_{[1,T]} = \expect{A}$ for an infinitely long simulation\footnote{We note that this equality only holds for simulation schemes that sample from the true equilibrium distribution $\pi(x)$, such as Metropolis-Hastings Monte Carlo or Metropolized integration schemes. Molecular dynamics simulations utilizing finite timestep integration without Metropolization will produce averages that may deviate from the true expectation $\expect{A}$~\cite{deviation}.}, the bias in $\hat{A}_{[1,T]}$ may be significant in a simulation of finite length $T$.
 
-While several automated methods for discarding data to equilibration have been proposed, these approaches have shortcomings that have greatly limited their use.
+By discarding samples $t < t_0$ to equilibration, we hope to eliminate the initial transient and provide a less biased estimate of $\expect{A}$,
+\begin{eqnarray}
+\hat{A}_{[t_0,T]} \equiv \frac{1}{T-t_0+1} \sum_{t=t_0}^T a_t . \label{equation:production-time-average} 
+\end{eqnarray}
+We quantify the bias in an estimator $\hat{A}$ by the expected error $\delta(\hat{A})$,
+\begin{eqnarray}
+\delta(\hat{A}) &\equiv& \left| \expect{\hat{A}} - \expect{A} \right| . \label{equation:error} 
+\end{eqnarray}
+In this note, we concern ourselves with this question: 
+Is there a simple approach to choosing an optimal equilibration time $t_0$ that provides an improved estimate $\hat{A}_{[t_0,T]}$ such that $\delta(\hat{A}_{[t_0,T]}) < \delta(\hat{A}_{[1,T]})$?
+
+While several automated methods for selecting $t_0$, these approaches have shortcomings that have greatly limited their use.
 The reverse cumulative averaging method~\cite{yang-karplus:2004:jcp:reverse-cumulative-averaging}, for example, uses a statistical test for normality to determine the point before which which the observable timeseries deviates from normality.
 While this concept may be reasonable for experimental data, where measurements often represent the sum of many random variables such that the central limit theorem's guarantee of asymptotic normality ensures the distribution of the observable will be approximately normal, there is no such guarantee that instantaneous measurements of a simulation property of interest will be normally distributed.
 In fact, many properties will be decidedly \emph{non-normal}.
@@ -200,7 +212,7 @@ At that point, the integrated autocorrelation time $\tau$ (and hence the statist
 \section*{Illustration}
 \label{section:methods}
 
-All molecular simulations were performed with OpenMM 6.2~\cite{eastman:jctc:2012:openmm} using the Python API.
+Molecular dynamics simulations were performed with OpenMM 6.2~\cite{eastman:jctc:2012:openmm} using the Python API.
 All scripts used to run simulations, analyze data, and generate plots---along with the simulation data itself---are availabile on GitHub at \url{http://github.com/choderalab/automatic-equilibration-detection}.
 The automated equilibration detection scheme is also available in the \href{http://pymbar.readthedocs.org/en/latest/timeseries.html}{\tt timeseries} module of the \href{http://github.com/choderalab/pymbar}{\tt pymbar} package as {\tt detectEquilibration()}:
 \begin{minted}[mathescape,
