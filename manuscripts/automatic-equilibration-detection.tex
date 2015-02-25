@@ -150,16 +150,15 @@ By discarding samples $t < t_0$ to equilibration, we hope to eliminate the initi
 \begin{eqnarray}
 \hat{A}_{[t_0,T]} \equiv \frac{1}{T-t_0+1} \sum_{t=t_0}^T a_t . \label{equation:production-time-average} 
 \end{eqnarray}
-We quantify the bias in an estimator $\hat{A}$ by the expected error $\delta^2 \hat{A}$,
+We can quantify the bias in an estimator $\hat{A}$ by the expected error $\delta^2 \hat{A}$,
 \begin{eqnarray}
 \delta^2 \hat{A} &\equiv& E_{x_0} \left| \left( \hat{A} - \expect{A} \right)^2 \right] . \label{equation:error} 
 \end{eqnarray}
-where $E_{x_0}[\cdot]$ denotes the expectation over independent realizations of the simulation from the same initial configuration $x_0$.
+where $E_{x_0}[\cdot]$ denotes the expectation over independent realizations of the simulation from the same initial configuration $x_0$ but different initial velocities and random number seeds.
 
-In this note, we concern ourselves with this question: 
-Is there a simple approach to choosing an optimal equilibration time $t_0$ that provides an improved estimate $\hat{A}_{[t_0,T]}$ such that $\delta^2 \hat{A}_{[t_0,T]} < \delta^2 \hat{A}_{[1,T]}$?
-
-{\color{red}[JDC: We note that, for cases in which the simulation is not long enough to reach equilibrium, no choice of $t_0$ will minimize bias completely.]}
+Here, we concern ourselves with this question: 
+Is there a simple approach to choosing an optimal equilibration time $t_0$ that provides an improved estimate $\hat{A}_{[t_0,T]}$, such that $\delta^2 \hat{A}_{[t_0,T]} < \delta^2 \hat{A}_{[1,T]}$?
+We note that, for cases in which the simulation is not long enough to reach equilibrium, no choice of $t_0$ will eliminate bias completely; the best we can hope for is to minimize this bias.
 
 While several automated methods for selecting the equilibration time $t_0$ have been proposed, these approaches have shortcomings that have greatly limited their use.
 The reverse cumulative averaging method~\cite{yang-karplus:2004:jcp:reverse-cumulative-averaging}, for example, uses a statistical test for normality to determine the point before which which the observable timeseries deviates from normality.
@@ -194,40 +193,46 @@ Densities were recorded every 25 timesteps.
 % STATISTICAL INEFFICIENCY
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section*{Effective number of uncorrelated samples}
+\section*{Autocorrelation analysis}
 \label{section:statistical-inefficiency}
 
-An important concept in the development of the main idea presented here is the notion of the \emph{effective number of uncorrelated samples} present in a sample of correlated timeseries data and the related concept of \emph{statistical inefficiency}.
-While this is well-established for the analysis of both Monte Carlo and molecular dynamics simulations~\cite{mueller-krumbhaar:j-stat-phys:1973:monte-carlo-analysis,swope:jcp:1982:autocorrelation-analysis,janke:2002:error-analysis,parallel-tempering-wham}, we review it here for the sake of clarity.
+The set of successively sampled configurations $\{x_t\}$ and their corresponding observables $\{a_t\}$ compose a correlated timeseries of observations.
+To estimate the statistical error or uncertainty in a stationary timeseries free of bias, we must be able to quantify the \emph{effective number of uncorrelated samples} present in the dataset.
+This is usually accomplished through computation of the \emph{statistical inefficiency} $g$, which quantifies the number of correlated timeseries samples needed to produce a single effectively uncorrelated sample of the observable of interest.
+While this concept is well-established for the analysis of both Monte Carlo and molecular dynamics simulations~\cite{mueller-krumbhaar:j-stat-phys:1973:monte-carlo-analysis,swope:jcp:1982:autocorrelation-analysis,janke:2002:error-analysis,chodera:jctc:2007:wham}, we review it here for the sake of clarity.
 
-The statistical uncertainty in the estimator $\hat{A}$ can be written as
+For a given equilibration time choice $t_0$, the statistical uncertainty in our estimator $\hat{A}_{[t_0,T]}$ can be written as,
 \begin{eqnarray}
 \delta^2 \estimator{A}_{[t_0,T]} &\equiv& E_{x_0}\left[\left(\hat{A}_{[t_0,T]} - \expect{\estimator{A}}\right)^2\right] \nonumber \\
 &=& E_{x_0}\left[ \hat{A}_{[t_0,T]} ^2 \right] - E_{x_0}\left[ \hat{A}_{[t_0,T]}  \right]^2 \nonumber \\
-&=& \frac{1}{(T-t_0+1)^2} \sum_{t,t'=t_0}^T \left[ \expect{a_t a_{t'}} - \expect{a_t}\expect{a_{t'}} \right] \nonumber \\
-&=& \frac{1}{(T-t_0+1)^2} \sum_{t=t_0}^T \left[ \expect{x_t^2} - \expect{x_t}^2 \right] \nonumber \\
-\mbox{} &+& \frac{1}{(T-t_0+1)^2} \sum_{t\ne t' = t_0}^T \left[ \expect{a_t a_{t'}} - \expect{a_t}\expect{a_{t'}} \right] .
+&=& \frac{1}{T_{t_0}^2} \sum_{t,t'=t_0}^T \left[ \expect{a_t a_{t'}} - \expect{a_t}\expect{a_{t'}} \right] \nonumber \\
+&=& \frac{1}{T_{t_0}^2} \sum_{t=t_0}^T \left[ \expect{x_t^2} - \expect{x_t}^2 \right] \nonumber \\
+\mbox{} &+& \frac{1}{T_{t_0}^2} \sum_{t\ne t' = t_0}^T \left[ \expect{a_t a_{t'}} - \expect{a_t}\expect{a_{t'}} \right] .
 \end{eqnarray}
-In the last step, we have split the sum into two sums---a term capturing the variance in the observations $a_t$, and a remaining term capturing the correlation between observations. 
+where $T_{t_0} \equiv T - t_0 + 1$, the number of correlated samples in the timeseries $\{a_t\}_{t_0}^T$.
+In the last step, we have split the double-sum into two separate sums---a term capturing the variance in the observations $a_t$, and a remaining term capturing the correlation between observations. 
 
-If $t_0$ is sufficiently large for the initial bias to be eliminated, the remaining timeseries $\{a_t\}_{t_0}^T$ will obey the properties of both stationarity and time-reversibility, which we can use to write
+If $t_0$ is sufficiently large for the initial bias to be eliminated, the remaining timeseries $\{a_t\}_{t_0}^T$ will obey the properties of both \emph{stationarity} and \emph{time-reversibility}, allowing us to write,
 \begin{eqnarray}
-\delta^2 \hat{A}_{[t_0,T]}^\mathrm{equil} &=& \frac{1}{T-t_0+1} \left[ \expect{a_t^2} - \expect{t_n}^2 \right] \nonumber \\
-\mbox{} &+& \frac{2}{T-t_0+1} \sum_{n=1}^{T-t_0} \left(\frac{T-t_0+1-n}{T-t_0+1}\right) \left[ \expect{a_t a_{t+n}} - \expect{a_t}\expect{a_{t+n}} \right]  \nonumber \\
-&\equiv& \frac{\sigma_{t_0}^2}{T-t_0+1}(1 + 2 \tau_{t_0}) \nonumber \\
-&=& \frac{\sigma_{t_0}^2}{g^{-1} (T-t_0+1)}
+\lefteqn{\delta^2 \hat{A}_{[t_0,T]}^\mathrm{equil} = \frac{1}{T_{t_0}} \left[ \expect{a_t^2} - \expect{a_t}^2 \right]} \nonumber \\
+\mbox{} &+& \frac{2}{T_{t_0}} \sum_{n=1}^{T-t_0} \left(\frac{T_{t_0}-n}{T_{t_0}}\right) \left[ \expect{a_t a_{t+n}} - \expect{a_t}\expect{a_{t+n}} \right]  \nonumber \\
+&\equiv& \frac{\sigma_{t_0}^2}{T_{t_0}}(1 + 2 \tau_{t_0}) \nonumber \\
+&=& \frac{\sigma_{t_0}^2}{T_{t_0}/g_{t_0}}
 \end{eqnarray}
-where the variance $\sigma_x^2$, statistical inefficiency $g$, and integrated autocorrelation time $\tau$ (in units of the sampling interval) are given by
+where the variance $\sigma^2$, statistical inefficiency $g$, and integrated autocorrelation time $\tau$ (in units of the sampling interval) are given by
 \begin{eqnarray}
-\sigma_x^2 &\equiv& \expect{x_n^2} - \expect{x_n}^2 \label{equation:variance-definition} \\
-\tau &\equiv& \sum_{t=1}^{N-1} \left(1 - \frac{t}{N}\right) C_t \label{equation:integrated-autocorrelation-time-definition} \\
+\sigma^2 &\equiv& \expect{a_t^2} - \expect{a_t}^2 \label{equation:variance-definition} \\
+\tau &\equiv& \sum_{t=1}^{T-1} \left(1 - \frac{t}{T}\right) C_t \label{equation:integrated-autocorrelation-time-definition} \\
 g &\equiv& 1 + 2 \tau \label{equation:statistical-inefficiency-definition}
 \end{eqnarray}
 with the discrete-time normalized fluctuation autocorrelation function $C_t$ defined as
 \begin{eqnarray}
-C_t &\equiv& \frac{\expect{x_n x_{n+t}} - \expect{x_n}^2}{\expect{x_n^2} - \expect{x_n}^2} . \label{equation:autocorrelation-definition}
+C_t &\equiv& \frac{\expect{a_n a_{n+t}} - \expect{a_n}^2}{\expect{a_n^2} - \expect{a_n}^2} . \label{equation:autocorrelation-definition}
 \end{eqnarray}
-The quantity $g \equiv (1 + 2 \tau) \ge 1$ can be thought of as a \emph{statistical inefficiency}, in that $g^{-1} N$ gives the effective number of \emph{uncorrelated} configurations contained in the time series.  The statistical inefficiency will depend on the time interval at which configurations are collected for analysis; longer intervals will reduce the statistical inefficiency, which will approach unity as the sampling interval exceeds the correlation time. Practically, we use our best estimates for the variance $\sigma_x^2$ and autocorrelation function $C_t$ to compute an estimate of the statistical uncertainty $\delta^2 \estimator{X}$.
+In practice, it is difficult to estimate $C_t$ for $t \sim T$, due to growth in the statistical error, so common estimators of $g$ make use of several additional properties of $C_t$ to provide useful estimates~\cite{crc-mcmc-handbook}.
+
+The $t_0$ subscript for the variance $\sigma^2$, the integrated autocorrelation time $\tau$, and the statistical inefficiency $t_0$ mean that these quantities are only estimated over the production portion of the timeseries, $\{a_t\}_{t=t_0}^T$.
+Since we assumed that the bias was eliminated by judicious choice of the equilibration time $t_0$, this estimate of the statistical error will be poor for choices of $t_0$ that are too small.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % THE IDEA

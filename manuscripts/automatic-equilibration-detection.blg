@@ -7,48 +7,47 @@ Reallocated singl_function (elt_size=4) to 100 items from 50.
 Database file #1: automatic-equilibration-detectionNotes.bib
 Database file #2: automatic-equilibration-detection.bib
 Warning--I didn't find a database entry for "deviation"
-Warning--I didn't find a database entry for "cite"
 Warning--Missing address in entry crc-mcmc-handbook.
 Warning--Missing address in entry janke:2002:error-analysis.
-You've used 12 entries,
+You've used 13 entries,
             1909 wiz_defined-function locations,
-            580 strings with 6482 characters,
-and the built_in function-call counts, 2989 in all, are:
-= -- 104
-> -- 183
+            584 strings with 6705 characters,
+and the built_in function-call counts, 3213 in all, are:
+= -- 109
+> -- 202
 < -- 0
-+ -- 57
-- -- 45
-* -- 270
-:= -- 373
-add.period$ -- 12
-call.type$ -- 12
++ -- 63
+- -- 50
+* -- 294
+:= -- 405
+add.period$ -- 13
+call.type$ -- 13
 change.case$ -- 2
 chr.to.int$ -- 0
-cite$ -- 14
-duplicate$ -- 118
-empty$ -- 320
-format.name$ -- 58
-if$ -- 754
+cite$ -- 15
+duplicate$ -- 128
+empty$ -- 337
+format.name$ -- 64
+if$ -- 805
 int.to.chr$ -- 0
-int.to.str$ -- 12
+int.to.str$ -- 13
 missing$ -- 0
-newline$ -- 39
-num.names$ -- 13
-pop$ -- 76
+newline$ -- 42
+num.names$ -- 14
+pop$ -- 82
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 224
+skip$ -- 237
 stack$ -- 0
-substring$ -- 116
-swap$ -- 64
+substring$ -- 123
+swap$ -- 71
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 23
 warning$ -- 2
-while$ -- 23
-width$ -- 14
-write$ -- 60
-(There were 4 warnings)
+while$ -- 25
+width$ -- 15
+write$ -- 65
+(There were 3 warnings)
