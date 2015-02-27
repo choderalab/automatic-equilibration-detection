@@ -24,7 +24,7 @@ reduced_density = 0.960     # reduced_density = density * (sigma**3)
 reduced_temperature = 0.850 # reduced_temperature = kB * temperature / epsilon
 reduced_pressure = 1.2660   # reduced_pressure = pressure * (sigma**3) / epsilon
 
-platform_name = 'CPU'    # OpenMM platform name to use for simulation
+platform_name = 'CUDA'    # OpenMM platform name to use for simulation
 platform = openmm.Platform.getPlatformByName(platform_name)
 data_directory = 'data'     # Directory in which data is to be stored
 
