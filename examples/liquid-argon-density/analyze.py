@@ -38,14 +38,17 @@ timestep = 0.002846993438 # ps
 nsteps_per_iteration = 25
 iterations_per_ns = timestep * nsteps_per_iteration * 1000 # ns per iteration
 
+# Write initial reduced densities.
+print "Initial reduced densities:"
+print A_it[:,0]
+
 x = np.arange(niterations+1) / iterations_per_ns # ns
 A_t = A_it.mean(0)
 dA_t = A_it.std(0)
 
-print "<A> = "
-print A_t
-print "d<A> = "
-print dA_t
+print "%8s %8s %8s" % ('t / ps', '<A>', 'd<a>')
+for t in range(100):
+    print "%8.1f %8.5f %8.5f" % (t*nsteps_per_iteration*timestep, A_t[t], dA_t[t])
 
 # Save plot to PDF.
 filename = 'argon-density.pdf' # PDF file to write
@@ -93,8 +96,8 @@ pylab.ylabel(r'reduced density $\rho^*$', fontsize=fontsize)
 oldaxis = pylab.axis()
 pylab.axis([0, x[:nmax].max(), oldaxis[2], oldaxis[3]])
 
-subplot.set_xticklabels([]) # no x-tick labels
-subplot.set_yticklabels([0.8, 0.9, 1.0, 1.1, 1.2]) # no x-tick labels
+subplot.set_xticks([]) # no x-tick labels
+#subplot.set_yticks([0.7, 0.8, 0.9, 1.0])
 
 #
 # BOTTOM PANEL: CUMULATIVE AVERAGE WITH INITIAL BURN-IN PERIOD DISCARDED
@@ -118,6 +121,11 @@ Aburnin_mean_t = Aburnin_it.mean(0)
 Acumavg_std_t = Acumavg_it.std(0)
 Aburnin_std_t = Aburnin_it.std(0)
 
+print "Cumulative average:"
+print "%8s %8s %8s" % ('t / ps', 'Acum', 'stdAcum')
+for t in range(100):
+    print "%8.1f %8.5f %8.5f" % (t*nsteps_per_iteration*timestep, Acumavg_mean_t[t], Acumavg_std_t[t])
+
 true_expectation = Acumavg_mean_t[-1]
 
 subplot = pylab.subplot(212)
@@ -136,7 +144,7 @@ pylab.legend(['cumulative average', 'discarding first %d samples to equilibratio
 pylab.xlabel('simulation time / ns', fontsize=fontsize)
 pylab.ylabel(r'reduced density $\rho^*$', fontsize=fontsize)
 
-subplot.set_yticklabels([0.8, 0.9, 1.0, 1.1, 1.2]) # no x-tick labels
+#subplot.set_yticks([0.7, 0.8, 0.9, 1.0])
 
 # Adjust axes.
 oldaxis = pylab.axis()
