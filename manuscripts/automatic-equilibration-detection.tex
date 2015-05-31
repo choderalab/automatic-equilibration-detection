@@ -190,13 +190,36 @@ Densities were recorded every 25 timesteps.
 \end{figure*}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FIGURE: BURN-IN EXAMPLE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure*} 
+\resizebox{0.9\textwidth}{!}{\includegraphics{argon-reverse-cumulative-average.pdf}}
+\caption{\label{figure:reverse-cumulative-average} {\bf Statistical inefficiency, number of uncorrelated samples, and bias for different burn-in times.} 
+Trajectories of length $T = $ 2~000 iterations ($\sim$14 ns) were analyzed as a function of equilibration time choice $t_0$.
+Averages over all 100 replicate simulations (all starting from the same initial conditions) are shown as dark lines, with shaded lines showing the standard deviation among replicates.
+{\bf Top:} The statistical inefficiency $g$ as a function of equilibration time choice $t_0$ is initially very large, but diminishes rapidly after the system has relaxed to equilibrium.
+{\bf Middle:} The number of effectively uncorrelated samples $N_\mathrm{eff} = (T - t_0 + 1) / g$ shows a maximum at $t_0 = 222$ iterations, suggesting the system has equilibrated by this time.
+The red vertical line in all plots marks this choice of $t_0 = 222$.
+{\bf Bottom:} The cumulative density average $\left\langle \rho^* \right\rangle$ computed over the span $[t_0, T]$ shows that the bias (deviation from the true estimate, shown as red dashed lines) is minimized for choices of $t_0 \ge 222$ iterations.
+The standard deviation among replicates (shaded region) grows with $t_0$ because fewer data are included in the estimate.
+The choice of optimal $t_0$ that maximizes $N_\mathrm{eff}$ (red vertical line) strikes a good balance between bias and variance.
+The true estimate (red dashed lines) is computed from averaging over the range [5~000, 10~000] iterations over all 100 replicates.
+}
+\end{figure*}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FIGURE: BIAS-VARIANCE TRADEOFF
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{figure} 
 \resizebox{\columnwidth}{!}{\includegraphics{argon-bias-variance.pdf}}
-\caption{\label{figure:bias-variance} {\bf Bias-variance tradeoff.} 
-Test.
+\caption{\label{figure:bias-variance} {\bf Bias-variance tradeoff for fixed equilibration time versus automatic equilibration time selection.} 
+Trajectories of length $T = $ 2~000 iterations ($\sim$14 ns) were analyzed as a function of equilibration time choice $t_0$.
+Using 100 replicate simulations, the average bias (deviation from true expectation) and standard error (random variation from replicate to replicate) were computed as a function of a prespecified fixed equilibration time $t_0$, with colors running from $t_0 = 0$ (red) to $t_0 =$1~800 iterations (blue).
+As is readily discerned, the bias for small $t_0$ is initially large, but minimized for larger $t_0$.
+By contrast, the variance (measured here by standard error) grows as $t_0$ grows above a certain critical time (here, $\sim$222 iterations).
+If the $t_0$ that maximizes $N_\mathrm{eff}$ is chosen individually for each trajectory, the resulting bias-variance tradeoff (black triangle) reduces the standard error (while keeping minimal bias) more than is possible for a fixed choice of $t_0$.
 }
 \end{figure}
 
