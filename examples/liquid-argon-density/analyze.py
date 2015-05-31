@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 data_directory = 'data'
 
-nreplicates = 35
+nreplicates = 100
 niterations = 10000
 
 reduced_density_it = np.zeros([nreplicates, niterations+1], np.float64)
@@ -46,9 +46,9 @@ x = np.arange(niterations+1) / iterations_per_ns # ns
 A_t = A_it.mean(0)
 dA_t = A_it.std(0)
 
-print "%8s %8s %8s" % ('t / ps', '<A>', 'd<a>')
-for t in range(100):
-    print "%8.1f %8.5f %8.5f" % (t*nsteps_per_iteration*timestep, A_t[t], dA_t[t])
+#print "%8s %8s %8s" % ('t / ps', '<A>', 'd<a>')
+#for t in range(100):
+#    print "%8.1f %8.5f %8.5f" % (t*nsteps_per_iteration*timestep, A_t[t], dA_t[t])
 
 # Save plot to PDF.
 filename = 'argon-density.pdf' # PDF file to write
@@ -60,7 +60,8 @@ import pylab
 #import seaborn as sns
 
 #
-# FIGURE
+# FIGURE 1
+# Plot average density decay from initial conditions, along with cumulative average and average with some data discarded to equilibrium.
 #
 
 fontsize=10
@@ -115,31 +116,45 @@ for i in range(nreplicates):
             Ninit = 0
         Aburnin_it[i,t] = A_it[i,Ninit:(t+1)].mean()
 
+# Compute reverse cumulative average.
+Arevcum_it = np.zeros([nreplicates, niterations+1], np.float64)
+for i in range(nreplicates):
+    for t0 in range(niterations+1):
+        Arevcum_it[i,t0] = A_it[i,t0:].mean()
+
 Acumavg_mean_t = Acumavg_it.mean(0)
 Aburnin_mean_t = Aburnin_it.mean(0)
+Arevcum_mean_t = Arevcum_it.mean(0)
 
 Acumavg_std_t = Acumavg_it.std(0)
 Aburnin_std_t = Aburnin_it.std(0)
+Arevcum_std_t = Arevcum_it.std(0)
 
-print "Cumulative average:"
-print "%8s %8s %8s" % ('t / ps', 'Acum', 'stdAcum')
-for t in range(100):
-    print "%8.1f %8.5f %8.5f" % (t*nsteps_per_iteration*timestep, Acumavg_mean_t[t], Acumavg_std_t[t])
+print Arevcum_mean_t
+
+#print "Cumulative average:"
+#print "%8s %8s %8s" % ('t / ps', 'Acum', 'stdAcum')
+#for t in range(100):
+#    print "%8.1f %8.5f %8.5f" % (t*nsteps_per_iteration*timestep, Acumavg_mean_t[t], Acumavg_std_t[t])
 
 true_expectation = Acumavg_mean_t[-1]
 
+# Create a subplot.
 subplot = pylab.subplot(212)
 pylab.subplots_adjust(hspace=0.001)
 pylab.hold(True)
 
+# Draw shaded confidence intervals
 pylab.fill_between(x[:nmax:nskip], Acumavg_mean_t[:nmax:nskip]+2*Acumavg_std_t[:nmax:nskip], Acumavg_mean_t[:nmax:nskip]-2*Acumavg_std_t[:nmax:nskip], facecolor='red', edgecolor='red', alpha=0.5, linewidth=0)
-pylab.fill_between(x[Nequil:nmax:nskip], Aburnin_mean_t[Nequil:nmax:nskip]+2*Aburnin_std_t[Nequil:nmax:nskip], Aburnin_mean_t[Nequil:nmax:nskip]-2*Acumavg_std_t[Nequil:nmax:nskip], facecolor='blue', edgecolor='blue', alpha=0.5, linewidth=0)
+pylab.fill_between(x[Nequil:nmax:nskip], Aburnin_mean_t[Nequil:nmax:nskip]+2*Aburnin_std_t[Nequil:nmax:nskip], Aburnin_mean_t[Nequil:nmax:nskip]-2*Aburnin_std_t[Nequil:nmax:nskip], facecolor='blue', edgecolor='blue', alpha=0.5, linewidth=0)
+#pylab.fill_between(x[:nmax:nskip], Arevcum_mean_t[:nmax:nskip]+2*Arevcum_std_t[:nmax:nskip], Arevcum_mean_t[:nmax:nskip]-2*Arevcum_std_t[:nmax:nskip], facecolor='green', edgecolor='green', alpha=0.5, linewidth=0)
 
-pylab.plot([x[0], x[nmax]], [true_expectation, true_expectation], 'k:')
+pylab.plot([x[0], x[nmax]], [true_expectation, true_expectation], 'k:') # true expectation (from all data)
+pylab.plot(x[:nmax], Acumavg_mean_t[:nmax], 'r-') # cumulative average from beginning
+pylab.plot(x[Nequil:nmax], Aburnin_mean_t[Nequil:nmax], 'b-') # cumulative average after discarding some initial data to equilibrium
+#pylab.plot(x[:nmax], Arevcum_mean_t[:nmax], 'g-')
 
-pylab.plot(x[:nmax], Acumavg_mean_t[:nmax], 'r-')
-pylab.plot(x[Nequil:nmax], Aburnin_mean_t[Nequil:nmax], 'b-')
-pylab.legend(['cumulative average', 'discarding first %d samples to equilibration' % Nequil], fontsize=fontsize)
+pylab.legend(['true expectation', 'cumulative average', 'discarding first %d samples to equilibration' % Nequil], fontsize=fontsize, frameon=False)
 
 pylab.xlabel('simulation time / ns', fontsize=fontsize)
 pylab.ylabel(r'reduced density $\rho^*$', fontsize=fontsize)
