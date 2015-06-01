@@ -140,7 +140,7 @@ Shaded regions denote 95\% confidence intervals.
 \begin{figure*}[tbp]
 \resizebox{0.9\textwidth}{!}{\includegraphics{argon-reverse-cumulative-average.pdf}}
 \caption{\label{figure:reverse-cumulative-average} {\bf Statistical inefficiency, number of uncorrelated samples, and bias for different burn-in times.} 
-Trajectories of length $T = $ 2~000 iterations ($\sim$14 ns) for the Lennard-Jones system described in Fig.~\ref{figure:burn-in-example} were analyzed as a function of equilibration time choice $t_0$.
+Trajectories of length $T = $ 2~000 iterations ($\sim$28 ns) for the Lennard-Jones system described in Fig.~\ref{figure:burn-in-example} were analyzed as a function of equilibration time choice $t_0$.
 Averages over all 100 replicate simulations (all starting from the same initial conditions) are shown as dark lines, with shaded lines showing standard deviation of estimates among replicates.
 {\bf Top:} The statistical inefficiency $g$ as a function of equilibration time choice $t_0$ is initially very large, but diminishes rapidly after the system has relaxed to equilibrium.
 {\bf Middle:} The number of effectively uncorrelated samples $N_\mathrm{eff} = (T - t_0 + 1) / g$ shows a maximum at $t_0 = 222$ iterations, suggesting the system has equilibrated by this time.
@@ -159,13 +159,27 @@ The true estimate (red dashed lines) is computed from averaging over the range [
 \begin{figure}[tbp]
 \resizebox{\columnwidth}{!}{\includegraphics{argon-bias-variance.pdf}}
 \caption{\label{figure:bias-variance} {\bf Bias-variance tradeoff for fixed equilibration time versus automatic equilibration time selection.} 
-Trajectories of length $T = $ 2~000 iterations ($\sim$14 ns) for the Lennard-Jones system described in Fig.~\ref{figure:burn-in-example} were analyzed as a function of equilibration time choice $t_0$.
+Trajectories of length $T = $ 2~000 iterations ($\sim$28 ns) for the Lennard-Jones system described in Fig.~\ref{figure:burn-in-example} were analyzed as a function of equilibration time choice $t_0$.
 Using 100 replicate simulations, the average bias (average deviation from true expectation) and standard deviation (random variation from replicate to replicate) were computed as a function of a prespecified fixed equilibration time $t_0$, with colors running from $t_0 = 0$ (red) to $t_0 =$1~800 iterations (blue).
 As is readily discerned, the bias for small $t_0$ is initially large, but minimized for larger $t_0$.
 By contrast, the standard error (a measure of variance, estimated here by standard deviation among replicates) grows as $t_0$ grows above a certain critical time (here, $\sim$222 iterations).
 If the $t_0$ that maximizes $N_\mathrm{eff}$ is instead chosen \emph{individually} for each trajectory based on that trajectory's estimated statistical inefficiency $g_{[t_0,T]}$, the resulting bias-variance tradeoff (black triangle) does an excellent job minimizing bias and variance simultaneously, comparable to what is possible for a choice of equilibration time $t_0$ based on knowledge of the true bias and variance among many replicate estimates.
 }
 \end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FIGURE: RMS ERROR
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure*}[tbp]
+\resizebox{\columnwidth}{!}{\includegraphics{argon-rmse.pdf}}
+\caption{\label{figure:bias-variance} {\bf RMS error for fixed equilibration time versus automatic equilibration time selection.} 
+Trajectories of length $T = $ 2~000 iterations ($\sim$28 ns) for the Lennard-Jones system described in Fig.~\ref{figure:burn-in-example} were analyzed as a function of fixed equilibration time choice $t_0$.
+Using 100 replicate simulations, the RMS error (average root mean squared deviation from true expectation, as defined in Eq.~\ref{equation:rms-error}) was computed (black line) along with 95\% confidence interval (gray shading).
+The RMS error is minimized for fixed equilibration time choices in the range 2--6 ns.
+If the $t_0$ that maximizes $N_\mathrm{eff}$ is instead chosen \emph{individually} for each trajectory based on that trajectory's estimated statistical inefficiency $g_{[t_0,T]}$ using Eq.~\ref{equation:optimal-equilibration-time}, the resulting bias-variance tradeoff (red line, 95\% confidence interval shown as red shading) is quite close to the minimum RMS error achieved from any particular fixed equilibration time $t_0$.
+}
+\end{figure*}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % INTRODUCTION
@@ -209,7 +223,7 @@ By discarding samples $t < t_0$ to equilibration, we hope to eliminate the initi
 \end{eqnarray}
 We can quantify the bias in an estimator $\hat{A}$ by the expected error $\delta^2 \hat{A}$,
 \begin{eqnarray}
-\delta^2 \hat{A} &\equiv& E_{x_0} \left| \left( \hat{A} - \expect{A} \right)^2 \right] . \label{equation:error} 
+\delta^2 \hat{A} &\equiv& E_{x_0} \left| \left( \hat{A} - \expect{A} \right)^2 \right] . \label{equation:rms-error} 
 \end{eqnarray}
 where $E_{x_0}[\cdot]$ denotes the expectation over independent realizations of the simulation from the same initial configuration $x_0$ but different initial velocities and random number seeds.
 
