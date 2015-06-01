@@ -216,10 +216,10 @@ The true estimate (red dashed lines) is computed from averaging over the range [
 \resizebox{\columnwidth}{!}{\includegraphics{argon-bias-variance.pdf}}
 \caption{\label{figure:bias-variance} {\bf Bias-variance tradeoff for fixed equilibration time versus automatic equilibration time selection.} 
 Trajectories of length $T = $ 2~000 iterations ($\sim$14 ns) were analyzed as a function of equilibration time choice $t_0$.
-Using 100 replicate simulations, the average bias (deviation from true expectation) and standard error (random variation from replicate to replicate) were computed as a function of a prespecified fixed equilibration time $t_0$, with colors running from $t_0 = 0$ (red) to $t_0 =$1~800 iterations (blue).
+Using 100 replicate simulations, the average bias (average deviation from true expectation) and standard deviation (random variation from replicate to replicate) were computed as a function of a prespecified fixed equilibration time $t_0$, with colors running from $t_0 = 0$ (red) to $t_0 =$1~800 iterations (blue).
 As is readily discerned, the bias for small $t_0$ is initially large, but minimized for larger $t_0$.
-By contrast, the variance (measured here by standard error) grows as $t_0$ grows above a certain critical time (here, $\sim$222 iterations).
-If the $t_0$ that maximizes $N_\mathrm{eff}$ is chosen individually for each trajectory, the resulting bias-variance tradeoff (black triangle) reduces the standard error (while keeping minimal bias) more than is possible for a fixed choice of $t_0$.
+By contrast, the standard error (a measure of variance, estimated here by standard deviation among replicates) grows as $t_0$ grows above a certain critical time (here, $\sim$222 iterations).
+If the $t_0$ that maximizes $N_\mathrm{eff}$ is instead chosen \emph{individually} for each trajectory based on that trajectory's estimated statistical inefficiency $g_{[t_0,T]}$, the resulting bias-variance tradeoff (black triangle) does an excellent job minimizing bias and variance simultaneously, comparable to what is possible for a choice of equilibration time $t_0$ based on knowledge of the true bias and variance among many replicate estimates.
 }
 \end{figure}
 
