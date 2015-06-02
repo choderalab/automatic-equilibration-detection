@@ -173,7 +173,7 @@ Averages over all 100 replicate simulations (all starting from the same initial 
 {\bf Top:} The statistical inefficiency $g$ as a function of equilibration time choice $t_0$ is initially very large, but diminishes rapidly after the system has relaxed to equilibrium.
 {\bf Middle:} The number of effectively uncorrelated samples $N_\mathrm{eff} = (T - t_0 + 1) / g$ shows a maximum at $t_0 = 222$ iterations, suggesting the system has equilibrated by this time.
 The red vertical line in all plots marks this choice of $t_0 = 222$.
-{\bf Bottom:} The cumulative density average $\left\langle \rho^* \right\rangle$ computed over the span $[t_0, T]$ shows that the bias (deviation from the true estimate, shown as red dashed lines) is minimized for choices of $t_0 \ge 222$ iterations.
+{\bf Bottom:} The cumulative density average $\expect{\rho^*}$ computed over the span $[t_0, T]$ shows that the bias (deviation from the true estimate, shown as red dashed lines) is minimized for choices of $t_0 \ge 222$ iterations.
 The standard deviation among replicates (shaded region) grows with $t_0$ because fewer data are included in the estimate.
 The choice of optimal $t_0$ that maximizes $N_\mathrm{eff}$ (red vertical line) strikes a good balance between bias and variance.
 The true estimate (red dashed lines) is computed from averaging over the range [5~000, 10~000] iterations over all 100 replicates.
@@ -284,7 +284,7 @@ t_0^\mathrm{opt} &=& \argmaxl_{t_0} N_\mathrm{eff}(t_0) \label{equation:optimal-
 Figure~\ref{figure:reverse-cumulative-average} demonstrates this for the liquid argon system described above, using expectations computed over 100 independent replicate trajectories.
 At short $t_0$, the statistical inefficiency $g$ (Figure~\ref{figure:reverse-cumulative-average}, top panel) is large due to the contribution from slow relaxation from atypical initial conditions, while at long $t_0$ the statistical inefficiency estimate is much shorter and nearly constant of a large span of time origins.
 As a result, the effective number of uncorrelated samples $N_\mathrm{eff}$ (Figure~\ref{figure:reverse-cumulative-average}, middle panel) has a peak at $t_0 \sim 222$ iterations (Figure~\ref{figure:reverse-cumulative-average}, vertical red lines).
-The effect on bias in the estimated average reduced density $\left\langle \rho^* \right\rangle$ (Figure~\ref{figure:reverse-cumulative-average}, bottom panel) is striking---the bias is essentially eliminated for the choice of equilibration time $t_0$ that maximizes the number of uncorrelated samples $N_\mathrm{eff}$.
+The effect on bias in the estimated average reduced density $\expect{\rho^*}$ (Figure~\ref{figure:reverse-cumulative-average}, bottom panel) is striking---the bias is essentially eliminated for the choice of equilibration time $t_0$ that maximizes the number of uncorrelated samples $N_\mathrm{eff}$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FIGURE: BIAS-VARIANCE TRADEOFF
@@ -394,10 +394,15 @@ There are, in fact, a variety of schemes for estimating $g$ described in the lit
 The main issue is that a straightforward approach to estimating the statistical inefficiency using Eqs.~\ref{equation:integrated-autocorrelation-time-definition}--\ref{equation:autocorrelation-definition} in which the expectations are simply replaced with sample estimates causes the statistical error in the estimated correlation function $C_t$ to grow with $t$ in a manner that allows this error to quickly overwhelm the sum of Eq.~\ref{equation:integrated-autocorrelation-time-definition}.
 As a result, a number of alternative schemes---generally based on controlling the error in the estimated $C_t$ or truncating the sum of Eq.~\ref{equation:integrated-autocorrelation-time-definition} when the error grows too large---have been proposed.
 
+For stationary, reversible Markov chains, Geyer observed that a function $\Gamma_{k} \equiv \gamma_{2k} + \gamma_{2k+1}$ of the unnormalized fluctuation autocorrelation function $\gamma_t \equiv \expect{a_i a_{i+t}} - \expect{a_i}^2$ has a number of pleasant properties (Theorem 3.1 of \cite{geyer:1992:stat-sci:practical-mcmc}): It is strictly, positive, strictly decreasing, and strictly convex.
+{\color{red}[JDC: Check conditions of Geyer proofs.]}
+These properties can be exploited to define a family of estimators called \emph{initial sequence methods} (see Section 3.3 of \cite{geyer:1992:stat-sci:practical-mcmc} and Section 1.10.2 of \cite{crc-mcmc-handbook}), of which the \emph{initial convex sequence} (ICS) estimator is generally agreed to be optimal, if somewhat complex to implement.
+{\color{red}[JDC: Give implementation details?]}
+
 All computations in this manuscript used the fast multiscale method described in Section 5.2 of \citep{chodera:jctc:2007:wham}.
-This method corresponds to a multiscale variant of the initial positive sequence (IPS) method of Geyer, of of the \emph{initial sequence methods}~\cite{geyer-thompson:j-royal-stat-soc-b:1992:initial-sequence-estimators,crc-mcmc-handbook}, in which contributions are accumulated at increasingly longer lag times and the sum of Eq.~\ref{equation:integrated-autocorrelation-time-definition} is truncated when the terms become negative.
-
-
+This method is related to a multiscale variant of the \emph{initial positive sequence} (IPS) method of Geyer \cite{geyer-thompson:j-royal-stat-soc-b:1992:initial-sequence-estimators}, where contributions are accumulated at increasingly longer lag times and the sum of Eq.~\ref{equation:integrated-autocorrelation-time-definition} is truncated when the terms become negative.
+We have found this method to be both fast and to provide useful estimates of the statistical inefficiency, but it may not perform well for all problems.
+{\color{red}[JDC: Give implementation details?  Compare with ICS?]}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ACKNOWLEDGMENTS
