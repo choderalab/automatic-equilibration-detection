@@ -102,13 +102,13 @@
 
 \begin{abstract}
 
-Molecular simulations intended to compute equilibrium properties are often initiated from configurations that are highly atypical of equilibrium samples, a practice which can generate a distinct initial transient in mechanical observables computed over the timecourse of the simulation.
+Molecular simulations intended to compute equilibrium properties are often initiated from configurations that are highly atypical of equilibrium samples, a practice which can generate a distinct initial transient in mechanical observables computed from the simulation trajectory.
 Traditional practice in simulation data analysis recommends this initial portion be discarded to \emph{equilibration}, but no simple, general, and automated procedure for this process exists.
-Here, we suggest a conceptually simple, automated procedure that does not make strict assumptions about the distribution of the observable of interest, in which the equilibration region is chosen to maximize the number of effectively uncorrelated samples in the production portion used to compute equilibrium averages.
-We present a simple reference implementation of the procedure in Python, and demonstrate its utility on both synthetic and real simulation data.\\
+Here, we suggest such a conceptually simple automated procedure that does not make strict assumptions about the distribution of the observable of interest, where the equilibration region is chosen to maximize the number of effectively uncorrelated samples in the production portion used to compute equilibrium averages.
+We present a simple Python reference implementation of this procedure, and demonstrate its utility on both synthetic and real simulation data.\\
 
 % KEYWORDS
-\emph{Keywords: molecular dynamics (MD); Metropolis-Hastings; Monte Carlo (MC); Markov chain Monte Carlo (MCMC); equilibration; timeseries analysis; statistical inefficiency; integrated autocorrelation time}
+\emph{Keywords: molecular dynamics (MD); Metropolis-Hastings; Monte Carlo (MC); Markov chain Monte Carlo (MCMC); equilibration; burn-in; timeseries analysis; statistical inefficiency; integrated autocorrelation time}
 
 \end{abstract}
 
@@ -134,6 +134,34 @@ Shaded regions denote 95\% confidence intervals.
 \end{figure*}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% INTRODUCTION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Introduction}
+\label{section:introduction}
+
+Molecular simulations use Markov chain Monte Carlo (MCMC) techniques~\cite{jun-s-liu:mcmc} to sample configurations $x$ from an equilibrium distribution $\pi(x)$, either exactly (using Monte Carlo methods such as Metropolis-Hastings) or approximately (using molecular dynamics integrators without Metropolization)~\cite{sivak:2013:prx:vvvr}.
+
+Due to the sensitivity of the equilibrium density $\pi(x)$ to small perturbations in configuration $x$ and the difficulty of producing sufficiently good guesses of typical equilibrium configurations $x \sim \pi(x)$, these molecular simulations are often started from highly atypical initial conditions.
+For example, simulations of biopolymers might be initiated from a fully extended conformation unrepresentative of behavior in solution, or a geometry derived from a fit to diffraction data collected from a cryocooled crystal; 
+solvated systems may be prepared by periodically replicating a small solvent box equilibrated under different conditions, yielding atypical densities and solvent structure; 
+liquid mixtures or lipid bilayers may be constructed by using methods that fulfill spatial constraints (e.g.~PackMol~\cite{martinez:jctc:2009:packmol}) but create locally aytpical geometries, requiring long simulation times to relax to typical configurations.
+
+As a result, traditional practice in molecular simulation has recommended some initial portion of the trajectory be discarded to \emph{equilibration} (also called \emph{burn-in}\footnote{The term \emph{burn-in} comes from the field of electronics, in which a short ``burn-in'' period is used to ensure that a device is free of faulty components---which often fail quickly---and is operating normally~\cite{crc-mcmc-handbook}.} in the MCMC literature~\cite{crc-mcmc-handbook}).
+While the process of discarding initial samples is strictly unnecessary for the time-average of quantities of interest to eventually converge to the desired expectations~\cite{geyer:burn-in-unnecessary}, and as a result is often not recommended by statisticians~\cite{crc-mcmc-handbook}, the differences in complexity of probability densities typically encountered in statistics and molecular simulation may explain the difference in historical practice.
+In the simulation field, discarding initial samples to equilibration nevertheless often allows the practitioner to avoid what may be impractically long run times to eliminate the bias in computed properties in finite-length simulations induced by atypical initial starting conditions.
+
+% Liquid argon example
+% JDC: Should we use TIP3P water instead?
+As an illustrative example, consider the computation of the average density of liquid argon under a given set of reduced temperature and pressure conditions Figure~\ref{figure:burn-in-example}.
+To initiate the simulation, an initial dense liquid geometry at reduced density $\rho^* \equiv \rho \sigma^3 = 0.960$ was prepared and subjected to local energy minimization.
+Figure~\ref{figure:burn-in-example} (top) depicts the relaxation behavior of 100 simulations initiated from the same configuration with different random initial velocities and integrator random number seeds (full simulation details are provided in \emph{Simulation Details}).
+The average (black line) and standard deviation (shaded grey) shows that all realizations of this simulation show a characteristic relaxation behavior away from the initial density toward the equilibrium density.
+The expectation of the running average of the density over many realizations of this procedure ({Figure~\ref{figure:burn-in-example}, bottom}) significantly deviates from the actual expectation, which would lead to biased estimates unless simulations were sufficiently long to eliminate this starting point dependent bias.
+Note that this significant bias is present because the \emph{same} atypical starting condition is used for every realization of this simulation process.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FIGURE: BURN-IN EXAMPLE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -153,60 +181,10 @@ The true estimate (red dashed lines) is computed from averaging over the range [
 \end{figure*}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FIGURE: BIAS-VARIANCE TRADEOFF
+% STATEMENT OF THE PROBLEM
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{figure}[tbp]
-\resizebox{\columnwidth}{!}{\includegraphics{argon-bias-variance.pdf}}
-\caption{\label{figure:bias-variance} {\bf Bias-variance tradeoff for fixed equilibration time versus automatic equilibration time selection.} 
-Trajectories of length $T = $ 2~000 iterations ($\sim$28 ns) for the Lennard-Jones system described in Fig.~\ref{figure:burn-in-example} were analyzed as a function of equilibration time choice $t_0$.
-Using 100 replicate simulations, the average bias (average deviation from true expectation) and standard deviation (random variation from replicate to replicate) were computed as a function of a prespecified fixed equilibration time $t_0$, with colors running from $t_0 = 0$ (red) to $t_0 =$1~800 iterations (blue).
-As is readily discerned, the bias for small $t_0$ is initially large, but minimized for larger $t_0$.
-By contrast, the standard error (a measure of variance, estimated here by standard deviation among replicates) grows as $t_0$ grows above a certain critical time (here, $\sim$222 iterations).
-If the $t_0$ that maximizes $N_\mathrm{eff}$ is instead chosen \emph{individually} for each trajectory based on that trajectory's estimated statistical inefficiency $g_{[t_0,T]}$, the resulting bias-variance tradeoff (black triangle) does an excellent job minimizing bias and variance simultaneously, comparable to what is possible for a choice of equilibration time $t_0$ based on knowledge of the true bias and variance among many replicate estimates.
-}
-\end{figure}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FIGURE: RMS ERROR
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{figure*}[tbp]
-\resizebox{\columnwidth}{!}{\includegraphics{argon-rmse.pdf}}
-\caption{\label{figure:bias-variance} {\bf RMS error for fixed equilibration time versus automatic equilibration time selection.} 
-Trajectories of length $T = $ 2~000 iterations ($\sim$28 ns) for the Lennard-Jones system described in Fig.~\ref{figure:burn-in-example} were analyzed as a function of fixed equilibration time choice $t_0$.
-Using 100 replicate simulations, the RMS error (average root mean squared deviation from true expectation, as defined in Eq.~\ref{equation:rms-error}) was computed (black line) along with 95\% confidence interval (gray shading).
-The RMS error is minimized for fixed equilibration time choices in the range 2--6 ns.
-If the $t_0$ that maximizes $N_\mathrm{eff}$ is instead chosen \emph{individually} for each trajectory based on that trajectory's estimated statistical inefficiency $g_{[t_0,T]}$ using Eq.~\ref{equation:optimal-equilibration-time}, the resulting bias-variance tradeoff (red line, 95\% confidence interval shown as red shading) is quite close to the minimum RMS error achieved from any particular fixed equilibration time $t_0$.
-}
-\end{figure*}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% INTRODUCTION
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section*{Introduction}
-\label{section:introduction}
-
-Molecular simulations use Markov chain Monte Carlo (MCMC) techniques~\cite{jun-s-liu:mcmc} to sample configurations $x$ from an equilibrium distribution $\pi(x)$, either exactly (using Monte Carlo methods such as Metropolis-Hastings) or approximately (using molecular dynamics integrators without Metropolization)~\cite{sivak:2013:prx:vvvr}.
-
-Due to the sensitivity of the equilibrium distribution $\pi(x)$ to small perturbations in configuration $x$ and the difficulty of producing sufficiently good guesses of typical equilibrium configurations, these molecular simulations are often started from highly atypical initial conditions.
-For example, simulations of biopolymers might be initiated from a fully extended conformation unrepresentative of behavior in solution, or a geometry derived from a fit to diffraction data collected from a cryocooled crystal; 
-solvated systems may be prepared by periodically replicating a small solvent box equilibrated under different conditions, yielding atypical densities and solvent structure; 
-liquid mixtures or lipid bilayers may be constructed by using methods that fulfill spatial constraints (e.g.~PackMol~\cite{martinez:jctc:2009:packmol}) but create locally aytpical geometries, requiring long simulation times to relax to typical configurations.
-
-As a result, traditional practice in molecular simulation has recommended some initial portion of the trajectory be discarded to \emph{equilibration} (also called \emph{burn-in}\footnote{The term \emph{burn-in} comes from the field of electronics, in which a short ``burn-in'' period is used to ensure that a device is free of faulty components---which often fail quickly---and is operating normally~\cite{crc-mcmc-handbook}.} in the MCMC literature~\cite{crc-mcmc-handbook}).
-While this practice is strictly unnecessary for the time-average of quantities of interest to eventually converge to the desired expectations~\cite{geyer:burn-in-unnecessary}, and statisticians often do not recommend this procedure in best practices~\cite{crc-mcmc-handbook}, this habit may be a result of the relative simplicity of probability densities that statisticians must sample from compared to the highly complex densities faced in nearly all molecular simulations.
-In the simulation field, discarding initial samples to equilibration nevertheless often allows the practitioner to avoid what may be impractically long run times to eliminate the bias in computed properties in finite-length simulations induced by atypical initial starting conditions.
-
-% Liquid argon example
-% JDC: Should we use TIP3P water instead?
-As an illustrative example, consider the computation of the average density of liquid argon under a given set of reduced temperature and pressure conditions Figure~\ref{figure:burn-in-example}.
-To initiate the simulation, an initial dense liquid geometry at reduced density $\rho^* \equiv \rho \sigma^3 = 0.960$ was prepared and subjected to local energy minimization.
-Figure~\ref{figure:burn-in-example} (top) depicts the relaxation behavior of 100 simulations initiated from the same configuration with different random initial velocities and integrator random number seeds.
-The average (black line) and standard deviation (shaded grey) shows that all realizations of this simulation show a characteristic relaxation behavior away from the initial density toward a new equilibrium density.
-The expectation of the running average of the density over many realizations of this procedure ({Figure~\ref{figure:burn-in-example}, bottom}) significantly deviates from the actual expectation, which would lead to biased estimates unless simulations were sufficiently long to eliminate this starting point dependent bias.
-Note that this significant bias is present because the \emph{same} atypical starting condition is used for every realization of this simulation process.
+\section*{Statement of the problem}
 
 Consider successively sampled configurations $x_t$ from a molecular simulation, with $t = 1, \ldots, T$.
 We presume we are interested in computing the expectation $\expect{A} \equiv \int dx \, A(x) \, \pi(x)$ of a mechanical property $A(x)$.
@@ -248,7 +226,7 @@ Instead, we require a method that makes no assumptions about the nature of the d
 The set of successively sampled configurations $\{x_t\}$ and their corresponding observables $\{a_t\}$ compose a correlated timeseries of observations.
 To estimate the statistical error or uncertainty in a stationary timeseries free of bias, we must be able to quantify the \emph{effective number of uncorrelated samples} present in the dataset.
 This is usually accomplished through computation of the \emph{statistical inefficiency} $g$, which quantifies the number of correlated timeseries samples needed to produce a single effectively uncorrelated sample of the observable of interest.
-While this concept is well-established for the analysis of both Monte Carlo and molecular dynamics simulations~\cite{mueller-krumbhaar:j-stat-phys:1973:monte-carlo-analysis,swope:jcp:1982:autocorrelation-analysis,janke:2002:error-analysis,chodera:jctc:2007:wham}, we review it here for the sake of clarity.
+While these concepts are well-established for the analysis of both Monte Carlo and molecular dynamics simulations~\cite{mueller-krumbhaar:j-stat-phys:1973:monte-carlo-analysis,swope:jcp:1982:autocorrelation-analysis,janke:2002:error-analysis,chodera:jctc:2007:wham}, we review it here for the sake of clarity.
 
 For a given equilibration time choice $t_0$, the statistical uncertainty in our estimator $\hat{A}_{[t_0,T]}$ can be written as,
 \begin{eqnarray}
@@ -296,7 +274,7 @@ We can determine this by computing the statistical inefficiency $g_{t_0}$ for th
 If we start at $t_0 \equiv T$ and move $t_0$ to earlier and earlier points in time, we expect that the effective number of uncorrelated samples $N_\mathrm{eff}(t_0)$ will continue to grow until we start to include the highly atypical initial data.
 At that point, the integrated autocorrelation time $\tau$ (and hence the statistical inefficiency $g$) will greatly increase, and the effective number of samples $N_\mathrm{eff}$ will start to plummet.
 
-This suggests an embarrassingly simple algorithm for identifying the optimal equilibration time---pick the $t_0$ which maximizes the number of uncorrelated samples $N_\mathrm{eff}$.
+This suggests an alluringly simple algorithm for identifying the optimal equilibration time---pick the $t_0$ which maximizes the number of uncorrelated samples $N_\mathrm{eff}$.
 In mathematical terms, 
 \begin{eqnarray}
 t_0^\mathrm{opt} &=& \argmaxl_{t_0} N_\mathrm{eff}(t_0) \label{equation:optimal-equilibration-time} \\
@@ -308,10 +286,32 @@ At short $t_0$, the statistical inefficiency $g$ (Figure~\ref{figure:reverse-cum
 As a result, the effective number of uncorrelated samples $N_\mathrm{eff}$ (Figure~\ref{figure:reverse-cumulative-average}, middle panel) has a peak at $t_0 \sim 222$ iterations (Figure~\ref{figure:reverse-cumulative-average}, vertical red lines).
 The effect on bias in the estimated average reduced density $\left\langle \rho^* \right\rangle$ (Figure~\ref{figure:reverse-cumulative-average}, bottom panel) is striking---the bias is essentially eliminated for the choice of equilibration time $t_0$ that maximizes the number of uncorrelated samples $N_\mathrm{eff}$.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FIGURE: BIAS-VARIANCE TRADEOFF
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}[tbp]
+\resizebox{\columnwidth}{!}{\includegraphics{argon-bias-variance.pdf}}
+\caption{\label{figure:bias-variance} {\bf Bias-variance tradeoff for fixed equilibration time versus automatic equilibration time selection.} 
+Trajectories of length $T = $ 2~000 iterations ($\sim$28 ns) for the Lennard-Jones system described in Fig.~\ref{figure:burn-in-example} were analyzed as a function of equilibration time choice $t_0$.
+Using 100 replicate simulations, the average bias (average deviation from true expectation) and standard deviation (random variation from replicate to replicate) were computed as a function of a prespecified fixed equilibration time $t_0$, with colors running from $t_0 = 0$ (red) to $t_0 =$1~800 iterations (blue).
+As is readily discerned, the bias for small $t_0$ is initially large, but minimized for larger $t_0$.
+By contrast, the standard error (a measure of variance, estimated here by standard deviation among replicates) grows as $t_0$ grows above a certain critical time (here, $\sim$222 iterations).
+If the $t_0$ that maximizes $N_\mathrm{eff}$ is instead chosen \emph{individually} for each trajectory based on that trajectory's estimated statistical inefficiency $g_{[t_0,T]}$, the resulting bias-variance tradeoff (black triangle) does an excellent job minimizing bias and variance simultaneously, comparable to what is possible for a choice of equilibration time $t_0$ based on knowledge of the true bias and variance among many replicate estimates.
+{\color{red}[JDC: Add colorbar.]}
+}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% BIAS-VARIANCE TRADEOFF
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section*{Bias-variance tradeoff}
 
 With increasing equilibration time $t_0$, bias is reduced, but the variance---the contribution to error due to random variation from having a finite number of uncorrelated samples---will increase because less data is included in the estimate.
-This can be seen in the bottom panel of Figure~\ref{figure:reverse-cumulative-average}, with the standard deviation among sample estimates (shaded region) which indicates the statistical uncertainty increasing with increasing choice of $t_0$, but is more clearly illustrated in Figure~\ref{figure:bias-variance}, which plots the bias and variance (here, shown as standard error) contributions against each other as a function of $t_0$ (denoted by color).
+This can be seen in the bottom panel of Figure~\ref{figure:reverse-cumulative-average}, where the shaded region (denoting the standard deviation among sample estimates) increases in width with increasing equilibration time $t_0$.
+
+To examine the tradeoff between bias and variance explicitly, Figure~\ref{figure:bias-variance} plots the bias and variance (here, shown as standard error) contributions against each other as a function of $t_0$ (denoted by color).
 At $t_0 = 0$, the bias is large but variance is minimized.
 With increasing $t_0$, bias is eventually eliminated but then variance rapidly grows as fewer uncorrelated samples are included in the estimate.
 There is a clear optimal choice at $t_0 \sim 222$ iterations that minimizes variance while also effectively eliminating bias.
@@ -319,6 +319,20 @@ There is a clear optimal choice at $t_0 \sim 222$ iterations that minimizes vari
 But how will this strategy work for cases where we do not know the statistical inefficiency $g$ as a function of the equilibration time $t_0$ precisely?
 When all that is available is a single simulation, our best estimate of $g_{t_0}$ is estimated from that simulation alone over the span $[t_0,T]$---will this affect the quality of our estimate of equilibration time?
 Empirically, this does not appear to be the case---the black triangle in Figure~\ref{figure:bias-variance} shows the bias and variance for estimates computed over the 100 replicates where $t_0$ is individually determined from each simulation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FIGURE: RMS ERROR
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure*}[tbp]
+\resizebox{\columnwidth}{!}{\includegraphics{argon-rmse.pdf}}
+\caption{\label{figure:bias-variance} {\bf RMS error for fixed equilibration time versus automatic equilibration time selection.} 
+Trajectories of length $T = $ 2~000 iterations ($\sim$28 ns) for the Lennard-Jones system described in Fig.~\ref{figure:burn-in-example} were analyzed as a function of fixed equilibration time choice $t_0$.
+Using 100 replicate simulations, the RMS error (average root mean squared deviation from true expectation, as defined in Eq.~\ref{equation:rms-error}) was computed (black line) along with 95\% confidence interval (gray shading).
+The RMS error is minimized for fixed equilibration time choices in the range 2--6 ns.
+If the $t_0$ that maximizes $N_\mathrm{eff}$ is instead chosen \emph{individually} for each trajectory based on that trajectory's estimated statistical inefficiency $g_{[t_0,T]}$ using Eq.~\ref{equation:optimal-equilibration-time}, the resulting RMS error (red line, 95\% confidence interval shown as red shading) is quite close to the minimum RMS error achieved from any particular fixed equilibration time $t_0$, suggesting that this simple automated approach to selecting $t_0$ performs reasonably well.
+}
+\end{figure*}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DISCUSSION
@@ -341,7 +355,7 @@ However, in these cases, the data itself should be suspect if the trajectory is 
 % METHODS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section*{Simulation Methods}
+\section*{Simulation Details}
 \label{section:methods}
 
 All molecular dynamics simulations described here were performed with OpenMM 6.2~\cite{eastman:jctc:2012:openmm} (available at \href{http://openmm.org}{openmm.org}) using the Python API.
@@ -367,6 +381,23 @@ from pymbar.timeseries import detectEquilibration
 # discard initial samples to equilibration
 A_t = A_t[t0:]
 \end{minted}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% STATISTICAL INEFFICIENCY
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Practical computation of statistical inefficiency}
+
+The computation of the statistical inefficiency $g$ (defined by Eq.~\ref{equation:statistical-inefficiency-definition}) for a finite timeseries $a_t$, $t = 1, \ldots, T$ deserves some comment.
+There are, in fact, a variety of schemes for estimating $g$ described in the literature, and their behaviors for finite datasets may differ, leading to different estimates of the equilibration time $t_0$ using the algorithm of Eq.~\ref{equation:optimal-equilibration-time}.
+
+The main issue is that a straightforward approach to estimating the statistical inefficiency using Eqs.~\ref{equation:integrated-autocorrelation-time-definition}--\ref{equation:autocorrelation-definition} in which the expectations are simply replaced with sample estimates causes the statistical error in the estimated correlation function $C_t$ to grow with $t$ in a manner that allows this error to quickly overwhelm the sum of Eq.~\ref{equation:integrated-autocorrelation-time-definition}.
+As a result, a number of alternative schemes---generally based on controlling the error in the estimated $C_t$ or truncating the sum of Eq.~\ref{equation:integrated-autocorrelation-time-definition} when the error grows too large---have been proposed.
+
+All computations in this manuscript used the fast multiscale method described in Section 5.2 of \citep{chodera:jctc:2007:wham}.
+This method corresponds to a multiscale variant of the initial positive sequence (IPS) method of Geyer, of of the \emph{initial sequence methods}~\cite{geyer-thompson:j-royal-stat-soc-b:1992:initial-sequence-estimators,crc-mcmc-handbook}, in which contributions are accumulated at increasingly longer lag times and the sum of Eq.~\ref{equation:integrated-autocorrelation-time-definition} is truncated when the terms become negative.
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ACKNOWLEDGMENTS

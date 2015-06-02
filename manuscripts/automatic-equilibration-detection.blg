@@ -9,45 +9,45 @@ Database file #2: automatic-equilibration-detection.bib
 Warning--I didn't find a database entry for "deviation"
 Warning--Missing address in entry crc-mcmc-handbook.
 Warning--Missing address in entry janke:2002:error-analysis.
-You've used 13 entries,
+You've used 14 entries,
             1909 wiz_defined-function locations,
-            584 strings with 6705 characters,
-and the built_in function-call counts, 3213 in all, are:
-= -- 109
-> -- 202
+            591 strings with 6917 characters,
+and the built_in function-call counts, 3406 in all, are:
+= -- 115
+> -- 212
 < -- 0
-+ -- 63
-- -- 50
-* -- 294
-:= -- 405
-add.period$ -- 13
-call.type$ -- 13
++ -- 66
+- -- 52
+* -- 312
+:= -- 429
+add.period$ -- 14
+call.type$ -- 14
 change.case$ -- 2
 chr.to.int$ -- 0
-cite$ -- 15
-duplicate$ -- 128
-empty$ -- 337
-format.name$ -- 64
-if$ -- 805
+cite$ -- 16
+duplicate$ -- 138
+empty$ -- 355
+format.name$ -- 67
+if$ -- 850
 int.to.chr$ -- 0
-int.to.str$ -- 13
+int.to.str$ -- 14
 missing$ -- 0
-newline$ -- 42
-num.names$ -- 14
-pop$ -- 82
+newline$ -- 45
+num.names$ -- 15
+pop$ -- 88
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 237
+skip$ -- 252
 stack$ -- 0
-substring$ -- 123
-swap$ -- 71
+substring$ -- 133
+swap$ -- 78
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 23
 warning$ -- 2
-while$ -- 25
-width$ -- 15
-write$ -- 65
+while$ -- 27
+width$ -- 16
+write$ -- 70
 (There were 3 warnings)
