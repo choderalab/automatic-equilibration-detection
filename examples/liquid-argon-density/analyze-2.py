@@ -166,7 +166,7 @@ print ""
 print "Creating RMS error figure..."
 
 # Create plot as PDF.
-filename = 'argon-rmse.pdf' # PDF file to write
+filename = os.path.join('figures', 'argon-rmse.pdf') # PDF file to write
 
 x = np.arange(tbvmax) / iterations_per_ns # ns
 
@@ -234,7 +234,7 @@ pp.close()
 print "Creating bias-variance tradeoff figure..."
 
 # Create plot as PDF.
-filename = 'argon-bias-variance.pdf' # PDF file to write
+filename = os.path.join('figures', 'argon-bias-variance.pdf') # PDF file to write
 
 from matplotlib.backends.backend_pdf import PdfPages
 pp = PdfPages(filename)
@@ -290,7 +290,7 @@ pp.close()
 print "Creating reverse cumulative averages figure..."
 
 # Create plot as PDF.
-filename = 'argon-reverse-cumulative-average.pdf' # PDF file to write
+filename = os.path.join('figures', 'argon-reverse-cumulative-average.pdf') # PDF file to write
 
 from matplotlib.backends.backend_pdf import PdfPages
 pp = PdfPages(filename)

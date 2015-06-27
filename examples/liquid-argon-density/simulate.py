@@ -24,8 +24,6 @@ reduced_density = 0.960     # reduced_density = density * (sigma**3)
 reduced_temperature = 0.850 # reduced_temperature = kB * temperature / epsilon
 reduced_pressure = 1.2660   # reduced_pressure = pressure * (sigma**3) / epsilon
 
-platform_name = 'CUDA'    # OpenMM platform name to use for simulation
-platform = openmm.Platform.getPlatformByName(platform_name)
 data_directory = 'data'     # Directory in which data is to be stored
 
 r0 = 2.0**(1./6.) * sigma   # minimum potential distance for Lennard-Jones interaction
@@ -101,7 +99,7 @@ for replicate in range(nreplicates):
 
     # Create context.
     print "Creating Context..."
-    context = openmm.Context(system, integrator, platform)
+    context = openmm.Context(system, integrator)
 
     # Set initial conditions.
     print "Setting initial positions..."

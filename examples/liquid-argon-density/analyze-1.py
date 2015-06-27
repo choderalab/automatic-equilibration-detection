@@ -51,7 +51,7 @@ dA_t = A_it.std(0)
 #    print "%8.1f %8.5f %8.5f" % (t*nsteps_per_iteration*timestep, A_t[t], dA_t[t])
 
 # Save plot to PDF.
-filename = 'argon-density.pdf' # PDF file to write
+filename = os.path.join('figures', 'argon-density.pdf') # PDF file to write
 
 from matplotlib.backends.backend_pdf import PdfPages
 pp = PdfPages(filename)

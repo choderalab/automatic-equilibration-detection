@@ -4,5 +4,14 @@
 #
 # WARNING: THIS WILL DELETE ALL SIMULATION RESULTS AND FIGURES
 
-rm -rf data/ figures/
+# Delete data
+rm -rf data/
+
+# Delete figures
+rm -rf figures/
+
+# Remove conda environment
+source deactivate
+rm -rf conda-env/
+
 
