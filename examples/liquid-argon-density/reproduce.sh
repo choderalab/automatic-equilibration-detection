@@ -8,8 +8,10 @@
 # This requires the conda Pythjon package environment management tool.
 
 # Create conda environment with necessary tools.
-if [ ! -e conda-env ]; then
-    conda create --yes -p conda-env python=2.7 openmmtools=0.7.0 openmm=6.2 matplotlib=1.4
+if [ ! -d conda-env ]; then
+    echo "Creating new conda environment ./conda-env containing versions of tools needed for reproducibility..."
+    conda config --add channels http://conda.binstar.org/omnia
+    conda create --yes --quiet -p conda-env python=2.7 openmmtools=0.7.0 openmm=6.2 matplotlib=1.4 pymbar=3.0.0.beta2
 fi
 source activate ./conda-env
 
@@ -17,6 +19,9 @@ source activate ./conda-env
 python simulate.py
 
 # Analyze simulation data to generate figures.
+if [ ! -e figures ]; then
+    mkdir figures
+fi
 python analyze-1.py
 python analyze-2.py
 
