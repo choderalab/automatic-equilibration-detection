@@ -6,12 +6,11 @@ Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Database file #1: automatic-equilibration-detectionNotes.bib
 Database file #2: automatic-equilibration-detection.bib
-Warning--I didn't find a database entry for "deviation"
 Warning--Missing address in entry crc-mcmc-handbook.
 Warning--Missing address in entry janke:2002:error-analysis.
 You've used 15 entries,
             1909 wiz_defined-function locations,
-            596 strings with 7021 characters,
+            595 strings with 7012 characters,
 and the built_in function-call counts, 3578 in all, are:
 = -- 120
 > -- 218
@@ -50,4 +49,4 @@ warning$ -- 2
 while$ -- 29
 width$ -- 17
 write$ -- 75
-(There were 3 warnings)
+(There were 2 warnings)
