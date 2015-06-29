@@ -127,12 +127,12 @@ Abias_stderr_t = Aburnin_it.mean(0) / np.sqrt(nreplicates)
 Astderr_mean_t = Aburnin_it.std(0)
 Astderr_stderr_t = Aburnin_it.std(0) / np.sqrt(nreplicates)
 
-print ""
-print "BIAS-VARIANCE TRADEOFF FOR FIXED INITIAL BURN-IN"
-print "%8s   %10s %10s" % ("", "bias", "stderr")
-for t0 in range(t0max):
-    print "%8d : %10.6f %10.6f" % (t0, Abias_mean_t[t0], Astderr_mean_t[t0])
-print ""
+#print ""
+#print "BIAS-VARIANCE TRADEOFF FOR FIXED INITIAL BURN-IN"
+#print "%8s   %10s %10s" % ("", "bias", "stderr")
+#for t0 in range(t0max):
+#    print "%8d : %10.6f %10.6f" % (t0, Abias_mean_t[t0], Astderr_mean_t[t0])
+#print ""
 
 # Compute estimates bias and variance using no equilibration, arbitrary equilibration, and optimal equilibration.
 bias_i = dict()

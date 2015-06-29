@@ -1014,6 +1014,6 @@
 			</Particles>
 			<Exceptions/>
 		</Force>
-		<Force forceGroup="0" frequency="25" pressure="32.074920415224916" randomSeed="-1762120574" temperature="101.80119098713912" type="MonteCarloBarostat" version="1"/>
+		<Force forceGroup="0" frequency="25" pressure="32.074920415224916" randomSeed="1574853568" temperature="101.80119098713912" type="MonteCarloBarostat" version="1"/>
 	</Forces>
 </System>
