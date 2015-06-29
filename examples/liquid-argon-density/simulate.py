@@ -11,7 +11,7 @@ from simtk import openmm
 from simtk import unit
 from simtk.openmm import app
 
-from openmmtools import testsystems
+from openmmtools import testsystems, integrators
 
 # Set conditions for simulation.
 # Roughly corresponds to conditions from http://www.cstl.nist.gov/srs/LJ_PURE/mc.htm
@@ -38,7 +38,8 @@ timestep = 0.01 * characteristic_timescale # integrator timestep
 print "characteristic timescale = %.3f ps" % (characteristic_timescale / unit.picoseconds)
 print "timestep = %.12f ps" % (timestep / unit.picoseconds)
 
-collision_rate = 5.0 / unit.picoseconds # collision rate for Langevin thermostat
+#collision_rate = 5.0 / unit.picoseconds # collision rate for Langevin thermostat
+collision_rate = 1.0 / characteristic_timescale # collision rate for Langevin thermostat
 barostat_frequency = 25 # number of steps between barostat updates
 
 # Set parameters for number of simulation replicates, number of iterations per simulation, and number of steps per iteration.
@@ -58,7 +59,8 @@ testsystem = testsystems.LennardJonesFluid(nparticles=nparticles, mass=mass, sig
 
 # Construct initial positions by minimization.
 print "Minimizing to obtain initial positions..."
-integrator = openmm.LangevinIntegrator(temperature, collision_rate, timestep)
+#integrator = openmm.LangevinIntegrator(temperature, collision_rate, timestep)
+integrator = integrators.VVVRIntegrator(temperature, collision_rate, timestep)
 context = openmm.Context(testsystem.system, integrator)
 context.setPositions(testsystem.positions)
 openmm.LocalEnergyMinimizer.minimize(context)
