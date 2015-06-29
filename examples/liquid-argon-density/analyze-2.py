@@ -20,7 +20,7 @@ from equilibration import statisticalInefficiency_multiscale as statisticalIneff
 data_directory = 'data'
 figure_directory = 'figures'
 
-nreplicates = 100
+nreplicates = 500
 niterations = 10000
 
 #nreplicates = 10

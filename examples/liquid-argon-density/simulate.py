@@ -43,7 +43,7 @@ collision_rate = 1.5 / characteristic_timescale # collision rate for Langevin th
 barostat_frequency = 25 # number of steps between barostat updates
 
 # Set parameters for number of simulation replicates, number of iterations per simulation, and number of steps per iteration.
-nreplicates = 100
+nreplicates = 500
 niterations = 10000
 nsteps_per_iteration = 25
 
