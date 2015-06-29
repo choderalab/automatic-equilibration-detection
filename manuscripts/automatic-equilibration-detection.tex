@@ -126,8 +126,8 @@ To illustrate the bias in expectations induced by relaxation away from initial c
 %
 {\bf Top:} The average of the reduced density (black line) over the replicates relaxes to the region of typical equilibrium densities over the first few ns of simulation time.
 %
-{\bf Bottom:} If the average density is estimated by a cumulative average from the beginning of the simulation (red line), the estimate will be heavily biased by the atypical starting density even beyond 10 ns.
-Discarding even a small amount of initial data---in this case 100 initial samples ($\sim$1.4 ns, blue line)---results in a cumulative average estimate that converges to the true average (black dotted line) much more rapidly.
+{\bf Bottom:} If the average density is estimated by a cumulative average from the beginning of the simulation (red dotted line), the estimate will be heavily biased by the atypical starting density even beyond 10 ns.
+Discarding even a small amount of initial data---in this case 100 initial samples ($\sim$1.4 ns, blue solid line)---results in a cumulative average estimate that converges to the true average (black dashed line) much more rapidly.
 % 
 Shaded regions denote 95\% confidence intervals.
 }
@@ -149,7 +149,7 @@ liquid mixtures or lipid bilayers may be constructed by using methods that fulfi
 
 As a result, traditional practice in molecular simulation has recommended some initial portion of the trajectory be discarded to \emph{equilibration} (also called \emph{burn-in}\footnote{The term \emph{burn-in} comes from the field of electronics, in which a short ``burn-in'' period is used to ensure that a device is free of faulty components---which often fail quickly---and is operating normally~\cite{crc-mcmc-handbook}.} in the MCMC literature~\cite{crc-mcmc-handbook}).
 While the process of discarding initial samples is strictly unnecessary for the time-average of quantities of interest to eventually converge to the desired expectations~\cite{geyer:burn-in-unnecessary}, this nevertheless often allows the practitioner to avoid what may be impractically long run times to eliminate the bias in computed properties in finite-length simulations induced by atypical initial starting conditions.
-It is worth noting that a similar procedure is often not recommended by statisticians when sampling from posterior distributions in statistical inference~\cite{crc-mcmc-handbook}; the differences in complexity of probability densities typically encountered in statistics and molecular simulation may explain the difference in historical practice.
+It is worth noting that a similar procedure is not a practice universally recommended by statisticians when sampling from posterior distributions in statistical inference~\cite{crc-mcmc-handbook}; the differences in complexity of probability densities typically encountered in statistics and molecular simulation may explain the difference in historical practice.
 
 % Liquid argon example
 % JDC: Should we use TIP3P water instead?
@@ -157,7 +157,7 @@ As a motivating example, consider the computation of the average density of liqu
 To initiate the simulation, an initial dense liquid geometry at reduced density $\rho^* \equiv \rho \sigma^3 = 0.960$ was prepared and subjected to local energy minimization.
 The upper panel of Figure~\ref{figure:burn-in-example} depicts the average relaxation behavior of simulations initiated from the same configuration with different random initial velocities and integrator random number seeds (see \emph{Simulation Details}).
 The average (black line) and 95\% confidence interval (shaded grey) of 100 realizations of this process show a characteristic relaxation behavior away from the initial density toward the equilibrium density.
-The expectation of the running average of the density over many realizations of this procedure ({Figure~\ref{figure:burn-in-example}, lower panel}) significantly deviates from the true expectation (dotted line), leading to significantly biased estimates of the expectation unless simulations are sufficiently long to eliminate this starting point dependent bias---a surprisingly long 30 ns in this case.
+The expectation of the running average of the density over many realizations of this procedure ({Figure~\ref{figure:burn-in-example}, lower panel}) significantly deviates from the true expectation (dashed line), leading to significantly biased estimates of the expectation unless simulations are sufficiently long to eliminate this starting point dependent bias---a surprisingly long 30 ns in this case.
 Note that this bias is present even in the average of many realizations because the \emph{same} atypical starting condition is used for every realization of this simulation process.
 
 
@@ -168,12 +168,12 @@ Note that this bias is present even in the average of many realizations because 
 \begin{figure*}[tbp]
 \resizebox{0.9\textwidth}{!}{\includegraphics{argon-reverse-cumulative-average.pdf}}
 \caption{\label{figure:reverse-cumulative-average} {\bf Statistical inefficiency, number of uncorrelated samples, and bias for different equilibration times.} 
-Trajectories of length $T = $ 2~000 iterations ($\sim$28 ns) for the Lennard-Jones system described in Fig.~\ref{figure:burn-in-example} were analyzed as a function of equilibration time choice $t_0$.
+Trajectories of length $T = $ 2~000 iterations ($\sim$28 ns) for the argon system described in Fig.~\ref{figure:burn-in-example} were analyzed as a function of equilibration time choice $t_0$.
 Averages over all 100 replicate simulations (all starting from the same initial conditions) are shown as dark lines, with shaded lines showing standard deviation of estimates among replicates.
 {\bf Top:} The statistical inefficiency $g$ as a function of equilibration time choice $t_0$ is initially very large, but diminishes rapidly after the system has relaxed to equilibrium.
-{\bf Middle:} The number of effectively uncorrelated samples $N_\mathrm{eff} = (T - t_0 + 1) / g$ shows a maximum at $t_0 = 222$ iterations ($\sim$3.1 ns), suggesting the system has equilibrated by this time.
-The red vertical line in all plots marks this choice of $t_0 = 222$.
-{\bf Bottom:} The cumulative density average $\expect{\rho^*}$ computed over the span $[t_0, T]$ shows that the bias (deviation from the true estimate, shown as red dashed lines) is minimized for choices of $t_0 \ge 222$ iterations.
+{\bf Middle:} The number of effectively uncorrelated samples $N_\mathrm{eff} = (T - t_0 + 1) / g$ shows a maximum at $t_0 \sim 150$ iterations ($\sim$2 ns), suggesting the system has equilibrated by this time.
+The red vertical line in all plots marks this choice of $t_0 \sim 150$.
+{\bf Bottom:} The cumulative density average $\expect{\rho^*}$ computed over the span $[t_0, T]$ shows that the bias (deviation from the true estimate, shown as red dashed lines) is minimized for choices of $t_0 \ge 150$ iterations ($\sim$ 2 ns).
 The standard deviation among replicates (shaded region) grows with $t_0$ because fewer data are included in the estimate.
 The choice of optimal $t_0$ that maximizes $N_\mathrm{eff}$ (red vertical line) strikes a good balance between bias and variance.
 The true estimate (red dashed lines) is computed from averaging over the range [5~000, 10~000] iterations over all 100 replicates.
@@ -192,7 +192,7 @@ We presume we are interested in computing the expectation
 \expect{A} \equiv \int dx \, A(x) \, \pi(x)
 \end{eqnarray}
 of a mechanical property $A(x)$.
-For convenience, we will refer to the timeseries $a_t \equiv A(x_t)$, with $t = 0$.
+For convenience, we will refer to the timeseries $a_t \equiv A(x_t)$, with $t \in [1,T]$.
 The estimator $\hat{A} \approx \expect{A}$ constructed from the entire dataset is given by
 \begin{eqnarray}
 \hat{A}_{[1,T]} \equiv \frac{1}{T} \sum_{t=1}^T a_t . \label{equation:time-average}
@@ -204,23 +204,21 @@ By discarding samples $t < t_0$ to equilibration, we hope to exclude the initial
 \hat{A}_{[t_0,T]} \equiv \frac{1}{T-t_0+1} \sum_{t=t_0}^T a_t . \label{equation:production-time-average} 
 \end{eqnarray}
 
-We can quantify the overall error in an estimator $\hat{A}$ in a sample average that starts at $x_0$ and excludes the first $t_0$ samples by the expected error $\delta^2 \hat{A}$,
+We can quantify the overall error in an estimator $\hat{A}$ in a sample average that starts at $x_0$ and excludes samples where $t < t_0$ by the expected error $\delta^2 \hat{A}$,
 \begin{eqnarray}
-\delta^2 \hat{A} &\equiv& E\left[ \left( \hat{A} - \expect{A} \right)^2 \right] \label{equation:rms-error} \\
-&=& E\left[ \left( \hat{A} - E[\hat{A}] \right)^2 \right] + \left| \left( E[\hat{A}] - \expect{A} \right)^2 \right] \label{equation:bias-variance} 
+\lefteqn{\delta^2 \hat{A} \equiv E_{x_0} \left[ \left( \hat{A}_{[t_0,T]} - \expect{A} \right)^2 \right]} \label{equation:rms-error} \\
+&=& E_{x_0}\left[ \left( \hat{A} - E_{x_0}[\hat{A}_{[t_0,T]}] \right)^2 \right] + \left| \left( E_{x_0}[\hat{A}_{[t_0,T]}] - \expect{A} \right)^2 \right] \label{equation:bias-variance}  \nonumber
 \end{eqnarray}
-where $E[\cdot]$ denotes the expectation over independent realizations of the specific simulation process.
+where $E_{x_0}[\cdot]$ denotes the expectation over independent realizations of the specific simulation process initiated from configuration $x_0$, but with different velocities and random number seeds.
 
-The first term denotes the variance in the estimator $\hat{A}$ where the trajectory is initiated from $x_0$:
+The first term denotes the variance in the estimator $\hat{A}$,
 \begin{eqnarray}
-\mathrm{var} (\hat{A}) &\equiv& \left( \hat{A} - E[\hat{A}] \right)^2 \label{equation:variance}
+\mathrm{var}_{x_0} (\hat{A}_{[t_0,T]}) &\equiv& E_{x_0} \left[ \hat{A}_{[t_0,T]} - E_{x_0}[\hat{A}_{[t_0,T]}] \right]^2 \label{equation:variance}
 \end{eqnarray}
 while the second term denotes the contribution from the squared bias,
 \begin{eqnarray}
-\mathrm{bias}^2 (\hat{A}) &\equiv& \left( E[\hat{A}] - \expect{A} \right)^2 \label{equation:variance}
+\mathrm{bias}^2_{x_0} (\hat{A}_{[t_0,T]}) &\equiv& \left( E_{x_0}[\hat{A}_{[t_0,T]}] - \expect{A} \right)^2 \label{equation:variance}
 \end{eqnarray}
-
-For our purposes, the expectation $E[\cdot]$ will be evaluated given that all realizations start from the \emph{same} initial configuration $x_0$---but with different initial velocities and random number seeds---and using different predetermined strategies for determined the equilibration time $t_0$ for which samples $t < t_0$ will be excluded from the sample mean.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BIAS-VARIANCE TRADEOFF
@@ -229,12 +227,12 @@ For our purposes, the expectation $E[\cdot]$ will be evaluated given that all re
 \section*{Bias-variance tradeoff}
 
 With increasing equilibration time $t_0$, bias is reduced, but the variance---the contribution to error due to random variation from having a finite number of uncorrelated samples---will increase because less data is included in the estimate.
-This can be seen in the bottom panel of Figure~\ref{figure:reverse-cumulative-average}, where the shaded region (denoting the standard deviation among sample estimates) increases in width with increasing equilibration time $t_0$.
+This can be seen in the bottom panel of Figure~\ref{figure:reverse-cumulative-average}, where the shaded region (denoting the 95\% confidence interval of the mean, computed from twice the standard deviation among sample estimates) increases in width with increasing equilibration time $t_0$.
 
-To examine the tradeoff between bias and variance explicitly, Figure~\ref{figure:bias-variance} plots the bias and variance (here, shown as standard error) contributions against each other as a function of $t_0$ (denoted by color).
+To examine the tradeoff between bias and variance explicitly, Figure~\ref{figure:bias-variance} plots the bias and variance (here, shown as standard error) contributions against each other as a function of $t_0$ (denoted by color) as computed from statistics over all 100 replicates.
 At $t_0 = 0$, the bias is large but variance is minimized.
 With increasing $t_0$, bias is eventually eliminated but then variance rapidly grows as fewer uncorrelated samples are included in the estimate.
-There is a clear optimal choice at $t_0 \sim 222$ iterations that minimizes variance while also effectively eliminating bias.
+There is a clear optimal choice at $t_0 \sim 150$ iterations that minimizes variance while also effectively eliminating bias.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BIAS-VARIANCE TRADEOFF
@@ -244,7 +242,7 @@ There is a clear optimal choice at $t_0 \sim 222$ iterations that minimizes vari
 
 Is there a simple approach to choosing an optimal equilibration time $t_0$ that provides a significantly improved estimate $\hat{A}_{[t_0,T]}$, even when we do not have access to multiple realizations of the same process?
 At worst, we hope that such a procedure would at least give some improvement over the naive estimate, such that $\delta^2 \hat{A}_{[t_0,T]} < \delta^2 \hat{A}_{[1,T]}$; at best, we hope that we can achieve a reasonable bias-variance tradeoff close to the optimal point identified in Figure~\ref{figure:bias-variance} that minimizes bias without greatly increasing variance.
-We note that, for cases in which the simulation is not long enough to reach equilibrium, no choice of $t_0$ will eliminate bias completely; the best we can hope for is to minimize this bias.
+We remark that, for cases in which the simulation is not long enough to reach equilibrium, no choice of $t_0$ will eliminate bias completely; the best we can hope for is to minimize this bias.
 
 While several automated methods for selecting the equilibration time $t_0$ have been proposed, these approaches have shortcomings that have greatly limited their use.
 The reverse cumulative averaging method~\cite{yang-karplus:2004:jcp:reverse-cumulative-averaging}, for example, uses a statistical test for normality to determine the point before which which the observable timeseries deviates from normality.
@@ -262,7 +260,7 @@ Instead, we require a method that makes no assumptions about the nature of the d
 The set of successively sampled configurations $\{x_t\}$ and their corresponding observables $\{a_t\}$ compose a correlated timeseries of observations.
 To estimate the statistical error or uncertainty in a stationary timeseries free of bias, we must be able to quantify the \emph{effective number of uncorrelated samples} present in the dataset.
 This is usually accomplished through computation of the \emph{statistical inefficiency} $g$, which quantifies the number of correlated timeseries samples needed to produce a single effectively uncorrelated sample of the observable of interest.
-While these concepts are well-established for the analysis of both Monte Carlo and molecular dynamics simulations~\cite{mueller-krumbhaar:j-stat-phys:1973:monte-carlo-analysis,swope:jcp:1982:autocorrelation-analysis,janke:2002:error-analysis,chodera:jctc:2007:wham}, we review it here for the sake of clarity.
+While these concepts are well-established for the analysis of both Monte Carlo and molecular dynamics simulations~\cite{mueller-krumbhaar:j-stat-phys:1973:monte-carlo-analysis,swope:jcp:1982:autocorrelation-analysis,janke:2002:error-analysis,chodera:jctc:2007:wham}, we review them here for the sake of clarity.
 
 For a given equilibration time choice $t_0$, the statistical uncertainty in our estimator $\hat{A}_{[t_0,T]}$ can be written as,
 \begin{eqnarray}
@@ -270,7 +268,7 @@ For a given equilibration time choice $t_0$, the statistical uncertainty in our 
 &=& E_{x_0}\left[ \hat{A}_{[t_0,T]} ^2 \right] - E_{x_0}\left[ \hat{A}_{[t_0,T]}  \right]^2 \nonumber \\
 &=& \frac{1}{T_{t_0}^2} \sum_{t,t'=t_0}^T \left\{ E_{x_0}\left[a_t a_{t'}\right] - E_{x_0}\left[a_t\right] E_{x_0}\left[a_{t'}\right] \right\} \nonumber \\
 &=& \frac{1}{T_{t_0}^2} \sum_{t=t_0}^T \left\{ E_{x_0}\left[x_t^2\right] - E_{x_0}\left[x_t\right]^2 \right\} \\
-\mbox{} &+& \frac{1}{T_{t_0}^2} \sum_{t\ne t' = t_0}^T \left\{ E_{x_0}\left[a_t a_{t'}\right] - E_{x_0}\left[a_t\right] E_{x_0}\left[a_{t'}\right] \right\} \nonumber .
+\mbox{} &+& \frac{1}{T_{t_0}^2} \sum_{t\ne t' = t_0}^T \left\{ E_{x_0}\left[a_t a_{t'}\right] - E_{x_0}\left[a_t\right] E_{x_0}\left[a_{t'}\right] \right\} \nonumber ,
 \end{eqnarray}
 where $T_{t_0} \equiv T - t_0 + 1$, the number of correlated samples in the timeseries $\{a_t\}_{t_0}^T$.
 In the last step, we have split the double-sum into two separate sums---a term capturing the variance in the observations $a_t$, and a remaining term capturing the correlation between observations. 
@@ -279,19 +277,19 @@ If $t_0$ is sufficiently large for the initial bias to be eliminated, the remain
 \begin{eqnarray}
 \lefteqn{\delta^2 \hat{A}_{[t_0,T]}^\mathrm{equil} = \frac{1}{T_{t_0}} \left[ \expect{a_t^2} - \expect{a_t}^2 \right]} \nonumber \\
 \mbox{} &+& \frac{2}{T_{t_0}} \sum_{n=1}^{T-t_0} \left(\frac{T_{t_0}-n}{T_{t_0}}\right) \left[ \expect{a_t a_{t+n}} - \expect{a_t}\expect{a_{t+n}} \right]  \nonumber \\
-&\equiv& \frac{\sigma_{t_0}^2}{T_{t_0}}(1 + 2 \tau_{t_0}) = \frac{\sigma_{t_0}^2}{T_{t_0}/g_{t_0}}
+&\equiv& \frac{\sigma_{t_0}^2}{T_{t_0}}(1 + 2 \tau_{t_0}) = \frac{\sigma_{t_0}^2}{T_{t_0}/g_{t_0}} ,
 \end{eqnarray}
 where the variance $\sigma^2$, statistical inefficiency $g$, and integrated autocorrelation time $\tau$ (in units of the sampling interval) are given by
 \begin{eqnarray}
-\sigma^2 &\equiv& \expect{a_t^2} - \expect{a_t}^2 \label{equation:variance-definition} \\
-\tau &\equiv& \sum_{t=1}^{T-1} \left(1 - \frac{t}{T}\right) C_t \label{equation:integrated-autocorrelation-time-definition} \\
-g &\equiv& 1 + 2 \tau \label{equation:statistical-inefficiency-definition}
+\sigma^2 &\equiv& \expect{a_t^2} - \expect{a_t}^2 \label{equation:variance-definition} , \\
+\tau &\equiv& \sum_{t=1}^{T-1} \left(1 - \frac{t}{T}\right) C_t \label{equation:integrated-autocorrelation-time-definition} , \\
+g &\equiv& 1 + 2 \tau \label{equation:statistical-inefficiency-definition} ,
 \end{eqnarray}
 with the discrete-time normalized fluctuation autocorrelation function $C_t$ defined as
 \begin{eqnarray}
 C_t &\equiv& \frac{\expect{a_n a_{n+t}} - \expect{a_n}^2}{\expect{a_n^2} - \expect{a_n}^2} . \label{equation:autocorrelation-definition}
 \end{eqnarray}
-In practice, it is difficult to estimate $C_t$ for $t \sim T$, due to growth in the statistical error, so common estimators of $g$ make use of several additional properties of $C_t$ to provide useful estimates~\cite{crc-mcmc-handbook}.
+In practice, it is difficult to estimate $C_t$ for $t \sim T$, due to growth in the statistical error, so common estimators of $g$ make use of several additional properties of $C_t$ to provide useful estimates (see \emph{Practical Computation of Statistical Inefficiencies}).
 
 The $t_0$ subscript for the variance $\sigma^2$, the integrated autocorrelation time $\tau$, and the statistical inefficiency $t_0$ mean that these quantities are only estimated over the production portion of the timeseries, $\{a_t\}_{t=t_0}^T$.
 Since we assumed that the bias was eliminated by judicious choice of the equilibration time $t_0$, this estimate of the statistical error will be poor for choices of $t_0$ that are too small.
@@ -309,17 +307,17 @@ We can determine this by computing the statistical inefficiency $g_{t_0}$ for th
 If we start at $t_0 \equiv T$ and move $t_0$ to earlier and earlier points in time, we expect that the effective number of uncorrelated samples $N_\mathrm{eff}(t_0)$ will continue to grow until we start to include the highly atypical initial data.
 At that point, the integrated autocorrelation time $\tau$ (and hence the statistical inefficiency $g$) will greatly increase, and the effective number of samples $N_\mathrm{eff}$ will start to plummet.
 
+Figure~\ref{figure:reverse-cumulative-average} demonstrates the application of this concept to the liquid argon system described above, using averages of the statistical inefficiency $g_{t_0}$ and $N_\mathrm{eff}(t_0)$ computed over 100 independent replicate trajectories.
+At short $t_0$, the average statistical inefficiency $g$ (Figure~\ref{figure:reverse-cumulative-average}, top panel) is large due to the contribution from slow relaxation from atypical initial conditions, while at long $t_0$ the statistical inefficiency estimate is much shorter and nearly constant of a large span of time origins.
+As a result, the average effective number of uncorrelated samples $N_\mathrm{eff}$ (Figure~\ref{figure:reverse-cumulative-average}, middle panel) has a peak at $t_0 \sim 222$ iterations (Figure~\ref{figure:reverse-cumulative-average}, vertical red lines).
+The effect on bias in the estimated average reduced density $\expect{\rho^*}$ (Figure~\ref{figure:reverse-cumulative-average}, bottom panel) is striking---the bias is essentially eliminated for the choice of equilibration time $t_0$ that maximizes the number of uncorrelated samples $N_\mathrm{eff}$.
+
 This suggests an alluringly simple algorithm for identifying the optimal equilibration time---pick the $t_0$ which maximizes the number of uncorrelated samples $N_\mathrm{eff}$.
 In mathematical terms, 
 \begin{eqnarray}
 t_0^\mathrm{opt} &=& \argmaxl_{t_0} N_\mathrm{eff}(t_0) \label{equation:optimal-equilibration-time} \\
 &=& \argmaxl_{t_0}  \frac{T - t_0 + 1}{g_{t_0}}
 \end{eqnarray}
-
-Figure~\ref{figure:reverse-cumulative-average} demonstrates the application of this concept to the liquid argon system described above, using averages of the statistical inefficiency $g_{t_0}$ and $N_\mathrm{eff}(t_0)$ computed over 100 independent replicate trajectories.
-At short $t_0$, the average statistical inefficiency $g$ (Figure~\ref{figure:reverse-cumulative-average}, top panel) is large due to the contribution from slow relaxation from atypical initial conditions, while at long $t_0$ the statistical inefficiency estimate is much shorter and nearly constant of a large span of time origins.
-As a result, the average effective number of uncorrelated samples $N_\mathrm{eff}$ (Figure~\ref{figure:reverse-cumulative-average}, middle panel) has a peak at $t_0 \sim 222$ iterations (Figure~\ref{figure:reverse-cumulative-average}, vertical red lines).
-The effect on bias in the estimated average reduced density $\expect{\rho^*}$ (Figure~\ref{figure:reverse-cumulative-average}, bottom panel) is striking---the bias is essentially eliminated for the choice of equilibration time $t_0$ that maximizes the number of uncorrelated samples $N_\mathrm{eff}$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FIGURE: BIAS-VARIANCE TRADEOFF
@@ -328,22 +326,22 @@ The effect on bias in the estimated average reduced density $\expect{\rho^*}$ (F
 \begin{figure}[tbp]
 \resizebox{\columnwidth}{!}{\includegraphics{argon-bias-variance.pdf}}
 \caption{\label{figure:bias-variance} {\bf Bias-variance tradeoff for fixed equilibration time versus automatic equilibration time selection.} 
-Trajectories of length $T = $ 2~000 iterations ($\sim$28 ns) for the Lennard-Jones system described in Fig.~\ref{figure:burn-in-example} were analyzed as a function of equilibration time choice $t_0$, with colors denoting the value of $t_0$ (in iterations) corresponding to each plotted point.
-Using 100 replicate simulations, the average bias (average deviation from true expectation) and standard deviation (random variation from replicate to replicate) were computed as a function of a prespecified fixed equilibration time $t_0$, with colors running from $t_0 = 0$ (red) to $t_0 =$1~800 iterations (blue).
+Trajectories of length $T = $ 2~000 iterations ($\sim$28 ns) for the argon system described in Fig.~\ref{figure:burn-in-example} were analyzed as a function of equilibration time choice $t_0$, with colors denoting the value of $t_0$ (in iterations) corresponding to each plotted point.
+Using 100 replicate simulations, the average bias (average deviation from true expectation) and standard deviation (random variation from replicate to replicate) were computed as a function of a prespecified fixed equilibration time $t_0$, with colors running from $t_0 = 0$ (violet) to $t_0 =$1~1800 iterations (red).
 As is readily discerned, the bias for small $t_0$ is initially large, but minimized for larger $t_0$.
 By contrast, the standard error (a measure of variance, estimated here by standard deviation among replicates) grows as $t_0$ grows above a certain critical time (here, $\sim$222 iterations).
-If the $t_0$ that maximizes $N_\mathrm{eff}$ is instead chosen \emph{individually} for each trajectory based on that trajectory's estimated statistical inefficiency $g_{[t_0,T]}$, the resulting bias-variance tradeoff (black triangle) does an excellent job minimizing bias and variance simultaneously, comparable to what is possible for a choice of equilibration time $t_0$ based on knowledge of the true bias and variance among many replicate estimates.
+If the $t_0$ that maximizes $N_\mathrm{eff}$ is instead chosen \emph{individually} for each trajectory based on that trajectory's estimates of statistical inefficiency $g_{[t_0,T]}$, the resulting bias-variance tradeoff (black triangle) does an excellent job minimizing bias and variance simultaneously, comparable to what is possible for a choice of equilibration time $t_0$ based on knowledge of the true bias and variance among many replicate estimates.
 }
 \end{figure}
 
 {\bf Bias-variance tradeoff.} 
 But how will this strategy work for cases where we do not know the statistical inefficiency $g$ as a function of the equilibration time $t_0$ precisely?
-When all that is available is a single simulation, our best estimate of $g_{t_0}$ is estimated from that simulation alone over the span $[t_0,T]$---will this affect the quality of our estimate of equilibration time?
+When all that is available is a single simulation, our best estimate of $g_{t_0}$ is derived from that simulation alone over the span $[t_0,T]$---will this affect the quality of our estimate of equilibration time?
 Empirically, this does not appear to be the case---the black triangle in Figure~\ref{figure:bias-variance} shows the bias and variance contributions to the error for estimates computed over the 100 replicates where $t_0$ is individually determined from each simulation using this simple scheme based on selecting $t_0$ to maximize $N_\mathrm{eff}$ for each individual realization.
 Despite not having knowledge about multiple realizations, this strategy effectively achieves a near-optimal balance between minimizing bias without increasing variance.
 
 {\bf Overall RMS error.} 
-How well does this strategy perform in terms of decreasing the \emph{overall} error $\delta^2 \hat{A}_{[t_0,T]}$ compared to $\delta^2 \hat{A}_{[1,T]}$?
+How well does this strategy perform in terms of decreasing the \emph{overall} error $\delta \hat{A}_{[t_0,T]}$ compared to $\delta \hat{A}_{[1,T]}$?
 Fiigure~\ref{figure:argon-rmse} compares the expected standard error (denoted $\delta \hat{A}$ in the figure) as a function of a fixed initial equilibration time $t_0$ (black line with shaded region denoting 95\% confidence interval) with the strategy of selecting $t_0$ to maximize $N_\mathrm{eff}$ for each realization (red line with shaded region denoted 95\% confidence interval).
 While the minimum error for the fixed-$t_0$ strategy is achieved in the range of 2--6 ns---a fact that could only be determined from knowledge of multiple realizations---the simple strategy of selecting $t_0$ using Eq.~\ref{equation:optimal-equilibration-time} achieves a minimum error that is statistically indistinguishable from this.
 
@@ -354,8 +352,8 @@ While the minimum error for the fixed-$t_0$ strategy is achieved in the range of
 \begin{figure*}[tbp]
 \resizebox{\columnwidth}{!}{\includegraphics{argon-rmse.pdf}}
 \caption{\label{figure:argon-rmse} {\bf RMS error for fixed equilibration time versus automatic equilibration time selection.} 
-Trajectories of length $T = $ 2~000 iterations ($\sim$28 ns) for the Lennard-Jones system described in Fig.~\ref{figure:burn-in-example} were analyzed as a function of fixed equilibration time choice $t_0$.
-Using 100 replicate simulations, the RMS error (average root mean squared deviation from true expectation, as defined in Eq.~\ref{equation:rms-error}) was computed (black line) along with 95\% confidence interval (gray shading).
+Trajectories of length $T = $ 2~000 iterations ($\sim$28 ns) for the argon system described in Fig.~\ref{figure:burn-in-example} were analyzed as a function of fixed equilibration time choice $t_0$.
+Using 100 replicate simulations, the root-mean-squared (RMS) error (Eq.~\ref{equation:rms-error}) was computed (black line) along with 95\% confidence interval (gray shading).
 The RMS error is minimized for fixed equilibration time choices in the range 2--6 ns.
 If the $t_0$ that maximizes $N_\mathrm{eff}$ is instead chosen \emph{individually} for each trajectory based on that trajectory's estimated statistical inefficiency $g_{[t_0,T]}$ using Eq.~\ref{equation:optimal-equilibration-time}, the resulting RMS error (red line, 95\% confidence interval shown as red shading) is quite close to the minimum RMS error achieved from any particular \emph{fixed} choice of equilibration time $t_0$, suggesting that this simple automated approach to selecting $t_0$ achieves near-optimal performance.
 }
@@ -368,13 +366,13 @@ If the $t_0$ that maximizes $N_\mathrm{eff}$ is instead chosen \emph{individuall
 \section*{Discussion}
 \label{section:discussion}
 
-The scheme described here---in which the equilibration time $t_0$ is computed using Eq.~\ref{equation:optimal-equilibration-time} as the time origin that maximizes the number of uncorrelated samples in the production region $[t_0,T]$---is both conceptually and computationally straightforward.
-It provides an approach to determining the optimal amount of initial data to discard to equilibration in order to minimize variance while also minimizing initial bias, and does this without employing statistical tests that require unsatisfiable assumptions of normality of the observable of interest.
+The scheme described here---in which the equilibration time $t_0$ is computed using Eq.~\ref{equation:optimal-equilibration-time} as the choice that maximizes the number of uncorrelated samples in the production region $[t_0,T]$---is both conceptually and computationally straightforward.
+It provides an approach to determining the optimal amount of initial data to discard to equilibration in order to minimize variance while also minimizing initial bias, and does this without employing statistical tests that require generally unsatisfiable assumptions of normality of the observable of interest.
 As we have seen, this scheme empirically appears to select a practical compromise between bias and variance even when the statistical inefficiency $g$ is estimated directly from the trajectory using Eq.~\ref{equation:statistical-inefficiency-definition}.
 
 A word of caution is necessary.
 One can certainly envision pathological scenarios where this algorithm for selecting an optimal equilibration time will break down.
-In cases where the simulation is not long enough to reach equilibrium---let alone collect many uncorrelated samples from it---no choice of equilibration time will bestow upon the data the ability to produce an unbiased estimate of the true expectation.
+In cases where the simulation is not long enough to reach equilibrium---let alone collect many uncorrelated samples from it---no choice of equilibration time will bestow upon the experimenter the ability to produce an unbiased estimate of the true expectation.
 Similarly, in cases where insufficient data is available for the statistical inefficiency to be estimated well, this algorithm is expected to perform poorly.
 However, in these cases, the data itself should be suspect if the trajectory is not at least an order of magnitude longer than the minimum estimated autocorrelation time.
 
@@ -390,10 +388,11 @@ All scripts used to retrieve the software versions used here, run the simulation
 \url{http://github.com/choderalab/automatic-equilibration-detection}}.
 
 The {\tt LennardJonesFluid} model system in the \href{http://github.com/choderalab/openmmtools}{openmmtools} package\footnote{available at \url{http://github.com/choderalab/openmmtools}} was used with parameters appropriate for liquid argon ($\sigma = $ 3.4 \AA, $\epsilon = $ 0.238 kcal/mol), though all results are reported in reduced (universal) units.
-A cubic switching function was employed, with the potential gently switched to zero from $\sigma$ to $3 \sigma$, and a long-range isotropic dispersion correction accounting for this switching behavior used to include neglected contributions.
-Simulations were performed using a box of $N = 500$ argon atoms at reduced temperature $T^* \equiv k_B T / \epsilon = 0.850$ and reduced pressure $p^* \equiv p \sigma^3 / \epsilon = 1.266$ using a Langevin integrator~\cite{sivak-chodera-crooks:jpcb:2014:vvvr} with timestep $\Delta t = 0.01 \tau$, where characteristic oscillation timescale $\tau = \sqrt{m r_0^2 / 72 \epsilon}$, with $r_0 = 2^{1/6} \sigma$~\cite{liquid-argon-characteristic-timescale}.
-A molecular scaling Metropolis Monte Carlo barostat with Gaussian box volume proposals moves attempted every 25 timesteps, along with an adaptive algorithm that adjusts the proposal width during the initial part of the simulation~\cite{eastman:jctc:2012:openmm}.
+A cubic switching function was employed, with the potential gently switched to zero over $r \in [\sigma, 3 \sigma]$, and a long-range isotropic dispersion correction accounting for this switching behavior used to include neglected contributions.
+Simulations were performed using a periodic box of $N = 500$ atoms at reduced temperature $T^* \equiv k_B T / \epsilon = 0.850$ and reduced pressure $p^* \equiv p \sigma^3 / \epsilon = 1.266$ using a Langevin integrator~\cite{sivak-chodera-crooks:jpcb:2014:vvvr} with timestep $\Delta t = 0.01 \tau$ and collision rate $\nu = 1.5 \tau^{-1}$, with characteristic oscillation timescale $\tau = \sqrt{m r_0^2 / 72 \epsilon}$ and $r_0 = 2^{1/6} \sigma$~\cite{liquid-argon-characteristic-timescale}.
+A molecular scaling Metropolis Monte Carlo barostat with Gaussian simulation volume change proposal moves attempted every 25 timesteps, along with an adaptive algorithm that adjusts the proposal width during the initial part of the simulation~\cite{eastman:jctc:2012:openmm}.
 Densities were recorded every 25 timesteps, with each set of 25 timesteps termed an ``iteration'' of the simulation.
+The true expectation $\expect{ \rho^* }$ was estimated from the sample average over all 100 realizations over [5000,10000] iterations.
 
 The automated equilibration detection scheme is also available in the \href{http://pymbar.readthedocs.org/en/latest/timeseries.html}{\tt timeseries} module of the \href{http://github.com/choderalab/pymbar}{\tt pymbar} package as {\tt detectEquilibration()}, and can be accessed using the following code:
 
@@ -414,16 +413,16 @@ A_t = A_t[t0:]
 % STATISTICAL INEFFICIENCY
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section*{Practical computation of statistical inefficiency}
+\section*{Practical computation of statistical inefficiencies}
 
-The computation of the statistical inefficiency $g$ (defined by Eq.~\ref{equation:statistical-inefficiency-definition}) for a finite timeseries $a_t$, $t = 1, \ldots, T$ deserves some comment.
+The robust computation of the statistical inefficiency $g$ (defined by Eq.~\ref{equation:statistical-inefficiency-definition}) for a finite timeseries $a_t$, $t = 1, \ldots, T$ deserves some comment.
 There are, in fact, a variety of schemes for estimating $g$ described in the literature, and their behaviors for finite datasets may differ, leading to different estimates of the equilibration time $t_0$ using the algorithm of Eq.~\ref{equation:optimal-equilibration-time}.
 
 The main issue is that a straightforward approach to estimating the statistical inefficiency using Eqs.~\ref{equation:integrated-autocorrelation-time-definition}--\ref{equation:autocorrelation-definition} in which the expectations are simply replaced with sample estimates causes the statistical error in the estimated correlation function $C_t$ to grow with $t$ in a manner that allows this error to quickly overwhelm the sum of Eq.~\ref{equation:integrated-autocorrelation-time-definition}.
 As a result, a number of alternative schemes---generally based on controlling the error in the estimated $C_t$ or truncating the sum of Eq.~\ref{equation:integrated-autocorrelation-time-definition} when the error grows too large---have been proposed.
 
 For stationary, irreducible, reversible Markov chains, Geyer observed that a function $\Gamma_{k} \equiv \gamma_{2k} + \gamma_{2k+1}$ of the unnormalized fluctuation autocorrelation function $\gamma_t \equiv \expect{a_i a_{i+t}} - \expect{a_i}^2$ has a number of pleasant properties (Theorem 3.1 of \cite{geyer:1992:stat-sci:practical-mcmc}): It is strictly positive, strictly decreasing, and strictly convex.
-These properties can be exploited to define a family of estimators called \emph{initial sequence methods} (see Section 3.3 of \cite{geyer:1992:stat-sci:practical-mcmc} and Section 1.10.2 of \cite{crc-mcmc-handbook}), of which the \emph{initial convex sequence} (ICS) estimator is generally agreed to be optimal, if somewhat more complex to implement.\footnote{Implementations of these methods are provided with the code distributed with this manuscript.}
+Some or all of these properties can be exploited to define a family of estimators called \emph{initial sequence methods} (see Section 3.3 of \cite{geyer:1992:stat-sci:practical-mcmc} and Section 1.10.2 of \cite{crc-mcmc-handbook}), of which the \emph{initial convex sequence} (ICS) estimator is generally agreed to be optimal, if somewhat more complex to implement.\footnote{Implementations of these methods are provided with the code distributed with this manuscript.}
 
 All computations in this manuscript used the fast multiscale method described in Section 5.2 of \citep{chodera:jctc:2007:wham}, which we found performed equivalently well to the Geyer estimators (data not shown).
 This method is related to a multiscale variant of the \emph{initial positive sequence} (IPS) method of Geyer \cite{geyer-thompson:j-royal-stat-soc-b:1992:initial-sequence-estimators}, where contributions are accumulated at increasingly longer lag times and the sum of Eq.~\ref{equation:integrated-autocorrelation-time-definition} is truncated when the terms become negative.
@@ -435,7 +434,7 @@ We have found this method to be both fast and to provide useful estimates of the
 
 \section*{Acknowledgments}
 
-We are grateful to William C.~Swope (IBM Almaden Research Center), Michael R.~Shirts (University of Virginia), David L.~Mobley (University of California, Irvine), Kyle A.~Beauchamp (MSKCC), and Robert C.~McGibbon (Stanford University) for valuable discussions on this topic, and Joshua L.~Adelman (University of Pittsburgh) for helpful feedback and encouragement.
+We are grateful to William C.~Swope (IBM Almaden Research Center) for his illuminating introduction to the use of autocorrelation analysis for the characterization of statistical error, as well as Michael R.~Shirts (University of Virginia), David L.~Mobley (University of California, Irvine), Kyle A.~Beauchamp (MSKCC), and Robert C.~McGibbon (Stanford University) for valuable discussions on this topic, and Joshua L.~Adelman (University of Pittsburgh) for helpful feedback and encouragement.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BIBLIOGRAPHY
