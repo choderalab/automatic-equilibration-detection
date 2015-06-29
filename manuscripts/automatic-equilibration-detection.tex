@@ -268,9 +268,9 @@ For a given equilibration time choice $t_0$, the statistical uncertainty in our 
 \begin{eqnarray}
 \delta^2 \estimator{A}_{[t_0,T]} &\equiv& E_{x_0}\left[\left(\hat{A}_{[t_0,T]} - \expect{\estimator{A}}\right)^2\right] \nonumber \\
 &=& E_{x_0}\left[ \hat{A}_{[t_0,T]} ^2 \right] - E_{x_0}\left[ \hat{A}_{[t_0,T]}  \right]^2 \nonumber \\
-&=& \frac{1}{T_{t_0}^2} \sum_{t,t'=t_0}^T \left[ \expect{a_t a_{t'}} - \expect{a_t}\expect{a_{t'}} \right] \nonumber \\
-&=& \frac{1}{T_{t_0}^2} \sum_{t=t_0}^T \left[ \expect{x_t^2} - \expect{x_t}^2 \right] \nonumber \\
-\mbox{} &+& \frac{1}{T_{t_0}^2} \sum_{t\ne t' = t_0}^T \left[ \expect{a_t a_{t'}} - \expect{a_t}\expect{a_{t'}} \right] .
+&=& \frac{1}{T_{t_0}^2} \sum_{t,t'=t_0}^T \left\{ E_{x_0}\left[a_t a_{t'}\right] - E_{x_0}\left[a_t\right] E_{x_0}\left[a_{t'}\right] \right\} \nonumber \\
+&=& \frac{1}{T_{t_0}^2} \sum_{t=t_0}^T \left\{ E_{x_0}\left[x_t^2\right] - E_{x_0}\left[x_t\right]^2 \right\} \\
+\mbox{} &+& \frac{1}{T_{t_0}^2} \sum_{t\ne t' = t_0}^T \left\{ E_{x_0}\left[a_t a_{t'}\right] - E_{x_0}\left[a_t\right] E_{x_0}\left[a_{t'}\right] \right\} \nonumber .
 \end{eqnarray}
 where $T_{t_0} \equiv T - t_0 + 1$, the number of correlated samples in the timeseries $\{a_t\}_{t_0}^T$.
 In the last step, we have split the double-sum into two separate sums---a term capturing the variance in the observations $a_t$, and a remaining term capturing the correlation between observations. 
@@ -279,8 +279,7 @@ If $t_0$ is sufficiently large for the initial bias to be eliminated, the remain
 \begin{eqnarray}
 \lefteqn{\delta^2 \hat{A}_{[t_0,T]}^\mathrm{equil} = \frac{1}{T_{t_0}} \left[ \expect{a_t^2} - \expect{a_t}^2 \right]} \nonumber \\
 \mbox{} &+& \frac{2}{T_{t_0}} \sum_{n=1}^{T-t_0} \left(\frac{T_{t_0}-n}{T_{t_0}}\right) \left[ \expect{a_t a_{t+n}} - \expect{a_t}\expect{a_{t+n}} \right]  \nonumber \\
-&\equiv& \frac{\sigma_{t_0}^2}{T_{t_0}}(1 + 2 \tau_{t_0}) \nonumber \\
-&=& \frac{\sigma_{t_0}^2}{T_{t_0}/g_{t_0}}
+&\equiv& \frac{\sigma_{t_0}^2}{T_{t_0}}(1 + 2 \tau_{t_0}) = \frac{\sigma_{t_0}^2}{T_{t_0}/g_{t_0}}
 \end{eqnarray}
 where the variance $\sigma^2$, statistical inefficiency $g$, and integrated autocorrelation time $\tau$ (in units of the sampling interval) are given by
 \begin{eqnarray}
@@ -329,20 +328,21 @@ The effect on bias in the estimated average reduced density $\expect{\rho^*}$ (F
 \begin{figure}[tbp]
 \resizebox{\columnwidth}{!}{\includegraphics{argon-bias-variance.pdf}}
 \caption{\label{figure:bias-variance} {\bf Bias-variance tradeoff for fixed equilibration time versus automatic equilibration time selection.} 
-Trajectories of length $T = $ 2~000 iterations ($\sim$28 ns) for the Lennard-Jones system described in Fig.~\ref{figure:burn-in-example} were analyzed as a function of equilibration time choice $t_0$.
+Trajectories of length $T = $ 2~000 iterations ($\sim$28 ns) for the Lennard-Jones system described in Fig.~\ref{figure:burn-in-example} were analyzed as a function of equilibration time choice $t_0$, with colors denoting the value of $t_0$ (in iterations) corresponding to each plotted point.
 Using 100 replicate simulations, the average bias (average deviation from true expectation) and standard deviation (random variation from replicate to replicate) were computed as a function of a prespecified fixed equilibration time $t_0$, with colors running from $t_0 = 0$ (red) to $t_0 =$1~800 iterations (blue).
 As is readily discerned, the bias for small $t_0$ is initially large, but minimized for larger $t_0$.
 By contrast, the standard error (a measure of variance, estimated here by standard deviation among replicates) grows as $t_0$ grows above a certain critical time (here, $\sim$222 iterations).
 If the $t_0$ that maximizes $N_\mathrm{eff}$ is instead chosen \emph{individually} for each trajectory based on that trajectory's estimated statistical inefficiency $g_{[t_0,T]}$, the resulting bias-variance tradeoff (black triangle) does an excellent job minimizing bias and variance simultaneously, comparable to what is possible for a choice of equilibration time $t_0$ based on knowledge of the true bias and variance among many replicate estimates.
-{\color{red}[TODO: Add colorbar and statistical uncertainties to plotted points.]}
 }
 \end{figure}
 
+{\bf Bias-variance tradeoff.} 
 But how will this strategy work for cases where we do not know the statistical inefficiency $g$ as a function of the equilibration time $t_0$ precisely?
 When all that is available is a single simulation, our best estimate of $g_{t_0}$ is estimated from that simulation alone over the span $[t_0,T]$---will this affect the quality of our estimate of equilibration time?
-Empirically, this does not appear to be the case---the black triangle in Figure~\ref{figure:bias-variance} shows the bias and variance for estimates computed over the 100 replicates where $t_0$ is individually determined from each simulation using this simple scheme based on selecting $t_0$ to maximize $N_\mathrm{eff}$ for each individual realization.
+Empirically, this does not appear to be the case---the black triangle in Figure~\ref{figure:bias-variance} shows the bias and variance contributions to the error for estimates computed over the 100 replicates where $t_0$ is individually determined from each simulation using this simple scheme based on selecting $t_0$ to maximize $N_\mathrm{eff}$ for each individual realization.
 Despite not having knowledge about multiple realizations, this strategy effectively achieves a near-optimal balance between minimizing bias without increasing variance.
 
+{\bf Overall RMS error.} 
 How well does this strategy perform in terms of decreasing the \emph{overall} error $\delta^2 \hat{A}_{[t_0,T]}$ compared to $\delta^2 \hat{A}_{[1,T]}$?
 Fiigure~\ref{figure:argon-rmse} compares the expected standard error (denoted $\delta \hat{A}$ in the figure) as a function of a fixed initial equilibration time $t_0$ (black line with shaded region denoting 95\% confidence interval) with the strategy of selecting $t_0$ to maximize $N_\mathrm{eff}$ for each realization (red line with shaded region denoted 95\% confidence interval).
 While the minimum error for the fixed-$t_0$ strategy is achieved in the range of 2--6 ns---a fact that could only be determined from knowledge of multiple realizations---the simple strategy of selecting $t_0$ using Eq.~\ref{equation:optimal-equilibration-time} achieves a minimum error that is statistically indistinguishable from this.
@@ -357,11 +357,9 @@ While the minimum error for the fixed-$t_0$ strategy is achieved in the range of
 Trajectories of length $T = $ 2~000 iterations ($\sim$28 ns) for the Lennard-Jones system described in Fig.~\ref{figure:burn-in-example} were analyzed as a function of fixed equilibration time choice $t_0$.
 Using 100 replicate simulations, the RMS error (average root mean squared deviation from true expectation, as defined in Eq.~\ref{equation:rms-error}) was computed (black line) along with 95\% confidence interval (gray shading).
 The RMS error is minimized for fixed equilibration time choices in the range 2--6 ns.
-If the $t_0$ that maximizes $N_\mathrm{eff}$ is instead chosen \emph{individually} for each trajectory based on that trajectory's estimated statistical inefficiency $g_{[t_0,T]}$ using Eq.~\ref{equation:optimal-equilibration-time}, the resulting RMS error (red line, 95\% confidence interval shown as red shading) is quite close to the minimum RMS error achieved from any particular \emph{fixed} choice of equilibration time $t_0$, suggesting that this simple automated approach to selecting $t_0$ performs reasonably well.
+If the $t_0$ that maximizes $N_\mathrm{eff}$ is instead chosen \emph{individually} for each trajectory based on that trajectory's estimated statistical inefficiency $g_{[t_0,T]}$ using Eq.~\ref{equation:optimal-equilibration-time}, the resulting RMS error (red line, 95\% confidence interval shown as red shading) is quite close to the minimum RMS error achieved from any particular \emph{fixed} choice of equilibration time $t_0$, suggesting that this simple automated approach to selecting $t_0$ achieves near-optimal performance.
 }
 \end{figure*}
-
-{\color{red}[JDC: Add discussion about RMS error to body text.]}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DISCUSSION
@@ -388,7 +386,7 @@ However, in these cases, the data itself should be suspect if the trajectory is 
 \label{section:methods}
 
 All molecular dynamics simulations described here were performed with OpenMM 6.2~\cite{eastman:jctc:2012:openmm} (available at \href{http://openmm.org}{openmm.org}) using the Python API.
-All scripts used to run simulations, analyze data, and generate plots---along with the simulation data itself and scripts for generating figures---are availabile on GitHub\footnote{All Python scripts necessary to reproduce this work---along with data plotted in the published version---are available at:\\
+All scripts used to retrieve the software versions used here, run the simulations, analyze data, and generate plots---along with the simulation data itself and scripts for generating figures---are available on GitHub\footnote{All Python scripts necessary to reproduce this work---along with data plotted in the published version---are available at:\\
 \url{http://github.com/choderalab/automatic-equilibration-detection}}.
 
 The {\tt LennardJonesFluid} model system in the \href{http://github.com/choderalab/openmmtools}{openmmtools} package\footnote{available at \url{http://github.com/choderalab/openmmtools}} was used with parameters appropriate for liquid argon ($\sigma = $ 3.4 \AA, $\epsilon = $ 0.238 kcal/mol), though all results are reported in reduced (universal) units.
@@ -424,15 +422,12 @@ There are, in fact, a variety of schemes for estimating $g$ described in the lit
 The main issue is that a straightforward approach to estimating the statistical inefficiency using Eqs.~\ref{equation:integrated-autocorrelation-time-definition}--\ref{equation:autocorrelation-definition} in which the expectations are simply replaced with sample estimates causes the statistical error in the estimated correlation function $C_t$ to grow with $t$ in a manner that allows this error to quickly overwhelm the sum of Eq.~\ref{equation:integrated-autocorrelation-time-definition}.
 As a result, a number of alternative schemes---generally based on controlling the error in the estimated $C_t$ or truncating the sum of Eq.~\ref{equation:integrated-autocorrelation-time-definition} when the error grows too large---have been proposed.
 
-For stationary, reversible Markov chains, Geyer observed that a function $\Gamma_{k} \equiv \gamma_{2k} + \gamma_{2k+1}$ of the unnormalized fluctuation autocorrelation function $\gamma_t \equiv \expect{a_i a_{i+t}} - \expect{a_i}^2$ has a number of pleasant properties (Theorem 3.1 of \cite{geyer:1992:stat-sci:practical-mcmc}): It is strictly, positive, strictly decreasing, and strictly convex.
-{\color{red}[JDC: Check conditions of Geyer proofs.]}
-These properties can be exploited to define a family of estimators called \emph{initial sequence methods} (see Section 3.3 of \cite{geyer:1992:stat-sci:practical-mcmc} and Section 1.10.2 of \cite{crc-mcmc-handbook}), of which the \emph{initial convex sequence} (ICS) estimator is generally agreed to be optimal, if somewhat complex to implement.
-{\color{red}[JDC: Give implementation details?]}
+For stationary, irreducible, reversible Markov chains, Geyer observed that a function $\Gamma_{k} \equiv \gamma_{2k} + \gamma_{2k+1}$ of the unnormalized fluctuation autocorrelation function $\gamma_t \equiv \expect{a_i a_{i+t}} - \expect{a_i}^2$ has a number of pleasant properties (Theorem 3.1 of \cite{geyer:1992:stat-sci:practical-mcmc}): It is strictly positive, strictly decreasing, and strictly convex.
+These properties can be exploited to define a family of estimators called \emph{initial sequence methods} (see Section 3.3 of \cite{geyer:1992:stat-sci:practical-mcmc} and Section 1.10.2 of \cite{crc-mcmc-handbook}), of which the \emph{initial convex sequence} (ICS) estimator is generally agreed to be optimal, if somewhat more complex to implement.\footnote{Implementations of these methods are provided with the code distributed with this manuscript.}
 
-All computations in this manuscript used the fast multiscale method described in Section 5.2 of \citep{chodera:jctc:2007:wham}.
+All computations in this manuscript used the fast multiscale method described in Section 5.2 of \citep{chodera:jctc:2007:wham}, which we found performed equivalently well to the Geyer estimators (data not shown).
 This method is related to a multiscale variant of the \emph{initial positive sequence} (IPS) method of Geyer \cite{geyer-thompson:j-royal-stat-soc-b:1992:initial-sequence-estimators}, where contributions are accumulated at increasingly longer lag times and the sum of Eq.~\ref{equation:integrated-autocorrelation-time-definition} is truncated when the terms become negative.
 We have found this method to be both fast and to provide useful estimates of the statistical inefficiency, but it may not perform well for all problems.
-{\color{red}[JDC: Give implementation details?  Compare with ICS?]}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ACKNOWLEDGMENTS
