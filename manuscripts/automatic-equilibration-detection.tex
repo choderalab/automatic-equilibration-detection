@@ -343,7 +343,8 @@ Despite not having knowledge about multiple realizations, this strategy effectiv
 {\bf Overall RMS error.} 
 How well does this strategy perform in terms of decreasing the \emph{overall} error $\delta \hat{A}_{[t_0,T]}$ compared to $\delta \hat{A}_{[1,T]}$?
 Fiigure~\ref{figure:argon-rmse} compares the expected standard error (denoted $\delta \hat{A}$ in the figure) as a function of a fixed initial equilibration time $t_0$ (black line with shaded region denoting 95\% confidence interval) with the strategy of selecting $t_0$ to maximize $N_\mathrm{eff}$ for each realization (red line with shaded region denoted 95\% confidence interval).
-While the minimum error for the fixed-$t_0$ strategy is achieved in the range of 2--6 ns---a fact that could only be determined from knowledge of multiple realizations---the simple strategy of selecting $t_0$ using Eq.~\ref{equation:optimal-equilibration-time} achieves a minimum error that is statistically indistinguishable from this.
+While the minimum error for the fixed-$t_0$ strategy (0.002545$\pm$0.00009) is achieved in the range of 2--6 ns---a fact that could only be determined from knowledge of multiple realizations---the simple strategy of selecting $t_0$ using Eq.~\ref{equation:optimal-equilibration-time} achieves a minimum error that is only 6\% worse (compared to 137\% worse should no data have been discarded).
+While this is certainly statistically significant in being worse than the optimal $t_0$ given all 500 replicates, it is remarkably good for a simple method employing data from a single simulation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FIGURE: RMS ERROR
