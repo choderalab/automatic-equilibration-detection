@@ -39,7 +39,7 @@ print "characteristic timescale = %.3f ps" % (characteristic_timescale / unit.pi
 print "timestep = %.12f ps" % (timestep / unit.picoseconds)
 
 #collision_rate = 5.0 / unit.picoseconds # collision rate for Langevin thermostat
-collision_rate = 1.0 / characteristic_timescale # collision rate for Langevin thermostat
+collision_rate = 1.5 / characteristic_timescale # collision rate for Langevin thermostat
 barostat_frequency = 25 # number of steps between barostat updates
 
 # Set parameters for number of simulation replicates, number of iterations per simulation, and number of steps per iteration.

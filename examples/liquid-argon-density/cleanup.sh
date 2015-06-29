@@ -11,7 +11,6 @@ rm -rf data/
 rm -rf figures/
 
 # Remove conda environment
-source deactivate
 rm -rf conda-env/
 
 
