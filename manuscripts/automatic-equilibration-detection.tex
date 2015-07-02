@@ -207,7 +207,7 @@ By discarding samples $t < t_0$ to equilibration, we hope to exclude the initial
 We can quantify the overall error in an estimator $\hat{A}$ in a sample average that starts at $x_0$ and excludes samples where $t < t_0$ by the expected error $\delta^2 \hat{A}$,
 \begin{eqnarray}
 \lefteqn{\delta^2 \hat{A} \equiv E_{x_0} \left[ \left( \hat{A}_{[t_0,T]} - \expect{A} \right)^2 \right]} \label{equation:rms-error} \\
-&=& E_{x_0}\left[ \left( \hat{A} - E_{x_0}[\hat{A}_{[t_0,T]}] \right)^2 \right] + \left| \left( E_{x_0}[\hat{A}_{[t_0,T]}] - \expect{A} \right)^2 \right] \label{equation:bias-variance}  \nonumber
+&=& E_{x_0}\left[ \left( \hat{A}_{[t_0,T]} - E_{x_0}[\hat{A}_{[t_0,T]}] \right)^2 \right] + \left( E_{x_0}[\hat{A}_{[t_0,T]}] - \expect{A} \right)^2  \label{equation:bias-variance}  \nonumber
 \end{eqnarray}
 where $E_{x_0}[\cdot]$ denotes the expectation over independent realizations of the specific simulation process initiated from configuration $x_0$, but with different velocities and random number seeds.
 
@@ -435,7 +435,7 @@ We have found this method to be both fast and to provide useful estimates of the
 
 \section*{Acknowledgments}
 
-We are grateful to William C.~Swope (IBM Almaden Research Center) for his illuminating introduction to the use of autocorrelation analysis for the characterization of statistical error, as well as Michael R.~Shirts (University of Virginia), David L.~Mobley (University of California, Irvine), Kyle A.~Beauchamp (MSKCC), and Robert C.~McGibbon (Stanford University) for valuable discussions on this topic, and Joshua L.~Adelman (University of Pittsburgh) for helpful feedback and encouragement.
+We are grateful to William C.~Swope (IBM Almaden Research Center) for his illuminating introduction to the use of autocorrelation analysis for the characterization of statistical error, as well as Michael R.~Shirts (University of Virginia), David L.~Mobley (University of California, Irvine), Michael K.~Gilson (University of California, San Diego), Kyle A.~Beauchamp (MSKCC), and Robert C.~McGibbon (Stanford University) for valuable discussions on this topic, and Joshua L.~Adelman (University of Pittsburgh) for helpful feedback and encouragement.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BIBLIOGRAPHY
