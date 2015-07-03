@@ -160,6 +160,8 @@ The average (black line) and 95\% confidence interval (shaded grey) of 500 reali
 The expectation of the running average of the density over many realizations of this procedure ({Figure~\ref{figure:burn-in-example}, lower panel}) significantly deviates from the true expectation (dashed line), leading to significantly biased estimates of the expectation unless simulations are sufficiently long to eliminate this starting point dependent bias---a surprisingly long 30 ns in this case.
 Note that this bias is present even in the average of many realizations because the \emph{same} atypical starting condition is used for every realization of this simulation process.
 
+To develop an automatic approach to eliminating this bias, we take motivation from the concept of \emph{reverse cumulative averaging} from Yang et al.~\cite{yang-karplus:2004:jcp:reverse-cumulative-averaging}, in which the trajectory statistics over the production region of the trajectory are examined for different choices of the end of the discarded equilibration region to determine the optimal production region to use for computing expectations and other statistical properties.
+We begin by first formalizing our objectives mathematically.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FIGURE: BURN-IN EXAMPLE
@@ -204,13 +206,17 @@ By discarding samples $t < t_0$ to equilibration, we hope to exclude the initial
 \hat{A}_{[t_0,T]} \equiv \frac{1}{T-t_0+1} \sum_{t=t_0}^T a_t . \label{equation:production-time-average} 
 \end{eqnarray}
 
-We can quantify the overall error in an estimator $\hat{A}$ in a sample average that starts at $x_0$ and excludes samples where $t < t_0$ by the expected error $\delta^2 \hat{A}$,
+We can quantify the overall error in an estimator $\hat{A}_{[t_0,T]}$ in a sample average that starts at $x_0$ and excludes samples where $t < t_0$ by the expected error $\delta^2 \hat{A}_{[t_0,T]}$,
 \begin{eqnarray}
-\lefteqn{\delta^2 \hat{A} \equiv E_{x_0} \left[ \left( \hat{A}_{[t_0,T]} - \expect{A} \right)^2 \right]} \label{equation:rms-error} \\
-&=& E_{x_0}\left[ \left( \hat{A}_{[t_0,T]} - E_{x_0}[\hat{A}_{[t_0,T]}] \right)^2 \right] + \left( E_{x_0}[\hat{A}_{[t_0,T]}] - \expect{A} \right)^2  \label{equation:bias-variance}  \nonumber
+\delta^2 \hat{A}_{[t_0,T]} &\equiv& E_{x_0} \left[ \left( \hat{A}_{[t_0,T]} - \expect{A} \right)^2 \right] \label{equation:rms-error} 
 \end{eqnarray}
 where $E_{x_0}[\cdot]$ denotes the expectation over independent realizations of the specific simulation process initiated from configuration $x_0$, but with different velocities and random number seeds.
 
+We can rewrite the expected error $\delta^2 \hat{A}$ by separating it into two components:
+\begin{eqnarray}
+\delta^2 \hat{A}_{[t_0,T]} = E_{x_0}\left[ \left( \hat{A}_{[t_0,T]} - E_{x_0}[\hat{A}_{[t_0,T]}] \right)^2 \right] \nonumber \\
++ \left( E_{x_0}[\hat{A}_{[t_0,T]}] - \expect{A} \right)^2  \label{equation:bias-variance}  
+\end{eqnarray}
 The first term denotes the variance in the estimator $\hat{A}$,
 \begin{eqnarray}
 \mathrm{var}_{x_0} (\hat{A}_{[t_0,T]}) &\equiv& E_{x_0} \left[ \hat{A}_{[t_0,T]} - E_{x_0}[\hat{A}_{[t_0,T]}] \right]^2 \label{equation:variance}
@@ -240,12 +246,12 @@ There is a clear optimal choice at $t_0 \sim 150$ iterations that minimizes vari
 
 \section*{Selecting the equilibration time}
 
-Is there a simple approach to choosing an optimal equilibration time $t_0$ that provides a significantly improved estimate $\hat{A}_{[t_0,T]}$, even when we do not have access to multiple realizations of the same process?
+Is there a simple approach to choosing an optimal equilibration time $t_0$ that provides a significantly improved estimate $\hat{A}_{[t_0,T]}$, even when we do not have access to multiple realizations?
 At worst, we hope that such a procedure would at least give some improvement over the naive estimate, such that $\delta^2 \hat{A}_{[t_0,T]} < \delta^2 \hat{A}_{[1,T]}$; at best, we hope that we can achieve a reasonable bias-variance tradeoff close to the optimal point identified in Figure~\ref{figure:bias-variance} that minimizes bias without greatly increasing variance.
 We remark that, for cases in which the simulation is not long enough to reach equilibrium, no choice of $t_0$ will eliminate bias completely; the best we can hope for is to minimize this bias.
 
-While several automated methods for selecting the equilibration time $t_0$ have been proposed, these approaches have shortcomings that have greatly limited their use.
-The reverse cumulative averaging method~\cite{yang-karplus:2004:jcp:reverse-cumulative-averaging}, for example, uses a statistical test for normality to determine the point before which which the observable timeseries deviates from normality.
+While automated methods for selecting the equilibration time $t_0$ have been proposed, these approaches have shortcomings that have greatly limited their use.
+The reverse cumulative averaging (RCA) method proposed by Yang et al.~\cite{yang-karplus:2004:jcp:reverse-cumulative-averaging}, for example, uses a statistical test for normality to determine the point before which which the observable timeseries deviates from normality when examining the timeseries in reverse.
 While this concept may be reasonable for experimental data, where measurements often represent the sum of many random variables such that the central limit theorem's guarantee of asymptotic normality ensures the distribution of the observable will be approximately normal, there is no such guarantee that instantaneous measurements of a simulation property of interest will be normally distributed.
 In fact, many properties will be decidedly \emph{non-normal}.
 For a biomolecule such as a protein, for example, the radius of gyration, end-to-end distance, and torsion angles sampled during a simulation will all be highly non-normal.
@@ -305,9 +311,10 @@ Suppose we choose some arbitrary time $t_0$ and discard all samples $t \in [0, t
 How much data remains?
 We can determine this by computing the statistical inefficiency $g_{t_0}$ for the interval $[t_0, T]$, and computing the effective number of uncorrelated samples $N_\mathrm{eff}(t_0) \equiv (T - t_0 + 1) / g_{t_0}$.
 If we start at $t_0 \equiv T$ and move $t_0$ to earlier and earlier points in time, we expect that the effective number of uncorrelated samples $N_\mathrm{eff}(t_0)$ will continue to grow until we start to include the highly atypical initial data.
-At that point, the integrated autocorrelation time $\tau$ (and hence the statistical inefficiency $g$) will greatly increase, and the effective number of samples $N_\mathrm{eff}$ will start to plummet.
+At that point, the integrated autocorrelation time $\tau$ (and hence the statistical inefficiency $g$) will greatly increase (a phenomenon observed earlier, e.g.~Fig.~2 of~\cite{yang-karplus:2004:jcp:reverse-cumulative-averaging}).
+As a result, the effective number of samples $N_\mathrm{eff}$ will start to plummet.
 
-Figure~\ref{figure:reverse-cumulative-average} demonstrates the application of this concept to the liquid argon system described above, using averages of the statistical inefficiency $g_{t_0}$ and $N_\mathrm{eff}(t_0)$ computed over 500 independent replicate trajectories.
+Figure~\ref{figure:reverse-cumulative-average} demonstrates this behavior for the liquid argon system described above, using averages of the statistical inefficiency $g_{t_0}$ and $N_\mathrm{eff}(t_0)$ computed over 500 independent replicate trajectories.
 At short $t_0$, the average statistical inefficiency $g$ (Figure~\ref{figure:reverse-cumulative-average}, top panel) is large due to the contribution from slow relaxation from atypical initial conditions, while at long $t_0$ the statistical inefficiency estimate is much shorter and nearly constant of a large span of time origins.
 As a result, the average effective number of uncorrelated samples $N_\mathrm{eff}$ (Figure~\ref{figure:reverse-cumulative-average}, middle panel) has a peak at $t_0 \sim 222$ iterations (Figure~\ref{figure:reverse-cumulative-average}, vertical red lines).
 The effect on bias in the estimated average reduced density $\expect{\rho^*}$ (Figure~\ref{figure:reverse-cumulative-average}, bottom panel) is striking---the bias is essentially eliminated for the choice of equilibration time $t_0$ that maximizes the number of uncorrelated samples $N_\mathrm{eff}$.
@@ -436,6 +443,7 @@ We have found this method to be both fast and to provide useful estimates of the
 \section*{Acknowledgments}
 
 We are grateful to William C.~Swope (IBM Almaden Research Center) for his illuminating introduction to the use of autocorrelation analysis for the characterization of statistical error, as well as Michael R.~Shirts (University of Virginia), David L.~Mobley (University of California, Irvine), Michael K.~Gilson (University of California, San Diego), Kyle A.~Beauchamp (MSKCC), and Robert C.~McGibbon (Stanford University) for valuable discussions on this topic, and Joshua L.~Adelman (University of Pittsburgh) for helpful feedback and encouragement.
+We are grateful to Michael K.~Gilson (University of California, San Diego) and Wei Yang (Florida State University) for critical feedback on the manuscript itself.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BIBLIOGRAPHY
