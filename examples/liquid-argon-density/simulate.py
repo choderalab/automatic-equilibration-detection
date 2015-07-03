@@ -6,6 +6,7 @@ Run a simulation of liquid argon at constant pressure.
 """
 
 import os, os.path, copy
+import numpy as np
 
 from simtk import openmm
 from simtk import unit
@@ -40,8 +41,7 @@ timestep = 0.01 * characteristic_timescale # integrator timestep
 print "characteristic timescale = %.3f ps" % (characteristic_timescale / unit.picoseconds)
 print "timestep = %.12f ps" % (timestep / unit.picoseconds)
 
-#collision_rate = 5.0 / unit.picoseconds # collision rate for Langevin thermostat
-collision_rate = 1.5 / characteristic_timescale # collision rate for Langevin thermostat
+collision_rate = 1.0 / characteristic_timescale # collision rate for Langevin thermostat
 barostat_frequency = 100 # number of steps between barostat updates
 
 # Set parameters for number of simulation replicates, number of iterations per simulation, and number of steps per iteration.
@@ -98,14 +98,18 @@ for replicate in range(nreplicates):
     print "Setting initial velocities appropriate for temperature..."
     context.setVelocitiesToTemperature(temperature)
 
+    # Allocate storage for data
+    reduced_density_t = np.zeros([niterations+1], np.float32)
+    reduced_potential_t = np.zeros([niterations+1], np.float32)
+
     # Record initial data.
     state = context.getState(getEnergy=True)
     reduced_volume = state.getPeriodicBoxVolume() / (nparticles * sigma**3)
     reduced_density = 1.0 / reduced_volume
     reduced_potential = state.getPotentialEnergy() / kT
     print "replicate %5d / %5d : initial                 : density %8.3f | potential %8.3f" % (replicate, nreplicates, reduced_density, reduced_potential)
-    ncfile.variables['reduced_density'][replicate,0] = reduced_density
-    ncfile.variables['reduced_potential'][replicate,0] = reduced_potential
+    reduced_density_t[0] = reduced_density
+    reduced_potential_t[0] = reduced_potential
 
     # Run simulation.
     for iteration in range(1,niterations+1):
@@ -118,18 +122,18 @@ for replicate in range(nreplicates):
         reduced_density = 1.0 / reduced_volume
         reduced_potential = state.getPotentialEnergy() / kT
 
+        reduced_potential_t[iteration] = reduced_potential
+        reduced_density_t[iteration] = reduced_density
+
         if (iteration % 1000) == 0:
             print "replicate %5d / %5d : iteration %5d / %5d : density %8.3f | potential %8.3f" % (replicate, nreplicates, iteration, niterations, reduced_density, reduced_potential)
-            ncfile.sync()
-
-        # Store data.
-        ncfile.variables['reduced_density'][replicate,iteration] = reduced_density
-        ncfile.variables['reduced_potential'][replicate,iteration] = reduced_potential
 
     # Clean up.
     del context, integrator
 
     # Ensure all data is flushed to NetCDF file.
+    ncfile.variables['reduced_density'][replicate,0:(niterations+1)] = reduced_density_t[0:(niterations+1)]
+    ncfile.variables['reduced_potential'][replicate,0:(niterations+1)] = reduced_potential_t[0:(niterations+1)]
     ncfile.sync()
 
     print ""
