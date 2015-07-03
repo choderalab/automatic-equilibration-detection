@@ -42,12 +42,12 @@ print "timestep = %.12f ps" % (timestep / unit.picoseconds)
 
 #collision_rate = 5.0 / unit.picoseconds # collision rate for Langevin thermostat
 collision_rate = 1.5 / characteristic_timescale # collision rate for Langevin thermostat
-barostat_frequency = 25 # number of steps between barostat updates
+barostat_frequency = 100 # number of steps between barostat updates
 
 # Set parameters for number of simulation replicates, number of iterations per simulation, and number of steps per iteration.
 nreplicates = 500
 niterations = 10000
-nsteps_per_iteration = 100
+nsteps_per_iteration = barostat_frequency
 observation_interval = timestep * nsteps_per_iteration
 
 # Compute real units.
@@ -69,7 +69,7 @@ print "Writing initial positions to initial.pdb"
 utils.write_pdb('initial.pdb', initial_positions)
 
 # Create NetCDF file to store data.
-ncfile = utils.create_netcdf_datastore(netcdf_filename, testsystem.system, initial_positions, nreplicates, observation_interval)
+ncfile = utils.create_netcdf_datastore(netcdf_filename, testsystem.system, initial_positions, nreplicates, niterations, observation_interval)
 
 # Run replicates of the simulation.
 for replicate in range(nreplicates):

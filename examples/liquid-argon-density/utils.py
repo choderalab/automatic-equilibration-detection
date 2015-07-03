@@ -57,7 +57,7 @@ def write_pdb(filename, positions):
     outfile.close()
     return
 
-def create_netcdf_datastore(filename, system, positions, nreplicates, observation_interval):
+def create_netcdf_datastore(filename, system, positions, nreplicates, niterations, observation_interval):
     """
     Create (or resume from) NetCDF data storage file.
 
@@ -71,6 +71,8 @@ def create_netcdf_datastore(filename, system, positions, nreplicates, observatio
         The initial positions used for all simulations
     nreplicates : int
         The number of simulation replicates to be performed
+    niterations : int
+        The number of simulation iterations to be performed.
     obervation_interval : simtk.unit.Quantity with units compatible with ps
         Observation interval between frames.
     
@@ -90,7 +92,7 @@ def create_netcdf_datastore(filename, system, positions, nreplicates, observatio
     nparticles = positions.shape[0]
     
     # Initialize NetCDF file.
-    ncfile.createDimension('replicate', nreplicates)
+    ncfile.createDimension('replicate', 0) # unlimited number of replicates
     ncfile.createDimension('iteration', 0) # unlimited number of iterations
     ncfile.createDimension('atom', nparticles) # number of atoms in system
     ncfile.createDimension('spatial', 3) # number of spatial dimensions
@@ -121,7 +123,7 @@ def create_netcdf_datastore(filename, system, positions, nreplicates, observatio
     # Create storage for simulation data.
     ncvar_densities = ncfile.createVariable('reduced_density', 'f4', ('replicate','iteration'), zlib=True, chunksizes=(nreplicates,1))
     setattr(ncvar_densities, "long_name", "reduced_density[replicate][iteration] is the density (in reduced, dimensionless units) of iteration 'iteration' of replicate 'replicate'")
-    ncvar_potential = ncfile.createVariable('reduced_potential', 'f4', ('replicate','iteration'), zlib=True, chunksizes=(nreplicates,1))
+    ncvar_potential = ncfile.createVariable('reduced_potential', 'f4', ('replicate','iteration'), zlib=True, chunksizes=(1,niterations+1))
     setattr(ncvar_potential, "long_name", "reduced_potential[replicate][iteration] is the density (in kT) of iteration 'iteration' of replicate 'replicate'")
 
     ncfile.sync()
