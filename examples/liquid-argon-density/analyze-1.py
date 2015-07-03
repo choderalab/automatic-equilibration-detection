@@ -13,20 +13,13 @@ import matplotlib.pyplot as plt
 import pylab
 #import seaborn as sns
 from matplotlib.backends.backend_pdf import PdfPages
+import netCDF4
 
 #from equilibration import statisticalInefficiency_geyer as statisticalInefficiency
 from equilibration import statisticalInefficiency_multiscale as statisticalInefficiency
 
-data_directory = 'data'
+netcdf_filename = 'data.nc'
 figure_directory = 'figures'
-
-nreplicates = 500
-niterations = 10000
-
-# TODO: Read this in?
-timestep = 0.002846993438 # ps
-nsteps_per_iteration = 25
-iterations_per_ns = timestep * nsteps_per_iteration * 1000 # ns per iteration
 
 #
 # Ensure figure directory exists
@@ -39,26 +32,18 @@ if not os.path.exists(figure_directory):
 # READ DATA
 #
 
-reduced_density_it = np.zeros([nreplicates, niterations+1], np.float64)
-reduced_potential_it = np.zeros([nreplicates, niterations+1], np.float64)
+# Open NetCDF file
+ncfile = netCDF4.Dataset(netcdf_filename, 'r')
+[nreplicates, niterations] = ncfile.variables['reduced_density'].shape
+observation_interval = ncfile.variables['observation_interval'].getValue() # ps
+ns_per_iteration = observation_interval / 1000
 
-for replicate in range(nreplicates):
-    filename = os.path.join(data_directory, '%05d.output' % replicate)
-    lines = open(filename, 'r').readlines()
-    for iteration in range(niterations+1):
-        elements = lines[iteration].split()
-        reduced_density_it[replicate, iteration] = float(elements[1])
-        reduced_potential_it[replicate, iteration] = float(elements[2])
-
-A_it = reduced_density_it
+# Select data to analyze.
+A_it = np.array(ncfile.variables['reduced_density'][:,:], np.float64)
 
 # Compute true expectation using mean of second half of all simulations.
 t0 = int(niterations/2)
 true_expectation = A_it[:,t0:].mean(1).mean(0)
-
-# Compute true expectation using all data. # DEBUG
-#true_expectation = A_it.mean().mean()
-#print "true expectation (from all data) : %f" % true_expectation
 
 #
 # PLOT RELAXATION OF REDUCED DENSITIES
@@ -68,7 +53,7 @@ true_expectation = A_it[:,t0:].mean(1).mean(0)
 print "Initial reduced densities:"
 print A_it[0,0]
 
-x = np.arange(niterations+1) / iterations_per_ns # ns
+x = np.arange(niterations+1) * ns_per_iteration # ns
 A_t = A_it.mean(0)
 dA_t = A_it.std(0)
 

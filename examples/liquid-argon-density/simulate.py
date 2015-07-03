@@ -13,6 +13,8 @@ from simtk.openmm import app
 
 from openmmtools import testsystems, integrators
 
+import utils # simulation and analysis utilities
+
 # Set conditions for simulation.
 # Roughly corresponds to conditions from http://www.cstl.nist.gov/srs/LJ_PURE/mc.htm
 nparticles = 500
@@ -24,7 +26,7 @@ reduced_density = 0.960     # reduced_density = density * (sigma**3)
 reduced_temperature = 0.850 # reduced_temperature = kB * temperature / epsilon
 reduced_pressure = 1.2660   # reduced_pressure = pressure * (sigma**3) / epsilon
 
-data_directory = 'data'     # Directory in which data is to be stored
+netcdf_filename = 'data.nc' # NetCDF file to store data in
 
 r0 = 2.0**(1./6.) * sigma   # minimum potential distance for Lennard-Jones interaction
 characteristic_timescale = unit.sqrt((mass * r0**2) / (72 * epsilon)) # characteristic timescale for bound Lennard-Jones interaction
@@ -58,31 +60,22 @@ kT = kB * temperature
 testsystem = testsystems.LennardJonesFluid(nparticles=nparticles, mass=mass, sigma=sigma, epsilon=epsilon, reduced_density=reduced_density)
 
 # Construct initial positions by minimization.
-print "Minimizing to obtain initial positions..."
-#integrator = openmm.LangevinIntegrator(temperature, collision_rate, timestep)
-integrator = integrators.VVVRIntegrator(temperature, collision_rate, timestep)
-context = openmm.Context(testsystem.system, integrator)
-context.setPositions(testsystem.positions)
-openmm.LocalEnergyMinimizer.minimize(context)
-state = context.getState(getPositions=True)
-initial_positions = state.getPositions(asNumpy=True)
-del context, integrator, state
+print "Minimizing positions..."
+initial_positions = utils.minimize(testsystem.system, testsystem.positions)
 
-# DEBUG: Write initial positions.
-outfile = open("initial.pdb", 'w')
-for particle in range(nparticles):
-    outfile.write("ATOM  %5d  AR   AR     1    %8.3f%8.3f%8.3f\n" % (particle, initial_positions[particle,0]/unit.angstrom, initial_positions[particle,1]/unit.angstrom, initial_positions[particle,2]/unit.angstrom))
-outfile.close()
+# Write initial positions.
+print "Writing initial positions to initial.pdb"
+utils.write_pdb('initial.pdb', initial_positions)
 
-# Make directory to store data.
-if not os.path.exists(data_directory):
-    os.makedirs(data_directory)
+# Create NetCDF file to store data.
+ncfile = utils.create_netcdf_datastore(netcdf_filename, testsystem.system, initial_positions, nreplicates, timestep * nsteps_per_iteration)
 
 # Run replicates of the simulation.
 for replicate in range(nreplicates):
-    # Make a new copy of the system.
-    print "Making a deep copy of the system..."
-    system = copy.deepcopy(testsystem.system)
+    # Reconstitute System object.
+    print "Reconstituting System object..."
+    system = openmm.System()
+    system.__setstate__(str(ncfile.variables['system'][0]))
 
     # Add a barostat to the system.
     # NOTE: This is added to a new copy of the system to ensure barostat random number seeds are unique.
@@ -90,14 +83,9 @@ for replicate in range(nreplicates):
     barostat = openmm.MonteCarloBarostat(pressure, temperature, barostat_frequency)
     system.addForce(barostat)
 
-    # Open output file.
-    print "Opening output file..."
-    output_filename = os.path.join(data_directory, '%05d.output' % replicate)
-    outfile = open(output_filename, 'w')
-
     # Create integrator
-    print "Creating LangevinIntegrator..."
-    integrator = openmm.LangevinIntegrator(temperature, collision_rate, timestep)
+    print "Creating integrator..."
+    integrator = integrators.VVVRIntegrator(temperature, collision_rate, timestep)
 
     # Create context.
     print "Creating Context..."
@@ -109,28 +97,17 @@ for replicate in range(nreplicates):
     print "Setting initial velocities appropriate for temperature..."
     context.setVelocitiesToTemperature(temperature)
 
-    # DEBUG: Write out initial conditions.
-    print "Serializing..."
-    def write_file(filename, contents):
-        file = open(filename, 'w')
-        file.write(contents)
-        file.close()
-    from simtk.openmm import XmlSerializer
-    state = context.getState(getPositions=True, getVelocities=True, getEnergy=True, getForces=True)
-    write_file(os.path.join(data_directory, '%05d.system.xml' % replicate), XmlSerializer.serialize(system))
-    write_file(os.path.join(data_directory, '%05d.state.xml' % replicate), XmlSerializer.serialize(state))
-    write_file(os.path.join(data_directory, '%05d.integrator.xml' % replicate), XmlSerializer.serialize(integrator))
-
     # Record initial data.
     state = context.getState(getEnergy=True)
     reduced_volume = state.getPeriodicBoxVolume() / (nparticles * sigma**3)
     reduced_density = 1.0 / reduced_volume
     reduced_potential = state.getPotentialEnergy() / kT
     print "replicate %5d / %5d : initial                 : density %8.3f | potential %8.3f" % (replicate, nreplicates, reduced_density, reduced_potential)
-    outfile.write('%8d %12.6f %12.6f\n' % (0, reduced_density, reduced_potential))
+    ncfile.variables['reduced_density'][replicate,0] = reduced_density
+    ncfile.variables['reduced_potential'][replicate,0] = reduced_potential
 
     # Run simulation.
-    for iteration in range(niterations):
+    for iteration in range(1,niterations+1):
         # Integrate the simulation.
         integrator.step(nsteps_per_iteration)
 
@@ -140,14 +117,22 @@ for replicate in range(nreplicates):
         reduced_density = 1.0 / reduced_volume
         reduced_potential = state.getPotentialEnergy() / kT
 
-        if ((iteration + 1) % 100) == 0:
-            print "replicate %5d / %5d : iteration %5d / %5d : density %8.3f | potential %8.3f" % (replicate, nreplicates, iteration+1, niterations, reduced_density, reduced_potential)
-        outfile.write('%8d %12.6f %12.6f\n' % (iteration+1, reduced_density, reduced_potential))
+        if (iteration % 1000) == 0:
+            print "replicate %5d / %5d : iteration %5d / %5d : density %8.3f | potential %8.3f" % (replicate, nreplicates, iteration, niterations, reduced_density, reduced_potential)
+            ncfile.sync()
+
+        # Store data.
+        ncfile.variables['reduced_density'][replicate,iteration] = reduced_density
+        ncfile.variables['reduced_potential'][replicate,iteration] = reduced_potential
 
     # Clean up.
     del context, integrator
-    outfile.close()
+
+    # Ensure all data is flushed to NetCDF file.
+    ncfile.sync()
 
     print ""
 
+# Clean up.
+ncfile.close()
 

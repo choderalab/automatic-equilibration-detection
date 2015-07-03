@@ -13,27 +13,16 @@ import matplotlib.pyplot as plt
 import pylab
 #import seaborn as sns
 from matplotlib.backends.backend_pdf import PdfPages
+import netCDF4
 
 #from equilibration import statisticalInefficiency_geyer as statisticalInefficiency
 from equilibration import statisticalInefficiency_multiscale as statisticalInefficiency
 
-data_directory = 'data'
+netcdf_filename = 'data.nc'
 figure_directory = 'figures'
-
-nreplicates = 500
-niterations = 10000
-
-#nreplicates = 10
-
-# TODO: Read this in?
-timestep = 0.002846993438 # ps
-nsteps_per_iteration = 25
-iterations_per_ns = timestep * nsteps_per_iteration * 1000 # ns per iteration # TODO: Fix me; inverse of what we want?
-print "iterations_per_ns = %f" % iterations_per_ns
 
 t0max = 1001 # largest number of initial samples to discard
 tmax = 2000 # total trajectory length to include in analysis
-print "tmax = %d (%.3f ns)" % (tmax, tmax / iterations_per_ns)
 
 #
 # Ensure figure directory exists
@@ -42,27 +31,18 @@ print "tmax = %d (%.3f ns)" % (tmax, tmax / iterations_per_ns)
 if not os.path.exists(figure_directory):
     print "Creating figures directory..."
     os.makedirs(figure_directory)
-
 #
 # READ DATA
 #
 
-print "Reading data..."
+# Open NetCDF file
+ncfile = netCDF4.Dataset(netcdf_filename, 'r')
+[nreplicates, niterations] = ncfile.variables['reduced_density'].shape
+observation_interval = ncfile.variables['observation_interval'].getValue() # ps
+ns_per_iteration = observation_interval / 1000
 
-reduced_density_it = np.zeros([nreplicates, niterations+1], np.float64)
-reduced_potential_it = np.zeros([nreplicates, niterations+1], np.float64)
-
-for replicate in range(nreplicates):
-    filename = os.path.join(data_directory, '%05d.output' % replicate)
-    lines = open(filename, 'r').readlines()
-    for iteration in range(niterations+1):
-        elements = lines[iteration].split()
-        reduced_density_it[replicate, iteration] = float(elements[1])
-        reduced_potential_it[replicate, iteration] = float(elements[2])
-
-# Extract observables.
-
-A_it = reduced_density_it
+# Select data to analyze.
+A_it = np.array(ncfile.variables['reduced_density'][:,:], np.float64)
 
 # Compute true expectation using mean of second half of all simulations.
 t0 = int(niterations/2)
@@ -76,7 +56,7 @@ true_expectation = A_it[:,t0:].mean(1).mean(0)
 # BIAS-VARIANCE TRADEOFF CALCULATIONS
 #
 
-x = np.arange(niterations+1) / iterations_per_ns # ns
+x = np.arange(niterations+1) * ns_per_iteration # ns
 A_t = A_it.mean(0)
 dA_t = A_it.std(0)
 
@@ -177,7 +157,7 @@ print "Creating RMS error figure..."
 # Create plot as PDF.
 filename = os.path.join(figure_directory, 'argon-rmse.pdf') # PDF file to write
 
-x = np.arange(tbvmax) / iterations_per_ns # ns
+x = np.arange(tbvmax) * ns_per_iteration # ns
 
 pp = PdfPages(filename)
 
