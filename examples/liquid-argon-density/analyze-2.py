@@ -39,7 +39,7 @@ if not os.path.exists(figure_directory):
 ncfile = netCDF4.Dataset(netcdf_filename, 'r')
 [nreplicates, niterations] = ncfile.variables['reduced_density'].shape
 observation_interval = ncfile.variables['observation_interval'].getValue() # ps
-ns_per_iteration = observation_interval / 1000
+ps_per_iteration = observation_interval
 
 # Select data to analyze.
 A_it = np.array(ncfile.variables['reduced_density'][:,:], np.float64)
@@ -56,7 +56,7 @@ true_expectation = A_it[:,t0:].mean(1).mean(0)
 # BIAS-VARIANCE TRADEOFF CALCULATIONS
 #
 
-x = np.arange(niterations+1) * ns_per_iteration # ns
+x = np.arange(niterations+1) * ps_per_iteration # ps
 A_t = A_it.mean(0)
 dA_t = A_it.std(0)
 
@@ -157,7 +157,7 @@ print "Creating RMS error figure..."
 # Create plot as PDF.
 filename = os.path.join(figure_directory, 'argon-rmse.pdf') # PDF file to write
 
-x = np.arange(tbvmax) * ns_per_iteration # ns
+x = np.arange(tbvmax) * ps_per_iteration # ps
 
 pp = PdfPages(filename)
 
@@ -199,7 +199,7 @@ print "rmse_optimal %10.6f drmse_optimal %10.6f" % (rmse_optimal, drmse_optimal)
 pylab.plot([x[0], x[tbvmax-1]], [rmse_optimal, rmse_optimal], 'r-')
 pylab.fill_between([x[0], x[tbvmax-1]], (rmse_optimal+2*drmse_optimal)*np.array([1,1]), (rmse_optimal-2*drmse_optimal)*np.array([1,1]), facecolor='red', edgecolor='red', alpha=0.5, linewidth=0)
 
-pylab.xlabel('$t_0$ / ns')
+pylab.xlabel('$t_0$ / ps')
 pylab.ylabel('$\delta \hat{\mathrm{A}}$')
 
 figure.tight_layout()
@@ -359,7 +359,7 @@ pylab.plot(x[0:t0max], Aburnin_mean_t[0:t0max], 'k-')
 
 pylab.legend(['true expectation', 'discarding initial $[0,t_0]$'], fontsize=fontsize-2, frameon=False)
 
-pylab.xlabel('initial simulation time $t_0$ / ns')
+pylab.xlabel('initial simulation time $t_0$ / ps')
 pylab.ylabel(r'$\left\langle\rho^*\right\rangle_{[t_0,T]}$', fontsize=fontsize)
 
 # Adjust axes.

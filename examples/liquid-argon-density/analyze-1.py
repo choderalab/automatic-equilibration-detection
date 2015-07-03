@@ -36,7 +36,7 @@ if not os.path.exists(figure_directory):
 ncfile = netCDF4.Dataset(netcdf_filename, 'r')
 [nreplicates, niterations] = ncfile.variables['reduced_density'].shape
 observation_interval = ncfile.variables['observation_interval'].getValue() # ps
-ns_per_iteration = observation_interval / 1000
+ps_per_iteration = observation_interval
 
 # Select data to analyze.
 A_it = np.array(ncfile.variables['reduced_density'][:,:], np.float64)
@@ -53,7 +53,7 @@ true_expectation = A_it[:,t0:].mean(1).mean(0)
 print "Initial reduced densities:"
 print A_it[0,0]
 
-x = np.arange(niterations+1) * ns_per_iteration # ns
+x = np.arange(niterations+1) * ps_per_iteration
 A_t = A_it.mean(0)
 dA_t = A_it.std(0)
 
@@ -142,7 +142,7 @@ pylab.plot(x[Nequil:nmax], Aburnin_mean_t[Nequil:nmax], 'b-') # cumulative avera
 
 pylab.legend(['true expectation', 'cumulative average', 'discarding first %d samples to equilibration' % Nequil], fontsize=fontsize, frameon=False)
 
-pylab.xlabel('simulation time / ns', fontsize=fontsize)
+pylab.xlabel('simulation time / ps', fontsize=fontsize)
 pylab.ylabel(r'reduced density $\rho^*$', fontsize=fontsize)
 
 # Adjust axes.
