@@ -47,7 +47,8 @@ barostat_frequency = 25 # number of steps between barostat updates
 # Set parameters for number of simulation replicates, number of iterations per simulation, and number of steps per iteration.
 nreplicates = 500
 niterations = 10000
-nsteps_per_iteration = 25
+nsteps_per_iteration = 100
+observation_interval = timestep * nsteps_per_iteration
 
 # Compute real units.
 kB = unit.BOLTZMANN_CONSTANT_kB * unit.AVOGADRO_CONSTANT_NA
@@ -68,7 +69,7 @@ print "Writing initial positions to initial.pdb"
 utils.write_pdb('initial.pdb', initial_positions)
 
 # Create NetCDF file to store data.
-ncfile = utils.create_netcdf_datastore(netcdf_filename, testsystem.system, initial_positions, nreplicates, timestep * nsteps_per_iteration)
+ncfile = utils.create_netcdf_datastore(netcdf_filename, testsystem.system, initial_positions, nreplicates, observation_interval)
 
 # Run replicates of the simulation.
 for replicate in range(nreplicates):
