@@ -7,6 +7,7 @@
 * `analyze.py` - analyze simulation data and generate figures in publication
 * `cleanup.sh` - bash script to clean up all simulation data and conda environment in preparation for reproducing everything from scratch
 * `equilibration.py` - utility methods for computing statistical inefficiencies and determining the equilibration time start usable from other codes
+* `submit-torque.sh` - sample Torque/Moab submission script
 
 ## Dependencies
 
