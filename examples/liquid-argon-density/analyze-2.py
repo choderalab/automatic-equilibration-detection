@@ -144,7 +144,13 @@ for replicate in range(nreplicates):
 print ""
 print "STATISTICS"
 for scheme in schemes:
-    print "%24s : error %10.6f bias %10.6f +- %10.6f stddev %10.6f +- %10.6f" % (scheme, np.sqrt((bias_i[scheme]**2).mean()), bias_i[scheme].mean(), bias_i[scheme].std()/np.sqrt(nreplicates), stddev_i[scheme].mean(), stddev_i[scheme].std()/np.sqrt(nreplicates))
+    # Compute RMSE and dRMSE for this scheme.
+    B = ((bias_i[scheme][:])**2).mean(0)
+    dB = ((bias_i[scheme][:])**2).std(0) / np.sqrt(nreplicates)
+    rmse = np.sqrt(B)
+    drmse = 0.5 * dB / rmse
+
+    print "%24s : error %10.6f +- %10.6f | bias %10.6f +- %10.6f | stddev %10.6f +- %10.6f" % (scheme, rmse, drmse, bias_i[scheme].mean(), bias_i[scheme].std()/np.sqrt(nreplicates), stddev_i[scheme].mean(), stddev_i[scheme].std()/np.sqrt(nreplicates))
 print ""
 
 #
