@@ -140,7 +140,7 @@ pylab.plot([x[0], x[nmax]], [true_expectation, true_expectation], 'k--') # true 
 pylab.plot(x[:nmax], Acumavg_mean_t[:nmax], 'r:') # cumulative average from beginning
 pylab.plot(x[Nequil:nmax], Aburnin_mean_t[Nequil:nmax], 'b-') # cumulative average after discarding some initial data to equilibrium
 
-pylab.legend(['true expectation', 'cumulative average', 'discarding first %d samples to equilibration' % Nequil], fontsize=fontsize, frameon=False)
+pylab.legend(['true expectation', 'cumulative average', r'discarding first %d $\tau$ to equilibration' % Nequil], fontsize=fontsize, frameon=False)
 
 pylab.xlabel(r'simulation length / $\tau$', fontsize=fontsize)
 pylab.ylabel(r'reduced density $\rho^*$', fontsize=fontsize)

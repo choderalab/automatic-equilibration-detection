@@ -238,7 +238,7 @@ This can be seen in the bottom panel of Figure~\ref{figure:reverse-cumulative-av
 To examine the tradeoff between bias and variance explicitly, Figure~\ref{figure:bias-variance} plots the bias and variance (here, shown as standard error) contributions against each other as a function of $t_0$ (denoted by color) as computed from statistics over all 500 replicates.
 At $t_0 = 0$, the bias is large but variance is minimized.
 With increasing $t_0$, bias is eventually eliminated but then variance rapidly grows as fewer uncorrelated samples are included in the estimate.
-There is a clear optimal choice at $t_0 \sim 150~\tau$ that minimizes variance while also effectively eliminating bias (where $\tau$ is a natural time unit---see \emph{Simulation Details}).
+There is a clear optimal choice at $t_0 \sim 90~\tau$ that minimizes variance while also effectively eliminating bias (where $\tau$ is a natural time unit---see \emph{Simulation Details}).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BIAS-VARIANCE TRADEOFF
@@ -350,7 +350,7 @@ Despite not having knowledge about multiple realizations, this strategy effectiv
 {\bf Overall RMS error.} 
 How well does this strategy perform in terms of decreasing the \emph{overall} error $\delta \hat{A}_{[t_0,T]}$ compared to $\delta \hat{A}_{[1,T]}$?
 Figure~\ref{figure:argon-rmse} compares the expected standard error (denoted $\delta \hat{A}$) as a function of a fixed initial equilibration time $t_0$ (black line with shaded region denoting 95\% confidence interval) with the strategy of selecting $t_0$ to maximize $N_\mathrm{eff}$ for each realization (red line with shaded region denoting 95\% confidence interval).
-While the minimum error for the fixed-$t_0$ strategy (0.0015$\pm$0.0003) is achieved at $90~\tau$---a fact that could only be determined from knowledge of multiple realizations---the simple strategy of selecting $t_0$ using Eq.~\ref{equation:optimal-equilibration-time} achieves a minimum error of 0.0017$\pm$0.0004, only 1\% worse (compared to errors of 0.0045$\pm$0.0042, or 300\% worse, should no data have been discarded).
+While the minimum error for the fixed-$t_0$ strategy (0.00154$\pm$0.00005) is achieved at $90~\tau$---a fact that could only be determined from knowledge of multiple realizations---the simple strategy of selecting $t_0$ using Eq.~\ref{equation:optimal-equilibration-time} achieves a minimum error of 0.00171$\pm$0.00006, only 11\% worse (compared to errors of 0.00456$\pm$0.00007, or 296\% worse, should no data have been discarded).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FIGURE: RMS ERROR
