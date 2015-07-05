@@ -124,10 +124,10 @@ We present a simple Python reference implementation of this procedure, and demon
 \caption{\label{figure:burn-in-example} {\bf Illustration of the motivation for discarding data to equilibration.} 
 To illustrate the bias in expectations induced by relaxation away from initial conditions, 500 replicates of a simulation of liquid argon were initiated from the same energy-minimized initial configuration constructed with initial reduced density $\rho^* \equiv \rho \sigma^3 = 0.960$ but different random number seeds for stochastic integration.
 %
-{\bf Top:} The average of the reduced density (black line) over the replicates relaxes to the region of typical equilibrium densities over the first few ns of simulation time.
+{\bf Top:} The average of the reduced density (black line) over the replicates relaxes to the region of typical equilibrium densities over the first $\sim 90~\tau$ of simulation time, where $\tau$ is a natural time unit (see \emph{Simulation Details}).
 %
-{\bf Bottom:} If the average density is estimated by a cumulative average from the beginning of the simulation (red dotted line), the estimate will be heavily biased by the atypical starting density even beyond 10 ns.
-Discarding even a small amount of initial data---in this case 500 initial samples ($\sim$1.4 ns, blue solid line)---results in a cumulative average estimate that converges to the true average (black dashed line) much more rapidly.
+{\bf Bottom:} If the average density is estimated by a cumulative average from the beginning of the simulation (red dotted line), the estimate will be heavily biased by the atypical starting density even beyond $1000~\tau$.
+Discarding even a small amount of initial data---in this case 500 initial samples---results in a cumulative average estimate that converges to the true average (black dashed line) much more rapidly.
 % 
 Shaded regions denote 95\% confidence intervals.
 }
@@ -170,15 +170,15 @@ We begin by first formalizing our objectives mathematically.
 \begin{figure*}[tbp]
 \resizebox{0.9\textwidth}{!}{\includegraphics{argon-reverse-cumulative-average.pdf}}
 \caption{\label{figure:reverse-cumulative-average} {\bf Statistical inefficiency, number of uncorrelated samples, and bias for different equilibration times.} 
-Trajectories of length $T = $ 2~000 iterations ($\sim$28 ns) for the argon system described in Fig.~\ref{figure:burn-in-example} were analyzed as a function of equilibration time choice $t_0$.
+Trajectories of length $T = 2000~\tau$ for the argon system described in Figure~\ref{figure:burn-in-example} were analyzed as a function of equilibration time choice $t_0$.
 Averages over all 500 replicate simulations (all starting from the same initial conditions) are shown as dark lines, with shaded lines showing standard deviation of estimates among replicates.
 {\bf Top:} The statistical inefficiency $g$ as a function of equilibration time choice $t_0$ is initially very large, but diminishes rapidly after the system has relaxed to equilibrium.
-{\bf Middle:} The number of effectively uncorrelated samples $N_\mathrm{eff} = (T - t_0 + 1) / g$ shows a maximum at $t_0 \sim 200$ iterations ($\sim$2 ns), suggesting the system has equilibrated by this time.
+{\bf Middle:} The number of effectively uncorrelated samples $N_\mathrm{eff} = (T - t_0 + 1) / g$ shows a maximum at $t_0 \sim 90~\tau$, suggesting the system has equilibrated by this time.
 The red vertical line in all plots marks this choice of $t_0 \sim 200$.
-{\bf Bottom:} The cumulative density average $\expect{\rho^*}$ computed over the span $[t_0, T]$ shows that the bias (deviation from the true estimate, shown as red dashed lines) is minimized for choices of $t_0 \ge 200$ iterations ($\sim$ 2 ns).
+{\bf Bottom:} The cumulative density average $\expect{\rho^*}$ computed over the span $[t_0, T]$ shows that the bias (deviation from the true estimate, shown as red dashed lines) is minimized for choices of $t_0 \ge 90~\tau$.
 The standard deviation among replicates (shaded region) grows with $t_0$ because fewer data are included in the estimate.
 The choice of optimal $t_0$ that maximizes $N_\mathrm{eff}$ (red vertical line) strikes a good balance between bias and variance.
-The true estimate (red dashed lines) is computed from averaging over the range [5~000, 10~000] iterations over all 500 replicates.
+The true estimate (red dashed lines) is computed from averaging over the range [5~000, 10~000] $\tau$ over all 500 replicates.
 }
 \end{figure*}
 
@@ -233,12 +233,12 @@ while the second term denotes the contribution from the squared bias,
 \section*{Bias-variance tradeoff}
 
 With increasing equilibration time $t_0$, bias is reduced, but the variance---the contribution to error due to random variation from having a finite number of uncorrelated samples---will increase because less data is included in the estimate.
-This can be seen in the bottom panel of Figure~\ref{figure:reverse-cumulative-average}, where the shaded region (denoting the 95\% confidence interval of the mean, computed from twice the standard deviation among sample estimates) increases in width with increasing equilibration time $t_0$.
+This can be seen in the bottom panel of Figure~\ref{figure:reverse-cumulative-average}, where the shaded region (95\% confidence interval of the mean) increases in width with increasing equilibration time $t_0$.
 
 To examine the tradeoff between bias and variance explicitly, Figure~\ref{figure:bias-variance} plots the bias and variance (here, shown as standard error) contributions against each other as a function of $t_0$ (denoted by color) as computed from statistics over all 500 replicates.
 At $t_0 = 0$, the bias is large but variance is minimized.
 With increasing $t_0$, bias is eventually eliminated but then variance rapidly grows as fewer uncorrelated samples are included in the estimate.
-There is a clear optimal choice at $t_0 \sim 150$ iterations that minimizes variance while also effectively eliminating bias.
+There is a clear optimal choice at $t_0 \sim 150~\tau$ that minimizes variance while also effectively eliminating bias (where $\tau$ is a natural time unit---see \emph{Simulation Details}).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BIAS-VARIANCE TRADEOFF
@@ -311,19 +311,19 @@ Suppose we choose some arbitrary time $t_0$ and discard all samples $t \in [0, t
 How much data remains?
 We can determine this by computing the statistical inefficiency $g_{t_0}$ for the interval $[t_0, T]$, and computing the effective number of uncorrelated samples $N_\mathrm{eff}(t_0) \equiv (T - t_0 + 1) / g_{t_0}$.
 If we start at $t_0 \equiv T$ and move $t_0$ to earlier and earlier points in time, we expect that the effective number of uncorrelated samples $N_\mathrm{eff}(t_0)$ will continue to grow until we start to include the highly atypical initial data.
-At that point, the integrated autocorrelation time $\tau$ (and hence the statistical inefficiency $g$) will greatly increase (a phenomenon observed earlier, e.g.~Fig.~2 of~\cite{yang-karplus:2004:jcp:reverse-cumulative-averaging}).
+At that point, the integrated autocorrelation time $\tau$ (and hence the statistical inefficiency $g$) will greatly increase (a phenomenon observed earlier, e.g.~Figure~2 of~\cite{yang-karplus:2004:jcp:reverse-cumulative-averaging}).
 As a result, the effective number of samples $N_\mathrm{eff}$ will start to plummet.
 
 Figure~\ref{figure:reverse-cumulative-average} demonstrates this behavior for the liquid argon system described above, using averages of the statistical inefficiency $g_{t_0}$ and $N_\mathrm{eff}(t_0)$ computed over 500 independent replicate trajectories.
 At short $t_0$, the average statistical inefficiency $g$ (Figure~\ref{figure:reverse-cumulative-average}, top panel) is large due to the contribution from slow relaxation from atypical initial conditions, while at long $t_0$ the statistical inefficiency estimate is much shorter and nearly constant of a large span of time origins.
-As a result, the average effective number of uncorrelated samples $N_\mathrm{eff}$ (Figure~\ref{figure:reverse-cumulative-average}, middle panel) has a peak at $t_0 \sim 222$ iterations (Figure~\ref{figure:reverse-cumulative-average}, vertical red lines).
+As a result, the average effective number of uncorrelated samples $N_\mathrm{eff}$ (Figure~\ref{figure:reverse-cumulative-average}, middle panel) has a peak at $t_0 \sim 90~\tau$ (Figure~\ref{figure:reverse-cumulative-average}, vertical red lines).
 The effect on bias in the estimated average reduced density $\expect{\rho^*}$ (Figure~\ref{figure:reverse-cumulative-average}, bottom panel) is striking---the bias is essentially eliminated for the choice of equilibration time $t_0$ that maximizes the number of uncorrelated samples $N_\mathrm{eff}$.
 
 This suggests an alluringly simple algorithm for identifying the optimal equilibration time---pick the $t_0$ which maximizes the number of uncorrelated samples $N_\mathrm{eff}$.
 In mathematical terms, 
 \begin{eqnarray}
 t_0^\mathrm{opt} &=& \argmaxl_{t_0} N_\mathrm{eff}(t_0) \label{equation:optimal-equilibration-time} \\
-&=& \argmaxl_{t_0}  \frac{T - t_0 + 1}{g_{t_0}}
+&=& \argmaxl_{t_0}  \frac{T - t_0 + 1}{g_{t_0}} \nonumber
 \end{eqnarray}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -333,25 +333,24 @@ t_0^\mathrm{opt} &=& \argmaxl_{t_0} N_\mathrm{eff}(t_0) \label{equation:optimal-
 \begin{figure}[tbp]
 \resizebox{\columnwidth}{!}{\includegraphics{argon-bias-variance.pdf}}
 \caption{\label{figure:bias-variance} {\bf Bias-variance tradeoff for fixed equilibration time versus automatic equilibration time selection.} 
-Trajectories of length $T = $ 2~000 iterations ($\sim$28 ns) for the argon system described in Fig.~\ref{figure:burn-in-example} were analyzed as a function of equilibration time choice $t_0$, with colors denoting the value of $t_0$ (in iterations) corresponding to each plotted point.
-Using 500 replicate simulations, the average bias (average deviation from true expectation) and standard deviation (random variation from replicate to replicate) were computed as a function of a prespecified fixed equilibration time $t_0$, with colors running from $t_0 = 0$ (violet) to $t_0 =$1~1800 iterations (red).
+Trajectories of length $T = 2000 \tau$ for the argon system described in Figure~\ref{figure:burn-in-example} were analyzed as a function of equilibration time choice $t_0$, with colors denoting the value of $t_0$ (in units of $\tau$) corresponding to each plotted point.
+Using 500 replicate simulations, the average bias (average deviation from true expectation) and standard deviation (random variation from replicate to replicate) were computed as a function of a prespecified fixed equilibration time $t_0$, with colors running from violet ($0~\tau$)  to red ($1800~\tau$).
 As is readily discerned, the bias for small $t_0$ is initially large, but minimized for larger $t_0$.
-By contrast, the standard error (a measure of variance, estimated here by standard deviation among replicates) grows as $t_0$ grows above a certain critical time (here, $\sim$200 iterations).
+By contrast, the standard error (a measure of variance, estimated here by standard deviation among replicates) grows as $t_0$ grows above a certain critical time (here, $\sim 90~\tau$).
 If the $t_0$ that maximizes $N_\mathrm{eff}$ is instead chosen \emph{individually} for each trajectory based on that trajectory's estimates of statistical inefficiency $g_{[t_0,T]}$, the resulting bias-variance tradeoff (black triangle) does an excellent job minimizing bias and variance simultaneously, comparable to what is possible for a choice of equilibration time $t_0$ based on knowledge of the true bias and variance among many replicate estimates.
 }
 \end{figure}
 
 {\bf Bias-variance tradeoff.} 
-But how will this strategy work for cases where we do not know the statistical inefficiency $g$ as a function of the equilibration time $t_0$ precisely?
+How will the simple strategy of selecting the equilibration time $t_0$ using Eq~\ref{equation:optimal-equilibration-time} work for cases where we do not know the statistical inefficiency $g$ as a function of the equilibration time $t_0$ precisely?
 When all that is available is a single simulation, our best estimate of $g_{t_0}$ is derived from that simulation alone over the span $[t_0,T]$---will this affect the quality of our estimate of equilibration time?
 Empirically, this does not appear to be the case---the black triangle in Figure~\ref{figure:bias-variance} shows the bias and variance contributions to the error for estimates computed over the 500 replicates where $t_0$ is individually determined from each simulation using this simple scheme based on selecting $t_0$ to maximize $N_\mathrm{eff}$ for each individual realization.
 Despite not having knowledge about multiple realizations, this strategy effectively achieves a near-optimal balance between minimizing bias without increasing variance.
 
 {\bf Overall RMS error.} 
 How well does this strategy perform in terms of decreasing the \emph{overall} error $\delta \hat{A}_{[t_0,T]}$ compared to $\delta \hat{A}_{[1,T]}$?
-Fiigure~\ref{figure:argon-rmse} compares the expected standard error (denoted $\delta \hat{A}$ in the figure) as a function of a fixed initial equilibration time $t_0$ (black line with shaded region denoting 95\% confidence interval) with the strategy of selecting $t_0$ to maximize $N_\mathrm{eff}$ for each realization (red line with shaded region denoted 95\% confidence interval).
-While the minimum error for the fixed-$t_0$ strategy (0.002545$\pm$0.00009) is achieved in the range of 2--6 ns---a fact that could only be determined from knowledge of multiple realizations---the simple strategy of selecting $t_0$ using Eq.~\ref{equation:optimal-equilibration-time} achieves a minimum error that is only 6\% worse (compared to 137\% worse should no data have been discarded).
-While this is certainly statistically significant in being worse than the optimal $t_0$ given all 500 replicates, it is remarkably good for a simple method employing data from a single simulation.
+Figure~\ref{figure:argon-rmse} compares the expected standard error (denoted $\delta \hat{A}$) as a function of a fixed initial equilibration time $t_0$ (black line with shaded region denoting 95\% confidence interval) with the strategy of selecting $t_0$ to maximize $N_\mathrm{eff}$ for each realization (red line with shaded region denoting 95\% confidence interval).
+While the minimum error for the fixed-$t_0$ strategy (0.0015$\pm$0.0003) is achieved at $90~\tau$---a fact that could only be determined from knowledge of multiple realizations---the simple strategy of selecting $t_0$ using Eq.~\ref{equation:optimal-equilibration-time} achieves a minimum error of 0.0017$\pm$0.0004, only 1\% worse (compared to errors of 0.0045$\pm$0.0042, or 300\% worse, should no data have been discarded).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FIGURE: RMS ERROR
@@ -360,9 +359,9 @@ While this is certainly statistically significant in being worse than the optima
 \begin{figure*}[tbp]
 \resizebox{\columnwidth}{!}{\includegraphics{argon-rmse.pdf}}
 \caption{\label{figure:argon-rmse} {\bf RMS error for fixed equilibration time versus automatic equilibration time selection.} 
-Trajectories of length $T = $ 2~000 iterations ($\sim$28 ns) for the argon system described in Fig.~\ref{figure:burn-in-example} were analyzed as a function of fixed equilibration time choice $t_0$.
+Trajectories of length $T = 2000 \tau$ for the argon system described in Figure~\ref{figure:burn-in-example} were analyzed as a function of fixed equilibration time choice $t_0$.
 Using 500 replicate simulations, the root-mean-squared (RMS) error (Eq.~\ref{equation:rms-error}) was computed (black line) along with 95\% confidence interval (gray shading).
-The RMS error is minimized for fixed equilibration time choices in the range 2--6 ns.
+The RMS error is minimized for fixed equilibration time choices in the range 90--200 $\tau$.
 If the $t_0$ that maximizes $N_\mathrm{eff}$ is instead chosen \emph{individually} for each trajectory based on that trajectory's estimated statistical inefficiency $g_{[t_0,T]}$ using Eq.~\ref{equation:optimal-equilibration-time}, the resulting RMS error (red line, 95\% confidence interval shown as red shading) is quite close to the minimum RMS error achieved from any particular \emph{fixed} choice of equilibration time $t_0$, suggesting that this simple automated approach to selecting $t_0$ achieves close to optimal performance.
 }
 \end{figure*}
@@ -395,12 +394,14 @@ All molecular dynamics simulations described here were performed with OpenMM 6.2
 All scripts used to retrieve the software versions used here, run the simulations, analyze data, and generate plots---along with the simulation data itself and scripts for generating figures---are available on GitHub\footnote{All Python scripts necessary to reproduce this work---along with data plotted in the published version---are available at:\\
 \url{http://github.com/choderalab/automatic-equilibration-detection}}.
 
-The {\tt LennardJonesFluid} model system in the \href{http://github.com/choderalab/openmmtools}{openmmtools} package\footnote{available at \url{http://github.com/choderalab/openmmtools}} was used with parameters appropriate for liquid argon ($\sigma = $ 3.4 \AA, $\epsilon = $ 0.238 kcal/mol), though all results are reported in reduced (universal) units.
+To model liquid argon, the {\tt LennardJonesFluid} model system in the \href{http://github.com/choderalab/openmmtools}{openmmtools} package\footnote{available at \url{http://github.com/choderalab/openmmtools}} was used with parameters appropriate for liquid argon ($\sigma = $ 3.4 \AA, $\epsilon = $ 0.238 kcal/mol).
+All results are reported in reduced (dimensionless) units.
 A cubic switching function was employed, with the potential gently switched to zero over $r \in [\sigma, 3 \sigma]$, and a long-range isotropic dispersion correction accounting for this switching behavior used to include neglected contributions.
-Simulations were performed using a periodic box of $N = 500$ atoms at reduced temperature $T^* \equiv k_B T / \epsilon = 0.850$ and reduced pressure $p^* \equiv p \sigma^3 / \epsilon = 1.266$ using a Langevin integrator~\cite{sivak-chodera-crooks:jpcb:2014:vvvr} with timestep $\Delta t = 0.01 \tau$ and collision rate $\nu = 1.5 \tau^{-1}$, with characteristic oscillation timescale $\tau = \sqrt{m r_0^2 / 72 \epsilon}$ and $r_0 = 2^{1/6} \sigma$~\cite{liquid-argon-characteristic-timescale}.
-A molecular scaling Metropolis Monte Carlo barostat with Gaussian simulation volume change proposal moves attempted every 25 timesteps, along with an adaptive algorithm that adjusts the proposal width during the initial part of the simulation~\cite{eastman:jctc:2012:openmm}.
-Densities were recorded every 25 timesteps, with each set of 25 timesteps termed an ``iteration'' of the simulation.
-The true expectation $\expect{ \rho^* }$ was estimated from the sample average over all 500 realizations over [5000,10000] iterations.
+Simulations were performed using a periodic box of $N = 500$ atoms at reduced temperature $T^* \equiv k_B T / \epsilon = 0.850$ and reduced pressure $p^* \equiv p \sigma^3 / \epsilon = 1.266$ using a Langevin integrator~\cite{sivak-chodera-crooks:jpcb:2014:vvvr} with timestep $\Delta t = 0.01 \tau$ and collision rate $\nu = \tau^{-1}$, with characteristic oscillation timescale $\tau = \sqrt{m r_0^2 / 72 \epsilon}$ and $r_0 = 2^{1/6} \sigma$~\cite{liquid-argon-characteristic-timescale}.
+All times are reported in multiples of the characteristic timescale $\tau$.
+A molecular scaling Metropolis Monte Carlo barostat with Gaussian simulation volume change proposal moves attempted every $\tau$ (100 timesteps), using an adaptive algorithm that adjusts the proposal width during the initial part of the simulation~\cite{eastman:jctc:2012:openmm}.
+Densities were recorded every $\tau$ (100 timesteps).
+The true expectation $\expect{ \rho^* }$ was estimated from the sample average over all 500 realizations over [5000,10000] $\tau$.
 
 The automated equilibration detection scheme is also available in the \href{http://pymbar.readthedocs.org/en/latest/timeseries.html}{\tt timeseries} module of the \href{http://github.com/choderalab/pymbar}{\tt pymbar} package as {\tt detectEquilibration()}, and can be accessed using the following code:
 
