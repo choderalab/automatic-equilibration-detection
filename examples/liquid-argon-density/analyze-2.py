@@ -15,6 +15,10 @@ import pylab
 from matplotlib.backends.backend_pdf import PdfPages
 import netCDF4
 
+# Set seaborn style.
+import seaborn as sns
+sns.set_style("white")
+
 #from equilibration import statisticalInefficiency_geyer as statisticalInefficiency
 from equilibration import statisticalInefficiency_multiscale as statisticalInefficiency
 
