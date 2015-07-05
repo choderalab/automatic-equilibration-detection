@@ -173,9 +173,8 @@ We begin by first formalizing our objectives mathematically.
 Trajectories of length $T = 2000~\tau$ for the argon system described in Figure~\ref{figure:burn-in-example} were analyzed as a function of equilibration time choice $t_0$.
 Averages over all 500 replicate simulations (all starting from the same initial conditions) are shown as dark lines, with shaded lines showing standard deviation of estimates among replicates.
 {\bf Top:} The statistical inefficiency $g$ as a function of equilibration time choice $t_0$ is initially very large, but diminishes rapidly after the system has relaxed to equilibrium.
-{\bf Middle:} The number of effectively uncorrelated samples $N_\mathrm{eff} = (T - t_0 + 1) / g$ shows a maximum at $t_0 \sim 90~\tau$, suggesting the system has equilibrated by this time.
-The red vertical line in all plots marks this choice of $t_0 \sim 200$.
-{\bf Bottom:} The cumulative density average $\expect{\rho^*}$ computed over the span $[t_0, T]$ shows that the bias (deviation from the true estimate, shown as red dashed lines) is minimized for choices of $t_0 \ge 90~\tau$.
+{\bf Middle:} The number of effectively uncorrelated samples $N_\mathrm{eff} = (T - t_0 + 1) / g$ shows a maximum at $t_0 \sim 90~\tau$ (red vertical lines), suggesting the system has equilibrated by this time.
+{\bf Bottom:} The cumulative average density $\expect{\rho^*}$ computed over the span $[t_0, T]$ shows that the bias (deviation from the true estimate, shown as red dashed lines) is minimized for choices of $t_0 \ge 90~\tau$.
 The standard deviation among replicates (shaded region) grows with $t_0$ because fewer data are included in the estimate.
 The choice of optimal $t_0$ that maximizes $N_\mathrm{eff}$ (red vertical line) strikes a good balance between bias and variance.
 The true estimate (red dashed lines) is computed from averaging over the range [5~000, 10~000] $\tau$ over all 500 replicates.
@@ -188,7 +187,7 @@ The true estimate (red dashed lines) is computed from averaging over the range [
 
 \section*{Statement of the problem}
 
-Consider $T$ successively sampled configurations $x_t$ from a molecular simulation, with $t = 1, \ldots, T$.
+Consider $T$ successively sampled configurations $x_t$ from a molecular simulation, with $t = 1, \ldots, T$, initiated from $x_0$.
 We presume we are interested in computing the expectation
 \begin{eqnarray}
 \expect{A} \equiv \int dx \, A(x) \, \pi(x)
@@ -247,7 +246,7 @@ There is a clear optimal choice at $t_0 \sim 90~\tau$ that minimizes variance wh
 \section*{Selecting the equilibration time}
 
 Is there a simple approach to choosing an optimal equilibration time $t_0$ that provides a significantly improved estimate $\hat{A}_{[t_0,T]}$, even when we do not have access to multiple realizations?
-At worst, we hope that such a procedure would at least give some improvement over the naive estimate, such that $\delta^2 \hat{A}_{[t_0,T]} < \delta^2 \hat{A}_{[1,T]}$; at best, we hope that we can achieve a reasonable bias-variance tradeoff close to the optimal point identified in Figure~\ref{figure:bias-variance} that minimizes bias without greatly increasing variance.
+At worst, we hope that such a procedure would at least give some improvement over the naive estimate, such that $\delta^2 \hat{A}_{[t_0,T]} < \delta^2 \hat{A}_{[0,T]}$; at best, we hope that we can achieve a reasonable bias-variance tradeoff close to the optimal point identified in Figure~\ref{figure:bias-variance} that minimizes bias without greatly increasing variance.
 We remark that, for cases in which the simulation is not long enough to reach equilibrium, no choice of $t_0$ will eliminate bias completely; the best we can hope for is to minimize this bias.
 
 While automated methods for selecting the equilibration time $t_0$ have been proposed, these approaches have shortcomings that have greatly limited their use.
@@ -348,7 +347,7 @@ Empirically, this does not appear to be the case---the black triangle in Figure~
 Despite not having knowledge about multiple realizations, this strategy effectively achieves a near-optimal balance between minimizing bias without increasing variance.
 
 {\bf Overall RMS error.} 
-How well does this strategy perform in terms of decreasing the \emph{overall} error $\delta \hat{A}_{[t_0,T]}$ compared to $\delta \hat{A}_{[1,T]}$?
+How well does this strategy perform in terms of decreasing the \emph{overall} error $\delta \hat{A}_{[t_0,T]}$ compared to $\delta \hat{A}_{[0,T]}$?
 Figure~\ref{figure:argon-rmse} compares the expected standard error (denoted $\delta \hat{A}$) as a function of a fixed initial equilibration time $t_0$ (black line with shaded region denoting 95\% confidence interval) with the strategy of selecting $t_0$ to maximize $N_\mathrm{eff}$ for each realization (red line with shaded region denoting 95\% confidence interval).
 While the minimum error for the fixed-$t_0$ strategy (0.00154$\pm$0.00005) is achieved at $90~\tau$---a fact that could only be determined from knowledge of multiple realizations---the simple strategy of selecting $t_0$ using Eq.~\ref{equation:optimal-equilibration-time} achieves a minimum error of 0.00171$\pm$0.00006, only 11\% worse (compared to errors of 0.00456$\pm$0.00007, or 296\% worse, should no data have been discarded).
 
@@ -424,7 +423,7 @@ A_t = A_t[t0:]
 
 \section*{Practical computation of statistical inefficiencies}
 
-The robust computation of the statistical inefficiency $g$ (defined by Eq.~\ref{equation:statistical-inefficiency-definition}) for a finite timeseries $a_t$, $t = 1, \ldots, T$ deserves some comment.
+The robust computation of the statistical inefficiency $g$ (defined by Eq.~\ref{equation:statistical-inefficiency-definition}) for a finite timeseries $a_t$, $t = 0, \ldots, T$ deserves some comment.
 There are, in fact, a variety of schemes for estimating $g$ described in the literature, and their behaviors for finite datasets may differ, leading to different estimates of the equilibration time $t_0$ using the algorithm of Eq.~\ref{equation:optimal-equilibration-time}.
 
 The main issue is that a straightforward approach to estimating the statistical inefficiency using Eqs.~\ref{equation:integrated-autocorrelation-time-definition}--\ref{equation:autocorrelation-definition} in which the expectations are simply replaced with sample estimates causes the statistical error in the estimated correlation function $C_t$ to grow with $t$ in a manner that allows this error to quickly overwhelm the sum of Eq.~\ref{equation:integrated-autocorrelation-time-definition}.

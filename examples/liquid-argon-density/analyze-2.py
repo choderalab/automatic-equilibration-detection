@@ -47,10 +47,6 @@ A_it = np.array(ncfile.variables['reduced_density'][:,:], np.float64)
 t0 = int(niterations/2)
 true_expectation = A_it[:,t0:].mean(1).mean(0)
 
-# Compute true expectation using all data. # DEBUG
-#true_expectation = A_it.mean().mean()
-#print "true expectation (from all data) : %f" % true_expectation
-
 #
 # BIAS-VARIANCE TRADEOFF CALCULATIONS
 #
@@ -105,13 +101,6 @@ Abias_mean_t = Aburnin_it.mean(0) - true_expectation
 Abias_stderr_t = Aburnin_it.mean(0) / np.sqrt(nreplicates)
 Astderr_mean_t = Aburnin_it.std(0)
 Astderr_stderr_t = Aburnin_it.std(0) / np.sqrt(nreplicates)
-
-#print ""
-#print "BIAS-VARIANCE TRADEOFF FOR FIXED INITIAL BURN-IN"
-#print "%8s   %10s %10s" % ("", "bias", "stderr")
-#for t0 in range(t0max):
-#    print "%8d : %10.6f %10.6f" % (t0, Abias_mean_t[t0], Astderr_mean_t[t0])
-#print ""
 
 # Compute estimates bias and variance using no equilibration, arbitrary equilibration, and optimal equilibration.
 bias_i = dict()
@@ -344,9 +333,6 @@ pylab.axis([0, x[:t0max].max(), oldaxis[2], oldaxis[3]])
 
 # Plot t0equil.
 pylab.plot(x[t0equil]*np.array([1,1]), [oldaxis[2], oldaxis[3]], 'r-', linewidth=3)
-# Plot individual t0equil estimates.
-#for replicate in range(nreplicates):
-#    pylab.plot(x[t0equil_i[replicate]]*np.array([1,1]), [oldaxis[2], oldaxis[3]], 'k-', linewidth=0.5)
 
 subplot.set_yticks([0, 10, 20, 30, 40, 50])
 
