@@ -11,7 +11,7 @@
 if [ ! -d conda-env ]; then
     echo "Creating new conda environment ./conda-env containing versions of tools needed for reproducibility..."
     conda config --add channels http://conda.binstar.org/omnia
-    conda create --yes --quiet -p conda-env python=2.7 openmmtools=0.7.0 openmm=6.2 matplotlib=1.4 pymbar=3.0.0.beta2 netCDF4 seaborn matplotlib
+    conda create --yes --quiet -p conda-env --file environment.yml
 fi
 source activate ./conda-env
 

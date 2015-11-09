@@ -272,7 +272,7 @@ For a given equilibration time choice $t_0$, the statistical uncertainty in our 
 \delta^2 \estimator{A}_{[t_0,T]} &\equiv& E_{x_0}\left[\left(\hat{A}_{[t_0,T]} - \expect{\estimator{A}}\right)^2\right] \nonumber \\
 &=& E_{x_0}\left[ \hat{A}_{[t_0,T]} ^2 \right] - E_{x_0}\left[ \hat{A}_{[t_0,T]}  \right]^2 \nonumber \\
 &=& \frac{1}{T_{t_0}^2} \sum_{t,t'=t_0}^T \left\{ E_{x_0}\left[a_t a_{t'}\right] - E_{x_0}\left[a_t\right] E_{x_0}\left[a_{t'}\right] \right\} \nonumber \\
-&=& \frac{1}{T_{t_0}^2} \sum_{t=t_0}^T \left\{ E_{x_0}\left[x_t^2\right] - E_{x_0}\left[x_t\right]^2 \right\} \\
+&=& \frac{1}{T_{t_0}^2} \sum_{t=t_0}^T \left\{ E_{x_0}\left[a_t^2\right] - E_{x_0}\left[a_t\right]^2 \right\} \\
 \mbox{} &+& \frac{1}{T_{t_0}^2} \sum_{t\ne t' = t_0}^T \left\{ E_{x_0}\left[a_t a_{t'}\right] - E_{x_0}\left[a_t\right] E_{x_0}\left[a_{t'}\right] \right\} \nonumber ,
 \end{eqnarray}
 where $T_{t_0} \equiv T - t_0 + 1$, the number of correlated samples in the timeseries $\{a_t\}_{t_0}^T$.
@@ -443,7 +443,7 @@ We have found this method to be both fast and to provide useful estimates of the
 \section*{Acknowledgments}
 
 We are grateful to William C.~Swope (IBM Almaden Research Center) for his illuminating introduction to the use of autocorrelation analysis for the characterization of statistical error, as well as Michael R.~Shirts (University of Virginia), David L.~Mobley (University of California, Irvine), Michael K.~Gilson (University of California, San Diego), Kyle A.~Beauchamp (MSKCC), and Robert C.~McGibbon (Stanford University) for valuable discussions on this topic, and Joshua L.~Adelman (University of Pittsburgh) for helpful feedback and encouragement.
-We are grateful to Michael K.~Gilson (University of California, San Diego) and Wei Yang (Florida State University) for critical feedback on the manuscript itself.
+We are grateful to Michael K.~Gilson (University of California, San Diego), Wei Yang (Florida State University), and Sabine Rei{\ss}er (SISSA, Italy) for critical feedback on the manuscript itself.
 JDC acknowledges a Louis V.~Gerstner Young Investigator Award, NIH core grant P30-CA008748, and the Sloan Kettering Institute for funding during the course of this work.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
