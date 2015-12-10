@@ -156,8 +156,9 @@ It is worth noting that a similar procedure is not a practice universally recomm
 As a motivating example, consider the computation of the average density of liquid argon under a given set of reduced temperature and pressure conditions shown in Figure~\ref{figure:burn-in-example}.
 To initiate the simulation, an initial dense liquid geometry at reduced density $\rho^* \equiv \rho \sigma^3 = 0.960$ was prepared and subjected to local energy minimization.
 The upper panel of Figure~\ref{figure:burn-in-example} depicts the average relaxation behavior of simulations initiated from the same configuration with different random initial velocities and integrator random number seeds (see \emph{Simulation Details}).
-The average (black line) and 95\% confidence interval (shaded grey) of 500 realizations of this process show a characteristic relaxation behavior away from the initial density toward the equilibrium density.
-The expectation of the running average of the density over many realizations of this procedure ({Figure~\ref{figure:burn-in-example}, lower panel}) significantly deviates from the true expectation (dashed line), leading to significantly biased estimates of the expectation unless simulations are sufficiently long to eliminate this starting point dependent bias---a surprisingly long 30 ns in this case.
+The average of 500 realizations of this process shows a characteristic relaxation away from the initial density toward the equilibrium density (Figure~\ref{figure:burn-in-example}, upper panel, black line).
+As a result, the expectation of the running average of the density significantly deviates from the true expectation (Figure~\ref{figure:burn-in-example}, lower panel, dashed line).
+This effect leads to significantly biased estimates of the expectation unless simulations are sufficiently long to eliminate starting point dependent bias, which takes a surprisingly long $\sim$30 ns in this example.
 Note that this bias is present even in the average of many realizations because the \emph{same} atypical starting condition is used for every realization of this simulation process.
 
 To develop an automatic approach to eliminating this bias, we take motivation from the concept of \emph{reverse cumulative averaging} from Yang et al.~\cite{yang-karplus:2004:jcp:reverse-cumulative-averaging}, in which the trajectory statistics over the production region of the trajectory are examined for different choices of the end of the discarded equilibration region to determine the optimal production region to use for computing expectations and other statistical properties.
@@ -192,7 +193,7 @@ We presume we are interested in computing the expectation
 \begin{eqnarray}
 \expect{A} \equiv \int dx \, A(x) \, \pi(x)
 \end{eqnarray}
-of a mechanical property $A(x)$.
+of a mechanical property of interest $A(x)$.
 For convenience, we will refer to the timeseries $a_t \equiv A(x_t)$, with $t \in [1,T]$.
 The estimator $\hat{A} \approx \expect{A}$ constructed from the entire dataset is given by
 \begin{eqnarray}
@@ -318,8 +319,8 @@ At short $t_0$, the average statistical inefficiency $g$ (Figure~\ref{figure:rev
 As a result, the average effective number of uncorrelated samples $N_\mathrm{eff}$ (Figure~\ref{figure:reverse-cumulative-average}, middle panel) has a peak at $t_0 \sim 90~\tau$ (Figure~\ref{figure:reverse-cumulative-average}, vertical red lines).
 The effect on bias in the estimated average reduced density $\expect{\rho^*}$ (Figure~\ref{figure:reverse-cumulative-average}, bottom panel) is striking---the bias is essentially eliminated for the choice of equilibration time $t_0$ that maximizes the number of uncorrelated samples $N_\mathrm{eff}$.
 
-This suggests an alluringly simple algorithm for identifying the optimal equilibration time---pick the $t_0$ which maximizes the number of uncorrelated samples $N_\mathrm{eff}$.
-In mathematical terms, 
+This suggests an alluringly simple algorithm for identifying the optimal equilibration time---pick the $t_0$ which maximizes the number of uncorrelated samples $N_\mathrm{eff}$ in the timeseries $\{a_t\}_{t_0}^{T}$  for the quantity of interest $A(x)$:
+%In mathematical terms, this algorithm can be written as identifying $t_0^\mathrm{opt}$ that satisfies 
 \begin{eqnarray}
 t_0^\mathrm{opt} &=& \argmaxl_{t_0} N_\mathrm{eff}(t_0) \label{equation:optimal-equilibration-time} \\
 &=& \argmaxl_{t_0}  \frac{T - t_0 + 1}{g_{t_0}} \nonumber
@@ -374,6 +375,7 @@ If the $t_0$ that maximizes $N_\mathrm{eff}$ is instead chosen \emph{individuall
 
 The scheme described here---in which the equilibration time $t_0$ is computed using Eq.~\ref{equation:optimal-equilibration-time} as the choice that maximizes the number of uncorrelated samples in the production region $[t_0,T]$---is both conceptually and computationally straightforward.
 It provides an approach to determining the optimal amount of initial data to discard to equilibration in order to minimize variance while also minimizing initial bias, and does this without employing statistical tests that require generally unsatisfiable assumptions of normality of the observable of interest.
+All that is needed is to save the timeseries $\{a_t\}_1^T$ of the observable $A(x)$ of interest---there is no need to store full configurations $x_t$---and post-process this dataset with a simple analysis procedure, for which we have provided a convenient Python reference implementation (see \emph{Simulation Details}).
 As we have seen, this scheme empirically appears to select a practical compromise between bias and variance even when the statistical inefficiency $g$ is estimated directly from the trajectory using Eq.~\ref{equation:statistical-inefficiency-definition}.
 
 A word of caution is necessary.
@@ -443,7 +445,7 @@ We have found this method to be both fast and to provide useful estimates of the
 \section*{Acknowledgments}
 
 We are grateful to William C.~Swope (IBM Almaden Research Center) for his illuminating introduction to the use of autocorrelation analysis for the characterization of statistical error, as well as Michael R.~Shirts (University of Virginia), David L.~Mobley (University of California, Irvine), Michael K.~Gilson (University of California, San Diego), Kyle A.~Beauchamp (MSKCC), and Robert C.~McGibbon (Stanford University) for valuable discussions on this topic, and Joshua L.~Adelman (University of Pittsburgh) for helpful feedback and encouragement.
-We are grateful to Michael K.~Gilson (University of California, San Diego), Wei Yang (Florida State University), and Sabine Rei{\ss}er (SISSA, Italy) for critical feedback on the manuscript itself.
+We are grateful to Michael K.~Gilson (University of California, San Diego), Wei Yang (Florida State University), Sabine Rei{\ss}er (SISSA, Italy), and the anonymous referees for critical feedback on the manuscript itself.
 JDC acknowledges a Louis V.~Gerstner Young Investigator Award, NIH core grant P30-CA008748, and the Sloan Kettering Institute for funding during the course of this work.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
