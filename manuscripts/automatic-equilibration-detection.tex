@@ -1,4 +1,5 @@
 % PRL look and style (easy on the eyes)
+\RequirePackage[hyphens]{url}
 \documentclass[aps,pre,twocolumn,nofootinbib,superscriptaddress,linenumbers,11point]{revtex4-1}
 % Two-column style (for submission/review/editing)
 %\documentclass[aps,prl,preprint,nofootinbib,superscriptaddress,linenumbers]{revtex4-1}
@@ -448,7 +449,9 @@ We have found this method to be both fast and to provide useful estimates of the
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{figure*}[tbp]
-\subfigure[\emph{Top:} Average reduced potential for relaxation from initial conditions. \emph{Bottom:} Cumulative averages of reduced potential with and without discarding some initial data to equilibration.]{\resizebox{0.9\textwidth}{!}{\includegraphics{argon-potential.pdf}}}
+\subfigure[\emph{Top:} Average reduced potential for relaxation from initial conditions (black solid line).
+\emph{Bottom:} Cumulative averages of reduced potential with (blue solid line) and without (red dotted line) discarding some initial data to equilibration.
+]{\resizebox{0.9\textwidth}{!}{\includegraphics{argon-potential.pdf}}}
 \subfigure[Statistical inefficiency $g$, effective number of uncorrelated samples $N_\mathrm{eff}$, and average of reduced potential $u^*$ omitting equilibration time $t_0$ for analysis of reduced potential.]{\resizebox{0.9\textwidth}{!}{\includegraphics{argon-potential-reverse-cumulative-average.pdf}}}
 \subfigure[Bias-variance tradeoff for reduced potential.]{\resizebox{0.22\textwidth}{!}{\includegraphics{argon-potential-bias-variance.pdf}}}
 \subfigure[Overall RMSE error in estimate of reduced potential as a function of discarded equilibration time (black) compared with RMSE from automatic equilibration detection scheme (red line).]{\resizebox{0.77\textwidth}{!}{\includegraphics{argon-potential-rmse.pdf}}}
@@ -456,6 +459,7 @@ We have found this method to be both fast and to provide useful estimates of the
 \caption{\label{figure:reduced-potential} {\bf Corresponding analysis for reduced potential energy of liquid argon system.}
 The analyses of Figs.~\ref{figure:burn-in-example}--\ref{figure:argon-rmse} were repeated for the reduced potential energy $u^*(x) \equiv \beta [U(x) + p V(x)]$ of the liquid argon system.  
 As with the analysis of reduced density, the simple automated determination of equilibration time $t_0$ from Eq.~\ref{equation:optimal-equilibration-time} works equivalently well for the reduced potential.
+Shaded regions denote 95\% confidence interval.
 }
 \end{figure*}
 
