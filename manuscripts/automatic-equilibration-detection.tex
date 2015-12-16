@@ -380,7 +380,7 @@ It provides an approach to determining the optimal amount of initial data to dis
 All that is needed is to save the timeseries $\{a_t\}_1^T$ of the observable $A(x)$ of interest---there is no need to store full configurations $x_t$---and post-process this dataset with a simple analysis procedure, for which we have provided a convenient Python reference implementation (see \emph{Simulation Details}).
 As we have seen, this scheme empirically appears to select a practical compromise between bias and variance even when the statistical inefficiency $g$ is estimated directly from the trajectory using Eq.~\ref{equation:statistical-inefficiency-definition}.
 
-To show that this approach is indeed general, we repeated the analysis illustrated above in Figs.~\ref{figure:burn-in-example}--\ref{figure:argon-rmse} for a different choice of observable $A(x)$ for the same liquid argon system---in this case, the reduced potential energy $u^*(x) \equiv \beta [U(x) + p V(x)]$.
+To show that this approach is indeed general, we repeated the analysis illustrated above in Figs.~\ref{figure:burn-in-example}--\ref{figure:argon-rmse} for a different choice of observable $A(x)$ for the same liquid argon system---in this case, the reduced potential energy\footnote{Note that the \emph{reduced potential}\cite{shirts-chodera:jcp:2008:mbar} for the isothermal-isobaric ensemble is generally defined as $u^*(x) = - \ln \pi(x) = \beta[u(x) + p V(x)]$ to include the pressure-volume term $\beta p V(x)$, but in order to demonstrate the performance of this analysis on an observable distinct from the density, we omit the pressure-volume term in the present analysis.} $u^*(x) \equiv \beta U(x)$.
 The results of this analysis are collected in Fig.~\ref{figure:reduced-potential}.
 As can readily be seen, this reduced potential behaves in essentially the same way the reduced density does, and the simple scheme for automated determination of equilibration time $t_0$ from Eq.~\ref{equation:optimal-equilibration-time} does just as well.
 
@@ -457,7 +457,7 @@ We have found this method to be both fast and to provide useful estimates of the
 \subfigure[Overall RMSE error in estimate of reduced potential as a function of discarded equilibration time (black) compared with RMSE from automatic equilibration detection scheme (red line).]{\resizebox{0.77\textwidth}{!}{\includegraphics{argon-potential-rmse.pdf}}}
 
 \caption{\label{figure:reduced-potential} {\bf Corresponding analysis for reduced potential energy of liquid argon system.}
-The analyses of Figs.~\ref{figure:burn-in-example}--\ref{figure:argon-rmse} were repeated for the reduced potential energy $u^*(x) \equiv \beta [U(x) + p V(x)]$ of the liquid argon system.  
+The analyses of Figs.~\ref{figure:burn-in-example}--\ref{figure:argon-rmse} were repeated for the reduced potential energy $u^*(x) \equiv \beta U(x)$ of the liquid argon system.  
 As with the analysis of reduced density, the simple automated determination of equilibration time $t_0$ from Eq.~\ref{equation:optimal-equilibration-time} works equivalently well for the reduced potential.
 Shaded regions denote 95\% confidence interval.
 }

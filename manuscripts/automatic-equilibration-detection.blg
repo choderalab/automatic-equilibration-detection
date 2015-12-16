@@ -8,45 +8,46 @@ Database file #1: automatic-equilibration-detectionNotes.bib
 Database file #2: automatic-equilibration-detection.bib
 Warning--Missing address in entry crc-mcmc-handbook.
 Warning--Missing address in entry janke:2002:error-analysis.
-You've used 15 entries,
+Warning--Warning: pages missing in entry shirts-chodera:jcp:2008:mbar.
+You've used 16 entries,
             1909 wiz_defined-function locations,
-            595 strings with 7012 characters,
-and the built_in function-call counts, 3578 in all, are:
-= -- 120
-> -- 218
+            600 strings with 7163 characters,
+and the built_in function-call counts, 3741 in all, are:
+= -- 123
+> -- 228
 < -- 0
-+ -- 68
-- -- 53
-* -- 328
-:= -- 450
-add.period$ -- 15
-call.type$ -- 15
++ -- 71
+- -- 55
+* -- 346
+:= -- 471
+add.period$ -- 16
+call.type$ -- 16
 change.case$ -- 2
 chr.to.int$ -- 0
-cite$ -- 17
-duplicate$ -- 148
-empty$ -- 373
-format.name$ -- 69
-if$ -- 889
+cite$ -- 19
+duplicate$ -- 158
+empty$ -- 388
+format.name$ -- 72
+if$ -- 924
 int.to.chr$ -- 0
-int.to.str$ -- 15
+int.to.str$ -- 16
 missing$ -- 0
-newline$ -- 48
-num.names$ -- 16
-pop$ -- 95
+newline$ -- 51
+num.names$ -- 17
+pop$ -- 101
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 264
+skip$ -- 275
 stack$ -- 0
-substring$ -- 143
-swap$ -- 85
+substring$ -- 144
+swap$ -- 92
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 23
-warning$ -- 2
-while$ -- 29
-width$ -- 17
-write$ -- 75
-(There were 2 warnings)
+warning$ -- 3
+while$ -- 31
+width$ -- 18
+write$ -- 80
+(There were 3 warnings)
