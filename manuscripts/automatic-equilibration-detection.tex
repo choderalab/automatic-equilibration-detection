@@ -1,4 +1,5 @@
 % PRL look and style (easy on the eyes)
+\RequirePackage[hyphens]{url}
 \documentclass[aps,pre,twocolumn,nofootinbib,superscriptaddress,linenumbers,11point]{revtex4-1}
 % Two-column style (for submission/review/editing)
 %\documentclass[aps,prl,preprint,nofootinbib,superscriptaddress,linenumbers]{revtex4-1}
@@ -35,6 +36,7 @@
 \usepackage{verbatim}
 \usepackage[colorlinks=true,citecolor=blue,linkcolor=blue]{hyperref}
 
+\usepackage{subfigure}  % use for side-by-side figures
 
 % The figures are in a figures/ subdirectory.
 \graphicspath{{figures/}}
@@ -378,6 +380,10 @@ It provides an approach to determining the optimal amount of initial data to dis
 All that is needed is to save the timeseries $\{a_t\}_1^T$ of the observable $A(x)$ of interest---there is no need to store full configurations $x_t$---and post-process this dataset with a simple analysis procedure, for which we have provided a convenient Python reference implementation (see \emph{Simulation Details}).
 As we have seen, this scheme empirically appears to select a practical compromise between bias and variance even when the statistical inefficiency $g$ is estimated directly from the trajectory using Eq.~\ref{equation:statistical-inefficiency-definition}.
 
+To show that this approach is indeed general, we repeated the analysis illustrated above in Figs.~\ref{figure:burn-in-example}--\ref{figure:argon-rmse} for a different choice of observable $A(x)$ for the same liquid argon system---in this case, the reduced potential energy\footnote{Note that the \emph{reduced potential}\cite{shirts-chodera:jcp:2008:mbar} for the isothermal-isobaric ensemble is generally defined as $u^*(x) = - \ln \pi(x) = \beta[u(x) + p V(x)]$ to include the pressure-volume term $\beta p V(x)$, but in order to demonstrate the performance of this analysis on an observable distinct from the density, we omit the pressure-volume term in the present analysis.} $u^*(x) \equiv \beta U(x)$.
+The results of this analysis are collected in Fig.~\ref{figure:reduced-potential}.
+As can readily be seen, this reduced potential behaves in essentially the same way the reduced density does, and the simple scheme for automated determination of equilibration time $t_0$ from Eq.~\ref{equation:optimal-equilibration-time} does just as well.
+
 A word of caution is necessary.
 One can certainly envision pathological scenarios where this algorithm for selecting an optimal equilibration time will break down.
 In cases where the simulation is not long enough to reach equilibrium---let alone collect many uncorrelated samples from it---no choice of equilibration time will bestow upon the experimenter the ability to produce an unbiased estimate of the true expectation.
@@ -437,6 +443,25 @@ Some or all of these properties can be exploited to define a family of estimator
 All computations in this manuscript used the fast multiscale method described in Section 5.2 of \citep{chodera:jctc:2007:wham}, which we found performed equivalently well to the Geyer estimators (data not shown).
 This method is related to a multiscale variant of the \emph{initial positive sequence} (IPS) method of Geyer \cite{geyer-thompson:j-royal-stat-soc-b:1992:initial-sequence-estimators}, where contributions are accumulated at increasingly longer lag times and the sum of Eq.~\ref{equation:integrated-autocorrelation-time-definition} is truncated when the terms become negative.
 We have found this method to be both fast and to provide useful estimates of the statistical inefficiency, but it may not perform well for all problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FIGURE: REDUCED POTENTIAL
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure*}[tbp]
+\subfigure[\emph{Top:} Average reduced potential for relaxation from initial conditions (black solid line).
+\emph{Bottom:} Cumulative averages of reduced potential with (blue solid line) and without (red dotted line) discarding some initial data to equilibration.
+]{\resizebox{0.9\textwidth}{!}{\includegraphics{argon-potential.pdf}}}
+\subfigure[Statistical inefficiency $g$, effective number of uncorrelated samples $N_\mathrm{eff}$, and average of reduced potential $u^*$ omitting equilibration time $t_0$ for analysis of reduced potential.]{\resizebox{0.9\textwidth}{!}{\includegraphics{argon-potential-reverse-cumulative-average.pdf}}}
+\subfigure[Bias-variance tradeoff for reduced potential.]{\resizebox{0.22\textwidth}{!}{\includegraphics{argon-potential-bias-variance.pdf}}}
+\subfigure[Overall RMSE error in estimate of reduced potential as a function of discarded equilibration time (black) compared with RMSE from automatic equilibration detection scheme (red line).]{\resizebox{0.77\textwidth}{!}{\includegraphics{argon-potential-rmse.pdf}}}
+
+\caption{\label{figure:reduced-potential} {\bf Corresponding analysis for reduced potential energy of liquid argon system.}
+The analyses of Figs.~\ref{figure:burn-in-example}--\ref{figure:argon-rmse} were repeated for the reduced potential energy $u^*(x) \equiv \beta U(x)$ of the liquid argon system.  
+As with the analysis of reduced density, the simple automated determination of equilibration time $t_0$ from Eq.~\ref{equation:optimal-equilibration-time} works equivalently well for the reduced potential.
+Shaded regions denote 95\% confidence interval.
+}
+\end{figure*}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ACKNOWLEDGMENTS
