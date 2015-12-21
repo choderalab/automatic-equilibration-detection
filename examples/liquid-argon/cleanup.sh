@@ -13,7 +13,4 @@ rm -rf data.nc
 # Delete figures
 rm -rf figures/
 
-# Remove conda environment
-rm -rf conda-env/
-
 
