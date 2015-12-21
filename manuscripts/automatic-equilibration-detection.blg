@@ -1,53 +1,48 @@
 This is BibTeX, Version 0.99d (TeX Live 2013)
 Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: automatic-equilibration-detection.aux
-The style file: prsty.bst
-Reallocated singl_function (elt_size=4) to 100 items from 50.
+The style file: achemso.bst
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Database file #1: automatic-equilibration-detectionNotes.bib
 Database file #2: automatic-equilibration-detection.bib
-Warning--Missing address in entry crc-mcmc-handbook.
-Warning--Missing address in entry janke:2002:error-analysis.
-Warning--Warning: pages missing in entry shirts-chodera:jcp:2008:mbar.
 You've used 16 entries,
-            1909 wiz_defined-function locations,
-            600 strings with 7163 characters,
-and the built_in function-call counts, 3741 in all, are:
-= -- 123
-> -- 228
-< -- 0
-+ -- 71
-- -- 55
-* -- 346
-:= -- 471
-add.period$ -- 16
+            2470 wiz_defined-function locations,
+            830 strings with 9759 characters,
+and the built_in function-call counts, 5314 in all, are:
+= -- 414
+> -- 319
+< -- 12
++ -- 123
+- -- 109
+* -- 560
+:= -- 738
+add.period$ -- 18
 call.type$ -- 16
-change.case$ -- 2
-chr.to.int$ -- 0
-cite$ -- 19
-duplicate$ -- 158
-empty$ -- 388
-format.name$ -- 72
-if$ -- 924
+change.case$ -- 1
+chr.to.int$ -- 2
+cite$ -- 16
+duplicate$ -- 308
+empty$ -- 364
+format.name$ -- 131
+if$ -- 1022
 int.to.chr$ -- 0
-int.to.str$ -- 16
+int.to.str$ -- 1
 missing$ -- 0
-newline$ -- 51
-num.names$ -- 17
-pop$ -- 101
+newline$ -- 117
+num.names$ -- 50
+pop$ -- 35
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 275
+skip$ -- 1
 stack$ -- 0
-substring$ -- 144
-swap$ -- 92
-text.length$ -- 0
+substring$ -- 243
+swap$ -- 305
+text.length$ -- 34
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 23
-warning$ -- 3
-while$ -- 31
-width$ -- 18
-write$ -- 80
-(There were 3 warnings)
+type$ -- 106
+warning$ -- 0
+while$ -- 56
+width$ -- 0
+write$ -- 212
