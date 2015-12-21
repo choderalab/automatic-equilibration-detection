@@ -22,8 +22,11 @@ python simulate.py
 if [ ! -e figures ]; then
     mkdir figures
 fi
+echo "Generating figures..."
 python analyze-1.py
 python analyze-2.py
+python analyze-3.py
+python analyze-4.py
 
 # Deactivate conda environment.
 source deactivate
