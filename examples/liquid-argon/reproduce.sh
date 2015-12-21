@@ -5,17 +5,19 @@
 #
 # PREREQUISITES
 #
-# This requires the conda Pythjon package environment management tool.
+# This requires the conda Python package environment management tool.
 
 # Create conda environment with necessary tools.
-if [ ! -d conda-env ]; then
-    echo "Creating new conda environment ./conda-env containing versions of tools needed for reproducibility..."
+CONDA_ENV="argon"
+if [ "$(conda env list | grep $CONDA_ENV | wc -l)" -eq "0" ]; then
+    echo "Creating new conda environment '$CONDA_ENV' containing versions of tools needed for reproducibility..."
     conda config --add channels http://conda.binstar.org/omnia
-    conda create --yes --quiet -p conda-env --file environment.yml
+    conda env create --quiet -n $CONDA_ENV --file environment.yml
 fi
-source activate ./conda-env
+source activate $CONDA_ENV
 
 # Run simulations.
+echo "Running simulations..."
 python simulate.py
 
 # Analyze simulation data to generate figures.
@@ -30,5 +32,14 @@ python analyze-4.py
 
 # Deactivate conda environment.
 source deactivate
+
+echo "Finished."
+echo ""
+echo "You can now safely remove the conda environment with:"
+echo ""
+echo "conda env remove -n $CONDA_ENV"
+echo ""
+echo "If you have no further need of it."
+
 
 
