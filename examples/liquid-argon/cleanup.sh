@@ -4,6 +4,9 @@
 #
 # WARNING: THIS WILL DELETE ALL SIMULATION RESULTS AND FIGURES
 
+# Clean up environment
+conda env remove -n argon --yes
+
 # Clean up compiled Python files.
 rm *.pyc
 
