@@ -16,4 +16,6 @@ rm -rf data.nc
 # Delete figures
 rm -rf figures/
 
+# Remove PDB files.
+rm -f initial.pdb
 
