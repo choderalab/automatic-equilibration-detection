@@ -166,7 +166,7 @@ font = {'family' : 'sans-serif',
 
 plt.rc('font', **font)
 
-figure = pylab.figure(figsize=(3.5, 3.5), dpi=300)
+figure = pylab.figure(figsize=(9.0, 3.5), dpi=300)
 
 nskip = 10 # number of samples to skip in uncertainty shading
 hspace = 0.001 # spacing between subplots
