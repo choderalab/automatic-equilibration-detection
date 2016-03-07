@@ -1,7 +1,7 @@
 % PRL look and style (easy on the eyes)
-\RequirePackage[hyphens]{url}
-\documentclass[linenumbers,11point]{achemso}
-%\documentclass[aps,pre,twocolumn,nofootinbib,superscriptaddress,linenumbers,11point]{revtex4-1}
+%\RequirePackage[hyphens]{url}
+%\documentclass[linenumbers,11point]{achemso}
+\documentclass[aps,pre,twocolumn,nofootinbib,superscriptaddress,linenumbers,11point]{revtex4-1}
 % Two-column style (for submission/review/editing)
 %\documentclass[aps,prl,preprint,nofootinbib,superscriptaddress,linenumbers]{revtex4-1}
 
@@ -15,12 +15,12 @@
 %\usepackage[font=sf]{floatrow}
 
 % Rework captions to use sans serif font.
-%\makeatletter
-%\renewcommand\@make@capt@title[2]{%
-% \@ifx@empty\float@link{\@firstofone}{\expandafter\href\expandafter{\float@link}}%
-%  {\textbf{#1}}\sf\@caption@fignum@sep#2\quad
-%}%
-%\makeatother
+\makeatletter
+\renewcommand\@make@capt@title[2]{%
+ \@ifx@empty\float@link{\@firstofone}{\expandafter\href\expandafter{\float@link}}%
+  {\textbf{#1}}\sf\@caption@fignum@sep#2\quad
+}%
+\makeatother
 
 \usepackage{listings} % For code examples
 \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
@@ -35,8 +35,8 @@
 \usepackage{dcolumn}
 \usepackage{boxedminipage}
 \usepackage{verbatim}
-%\usepackage[colorlinks=true,citecolor=blue,linkcolor=blue]{hyperref}
-\usepackage[colorlinks=false,citecolor=blue,linkcolor=blue]{hyperref}
+\usepackage[colorlinks=true,citecolor=blue,linkcolor=blue]{hyperref}
+%\usepackage[colorlinks=false,citecolor=blue,linkcolor=blue]{hyperref}
 
 \usepackage{subfigure}  % use for side-by-side figures
 
@@ -102,25 +102,80 @@
 %% when authors are associated with multiple institutions.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\author{John D. Chodera}
- \email{john.chodera@choderalab.org}
- \affiliation{Computational Biology Program, Sloan Kettering Institute, Memorial Sloan Kettering Cancer Center, New York, NY 10065}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% The document title should be given as usual. Some journals require
-%% a running title from the author: this should be supplied as an
-%% optional argument to \title.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\title[Automated equilibration detection]
-  {A simple method for automated equilibration detection in molecular simulations}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Some journals require a list of abbreviations or keywords to be
-%% supplied. These should be set up here, and will be printed after
-%% the title and author information, if needed.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\abbreviations{MD,MC,MCMC}
-\keywords{molecular dynamics (MD); Metropolis-Hastings; Monte Carlo (MC); Markov chain Monte Carlo (MCMC); equilibration; burn-in; timeseries analysis; statistical inefficiency; integrated autocorrelation time}
+%\author{John D. Chodera}
+% \email{john.chodera@choderalab.org}
+% \affiliation{Computational Biology Program, Sloan Kettering Institute, Memorial Sloan Kettering Cancer Center, New York, NY 10065}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% The document title should be given as usual. Some journals require
+%%% a running title from the author: this should be supplied as an
+%%% optional argument to \title.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\title[Automated equilibration detection]
+%  {A simple method for automated equilibration detection in molecular simulations}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Some journals require a list of abbreviations or keywords to be
+%%% supplied. These should be set up here, and will be printed after
+%%% the title and author information, if needed.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\abbreviations{MD,MC,MCMC}
+%\keywords{molecular dynamics (MD); Metropolis-Hastings; Monte Carlo (MC); Markov chain Monte Carlo (MCMC); equilibration; burn-in; timeseries analysis; statistical inefficiency; integrated autocorrelation time}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% DOCUMENT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%\begin{document}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% The "tocentry" environment can be used to create an entry for the
+%%% graphical table of contents. It is given here as some journals
+%%% require that it is printed as part of the abstract page. It will
+%%% be automatically moved as appropriate.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\begin{tocentry}
+%
+%\begin{centering}
+%\resizebox{9cm}{!}{\includegraphics{toc-graphic.pdf}}
+%
+%\end{centering}
+%%
+%%Some journals require a graphical entry for the Table of Contents.
+%%This should be laid out ``print ready'' so that the sizing of the
+%%text is correct.
+%%
+%%Inside the \texttt{tocentry} environment, the font used is Helvetica
+%%8\,pt, as required by \emph{Journal of the American Chemical
+%%Society}.
+%%
+%%The surrounding frame is 9\,cm by 3.5\,cm, which is the maximum
+%%permitted for  \emph{Journal of the American Chemical Society}
+%%graphical table of content entries. The box will not resize if the
+%%content is too big: instead it will overflow the edge of the box.
+%%
+%%This box and the associated title will always be printed on a
+%%separate page at the end of the document.
+%
+%\end{tocentry}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% ABSTRACT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%\begin{abstract}
+%
+%Molecular simulations intended to compute equilibrium properties are often initiated from configurations that are highly atypical of equilibrium samples, a practice which can generate a distinct initial transient in mechanical observables computed from the simulation trajectory.
+%Traditional practice in simulation data analysis recommends this initial portion be discarded to \emph{equilibration}, but no simple, general, and automated procedure for this process exists.
+%Here, we suggest a conceptually simple automated procedure that does not make strict assumptions about the distribution of the observable of interest, in which the equilibration time is chosen to maximize the number of effectively uncorrelated samples in the production timespan used to compute equilibrium averages.
+%We present a simple Python reference implementation of this procedure, and demonstrate its utility on typical molecular simulation data.\\
+%
+%% KEYWORDS
+%\emph{Keywords: molecular dynamics (MD); Metropolis-Hastings; Monte Carlo (MC); Markov chain Monte Carlo (MCMC); equilibration; burn-in; timeseries analysis; statistical inefficiency; integrated autocorrelation time}
+%
+%\end{abstract}
+%
+%\maketitle
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DOCUMENT
@@ -128,36 +183,18 @@
 
 \begin{document}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% The "tocentry" environment can be used to create an entry for the
-%% graphical table of contents. It is given here as some journals
-%% require that it is printed as part of the abstract page. It will
-%% be automatically moved as appropriate.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{tocentry}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TITLE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{centering}
-\resizebox{9cm}{!}{\includegraphics{toc-graphic.pdf}}
+\title{A simple method for automated equilibration detection in molecular simulations}
 
-\end{centering}
-%
-%Some journals require a graphical entry for the Table of Contents.
-%This should be laid out ``print ready'' so that the sizing of the
-%text is correct.
-%
-%Inside the \texttt{tocentry} environment, the font used is Helvetica
-%8\,pt, as required by \emph{Journal of the American Chemical
-%Society}.
-%
-%The surrounding frame is 9\,cm by 3.5\,cm, which is the maximum
-%permitted for  \emph{Journal of the American Chemical Society}
-%graphical table of content entries. The box will not resize if the
-%content is too big: instead it will overflow the edge of the box.
-%
-%This box and the associated title will always be printed on a
-%separate page at the end of the document.
+\author{John D. Chodera}
+ \thanks{Corresponding author}
+ \email{john.chodera@choderalab.org}
+ \affiliation{Computational Biology Program, Sloan Kettering Institute, Memorial Sloan Kettering Cancer Center, New York, NY 10065}
 
-\end{tocentry}
+\date{\today}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ABSTRACT
@@ -220,7 +257,7 @@ To initiate the simulation, an initial dense liquid geometry at reduced density 
 The upper panel of Figure~\ref{figure:burn-in-example} depicts the average relaxation behavior of simulations initiated from the same configuration with different random initial velocities and integrator random number seeds (see \emph{Simulation Details}).
 The average of 500 realizations of this process shows a characteristic relaxation away from the initial density toward the equilibrium density (Figure~\ref{figure:burn-in-example}, upper panel, black line).
 As a result, the expectation of the running average of the density significantly deviates from the true expectation (Figure~\ref{figure:burn-in-example}, lower panel, dashed line).
-This effect leads to significantly biased estimates of the expectation unless simulations are sufficiently long to eliminate starting point dependent bias, which takes a surprisingly long $\sim$30 ns in this example.
+This effect leads to significantly biased estimates of the expectation unless simulations are sufficiently long to eliminate starting point dependent bias, which takes a surprisingly long $\sim$2000$\tau$ in this example.
 Note that this bias is present even in the average of many realizations because the \emph{same} atypical starting condition is used for every realization of this simulation process.
 
 To develop an automatic approach to eliminating this bias, we take motivation from the concept of \emph{reverse cumulative averaging} from Yang et al.~\cite{yang-karplus:2004:jcp:reverse-cumulative-averaging}, in which the trajectory statistics over the production region of the trajectory are examined for different choices of the end of the discarded equilibration region to determine the optimal production region to use for computing expectations and other statistical properties.
@@ -268,7 +305,7 @@ By discarding samples $t < t_0$ to equilibration, we hope to exclude the initial
 \hat{A}_{[t_0,T]} \equiv \frac{1}{T-t_0+1} \sum_{t=t_0}^T a_t . \label{equation:production-time-average} 
 \end{eqnarray}
 
-We can quantify the overall error in an estimator $\hat{A}_{[t_0,T]}$ in a sample average that starts at $x_0$ and excludes samples where $t < t_0$ by the expected error $\delta^2 \hat{A}_{[t_0,T]}$,
+We can quantify the overall error in an estimator $\hat{A}_{[t_0,T]}$ in a sample average of trajectories initiated from $x_0$ that excludes samples where $t < t_0$ by the expected error $\delta^2 \hat{A}_{[t_0,T]}$,
 \begin{eqnarray}
 \delta^2 \hat{A}_{[t_0,T]} &\equiv& E_{x_0} \left[ \left( \hat{A}_{[t_0,T]} - \expect{A} \right)^2 \right] \label{equation:rms-error} 
 \end{eqnarray}
@@ -281,7 +318,7 @@ We can rewrite the expected error $\delta^2 \hat{A}$ by separating it into two c
 \end{eqnarray}
 The first term denotes the variance in the estimator $\hat{A}$,
 \begin{eqnarray}
-\mathrm{var}_{x_0} (\hat{A}_{[t_0,T]}) &\equiv& E_{x_0} \left[ \hat{A}_{[t_0,T]} - E_{x_0}[\hat{A}_{[t_0,T]}] \right]^2 \label{equation:variance}
+\mathrm{var}_{x_0} (\hat{A}_{[t_0,T]}) &\equiv& E_{x_0} \left[ \left( \hat{A}_{[t_0,T]} - E_{x_0}[\hat{A}_{[t_0,T]}]\right)^2 \right] \label{equation:variance}
 \end{eqnarray}
 while the second term denotes the contribution from the squared bias,
 \begin{eqnarray}
@@ -297,7 +334,7 @@ while the second term denotes the contribution from the squared bias,
 With increasing equilibration time $t_0$, bias is reduced, but the variance---the contribution to error due to random variation from having a finite number of uncorrelated samples---will increase because less data is included in the estimate.
 This can be seen in the bottom panel of Figure~\ref{figure:reverse-cumulative-average}, where the shaded region (95\% confidence interval of the mean) increases in width with increasing equilibration time $t_0$.
 
-To examine the tradeoff between bias and variance explicitly, Figure~\ref{figure:bias-variance} plots the bias and variance (here, shown as standard error) contributions against each other as a function of $t_0$ (denoted by color) as computed from statistics over all 500 replicates.
+To examine the tradeoff between bias and variance explicitly, Figure~\ref{figure:bias-variance} plots the bias and variance (here, shown as the standard deviation over replicates---the square root of the variance---which is an indication of the true standard error of a single simulation) contributions against each other as a function of $t_0$ (denoted by color) as computed from statistics over all 500 replicates.
 At $t_0 = 0$, the bias is large but variance is minimized.
 With increasing $t_0$, bias is eventually eliminated but then variance rapidly grows as fewer uncorrelated samples are included in the estimate.
 There is a clear optimal choice at $t_0 \sim 100~\tau$ that minimizes variance while also effectively eliminating bias (where $\tau$ is a natural time unit---see \emph{Simulation Details}).
@@ -345,13 +382,16 @@ If $t_0$ is sufficiently large for the initial bias to be eliminated, the remain
 \begin{eqnarray}
 \lefteqn{\delta^2 \hat{A}_{[t_0,T]}^\mathrm{equil} = \frac{1}{T_{t_0}} \left[ \expect{a_t^2} - \expect{a_t}^2 \right]} \nonumber \\
 \mbox{} &+& \frac{2}{T_{t_0}} \sum_{n=1}^{T-t_0} \left(\frac{T_{t_0}-n}{T_{t_0}}\right) \left[ \expect{a_t a_{t+n}} - \expect{a_t}\expect{a_{t+n}} \right]  \nonumber \\
-&\equiv& \frac{\sigma_{t_0}^2}{T_{t_0}}(1 + 2 \tau_{t_0}) = \frac{\sigma_{t_0}^2}{T_{t_0}/g_{t_0}} ,
+&\equiv& \frac{\sigma_{t_0}^2}{T_{t_0}/g_{t_0}} ,
 \end{eqnarray}
-where the variance $\sigma^2$, statistical inefficiency $g$, and integrated autocorrelation time $\tau$ (in units of the sampling interval) are given by
+where the variance $\sigma^2$ and statistical inefficiency $g$ (in units of the sampling interval $\tau$) are given by
 \begin{eqnarray}
 \sigma^2 &\equiv& \expect{a_t^2} - \expect{a_t}^2 \label{equation:variance-definition} , \\
-\tau &\equiv& \sum_{t=1}^{T-1} \left(1 - \frac{t}{T}\right) C_t \label{equation:integrated-autocorrelation-time-definition} , \\
-g &\equiv& 1 + 2 \tau \label{equation:statistical-inefficiency-definition} ,
+g &\equiv& 1 + 2 \tau_\mathrm{eq} \label{equation:statistical-inefficiency-definition} ,
+\end{eqnarray}
+integrated autocorrelation time $\tau_\mathrm{ac}$ given by
+\begin{eqnarray}
+\tau_\mathrm{eq} &\equiv& \sum_{t=1}^{T-1} \left(1 - \frac{t}{T}\right) C_t \label{equation:integrated-autocorrelation-time-definition} , \\
 \end{eqnarray}
 with the discrete-time normalized fluctuation autocorrelation function $C_t$ defined as
 \begin{eqnarray}
@@ -359,7 +399,7 @@ C_t &\equiv& \frac{\expect{a_n a_{n+t}} - \expect{a_n}^2}{\expect{a_n^2} - \expe
 \end{eqnarray}
 In practice, it is difficult to estimate $C_t$ for $t \sim T$, due to growth in the statistical error, so common estimators of $g$ make use of several additional properties of $C_t$ to provide useful estimates (see \emph{Practical Computation of Statistical Inefficiencies}).
 
-The $t_0$ subscript for the variance $\sigma^2$, the integrated autocorrelation time $\tau$, and the statistical inefficiency $t_0$ mean that these quantities are only estimated over the production portion of the timeseries, $\{a_t\}_{t=t_0}^T$.
+The $t_0$ subscript for the variance $\sigma^2$, the integrated autocorrelation time $\tau_\mathrm{ac}$, and the statistical inefficiency $g$ mean that these quantities are only estimated over the production portion of the timeseries, $\{a_t\}_{t=t_0}^T$.
 Since we assumed that the bias was eliminated by judicious choice of the equilibration time $t_0$, this estimate of the statistical error will be poor for choices of $t_0$ that are too small.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -463,6 +503,7 @@ All scripts used to retrieve the software versions used here, run the simulation
 
 To model liquid argon, the {\tt LennardJonesFluid} model system in the \href{http://github.com/choderalab/openmmtools}{openmmtools} package\footnote{available at \url{http://github.com/choderalab/openmmtools}} was used with parameters appropriate for liquid argon ($\sigma = $ 3.4 \AA, $\epsilon = $ 0.238 kcal/mol).
 All results are reported in reduced (dimensionless) units.
+Initial dense liquid geometries were generated via a Sobol' subrandom sequence~\cite{sobol:1967:ussr-comput-maths-math-phys:sobol-subrandom-sequence}, as generated by the {\tt subrandom\_particle\_positions} method in {\tt openmmtools}. 
 A cubic switching function was employed, with the potential gently switched to zero over $r \in [\sigma, 3 \sigma]$, and a long-range isotropic dispersion correction accounting for this switching behavior used to include neglected contributions.
 Simulations were performed using a periodic box of $N = 500$ atoms at reduced temperature $T^* \equiv k_B T / \epsilon = 0.850$ and reduced pressure $p^* \equiv p \sigma^3 / \epsilon = 1.266$ using a Langevin integrator~\cite{sivak-chodera-crooks:jpcb:2014:vvvr} with timestep $\Delta t = 0.01 \tau$ and collision rate $\nu = \tau^{-1}$, with characteristic oscillation timescale $\tau = \sqrt{m r_0^2 / 72 \epsilon}$ and $r_0 = 2^{1/6} \sigma$~\cite{liquid-argon-characteristic-timescale}.
 All times are reported in multiples of the characteristic timescale $\tau$.
