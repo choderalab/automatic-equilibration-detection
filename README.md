@@ -13,7 +13,7 @@ A preprint manuscript of this work is available [on bioRxiv](http://biorxiv.org/
 ## Reproducing the results
 
 * Check out a copy of this repository, or [download a release](https://github.com/choderalab/automatic-equilibration-detection/releases) corresponding to the version of the paper of interest.
-* Go to `examples/liquid-argon-density/` and check the `README.md` for instructions on running the `./reproduce.sh` script.
+* Go to `examples/liquid-argon/` and check the `README.md` for instructions on running the `./reproduce.sh` script.
 
 ## Automatically computing equilibration times
 
